@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.holon-platform.jpa</groupId>
+		<artifactId>holon-datastore-jpa-root</artifactId>
+		<version>5.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>holon-datastore-jpa-bom</artifactId>
+	<packaging>pom</packaging>
+
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Holon Datastore JPA (Bill of Materials)</description>
+
+	<url>https://holon-platform.com</url>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>com.holon-platform.jpa</groupId>
+				<artifactId>holon-datastore-jpa</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.holon-platform.jpa</groupId>
+				<artifactId>holon-datastore-jpa-spring</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.holon-platform.jpa</groupId>
+				<artifactId>holon-datastore-jpa-spring-boot</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- Spring boot starters -->
+			<dependency>
+				<groupId>com.holon-platform.jpa</groupId>
+				<artifactId>holon-starter-hibernate</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.holon-platform.jpa</groupId>
+				<artifactId>holon-starter-eclipselink</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+</project>

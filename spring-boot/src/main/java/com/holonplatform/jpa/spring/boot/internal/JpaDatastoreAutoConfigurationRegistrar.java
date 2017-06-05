@@ -1,0 +1,90 @@
+/*
+ * Copyright 2000-2016 Holon TDCN.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package com.holonplatform.jpa.spring.boot.internal;
+
+import javax.persistence.EntityManagerFactory;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
+
+import com.holonplatform.core.datastore.Datastore;
+import com.holonplatform.jpa.spring.internal.JpaDatastoreRegistrar;
+import com.holonplatform.spring.internal.PrimaryMode;
+
+/**
+ * Registrar for JPA {@link Datastore} beans registration.
+ * 
+ * @since 5.0.0
+ */
+public class JpaDatastoreAutoConfigurationRegistrar
+		implements ImportBeanDefinitionRegistrar, BeanFactoryAware, BeanClassLoaderAware {
+
+	private BeanFactory beanFactory;
+
+	private ClassLoader beanClassLoader;
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
+	 */
+	@Override
+	public void setBeanClassLoader(ClassLoader classLoader) {
+		this.beanClassLoader = classLoader;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+	 */
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.springframework.
+	 * core.type.AnnotationMetadata, org.springframework.beans.factory.support.BeanDefinitionRegistry)
+	 */
+	@Override
+	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
+		// Register JPA Datastore (transactional)
+		if (beanFactory instanceof ListableBeanFactory) {
+			String[] emfBeanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
+					(ListableBeanFactory) beanFactory, EntityManagerFactory.class, true, false);
+			if (emfBeanNames == null || emfBeanNames.length == 0) {
+				emfBeanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ListableBeanFactory) beanFactory,
+						AbstractEntityManagerFactoryBean.class, true, false);
+			}
+			if (emfBeanNames != null && emfBeanNames.length == 1) {
+				String emfBeanName = (emfBeanNames[0].startsWith("&")) ? emfBeanNames[0].substring(1) : emfBeanNames[0];
+				JpaDatastoreRegistrar.registerDatastore(registry, null, PrimaryMode.AUTO, emfBeanName, true, false,
+						beanClassLoader);
+			}
+		}
+	}
+
+}
