@@ -1,0 +1,120 @@
+== Datastore
+
+The link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.html[JpaDatastore^] interface represents the *JPA Datastore*, which extends the core *Datastore* interface.
+
+The `withEntityManager` method can be used to execute a JPA operation using a Datastore managed link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager], providing the operation execution code through the `EntityManagerOperation` functional interface. Any `EntityManager` initialization and finalization operation is executed by the JPA Datastore before and after the execution of the provided operation.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=wem,indent=0]
+----
+
+IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core *Datastore* interface should be used as a reference for persistence operations, instead of the specific *JpaDatastore* interface. This way, the concrete Datastore implementation may be replaced by a different one at any time, without any change to rest of the code.
+
+=== Setup
+
+The JPA Datastore supports the default Datastore configuration property:
+
+* `holon.datastore.trace`: To enable/disable Datastore operations tracing
+
+To create a *JpaDatastore* instance, the `builder()` static method of the interface can be used.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=setup,indent=0]
+----
+<1> Set the `EntityManagerFactory` to use
+<2> Set the `autoFlush` mode to `true`, i.e. `EntityManager.flush()` is invoked after any Datastore data manipulation operation
+<3> Enable the `trace` mode to log the `JPQL` queries and operation performed by the Datastore
+<4> Set the `EntityManagerFactory` to use
+<5> Provide a custom `EntityManagerInitializer` to control how the `EntityManager` instances are obtained from the `EntityManagerFactory`
+<6> Provide a custom `EntityManagerFinalizer` to control how the `EntityManager` instances are finalized after Datastore operations executions
+<7> Set the `EntityManagerFactory` to use
+<8> Build a Datastore bound to a specific _data context id_ named `test`
+<9> Set a Datastore configuration property source using the `datastore.properties` file
+
+=== Data targets and paths
+
+The JPA `Datastore` relies on the following conventions regarding *DataTarget*s and *Path*s:
+
+* The *DataTarget* _name_ is interpreted as the JPA _entity_ name (i.e. the simple Entity class name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation)
+* The *Path* _name_ is interpreted as a JPA _entity_ attribute name, supporting nested classes through the conventional _dot_ notation (e.g. `address.city`)
+
+TIP: See the core link:../../holon-core/core.html#Datastore[Datastore] documentation for more informations about *DataTarget*s and *Path*s, and about the use of extension hooks such as *DataTargetResolver* for target names resolution.
+
+=== JpaTarget
+
+The link:{apidir}/com/holonplatform/datastore/jpa/JpaTarget.html[JpaTarget^] interface can be used to define a *DataTarget* using a JPA _entity_ class rather than an entity name. The entity name used in persistence operations will be the provided entity class simple name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation, if available.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=jpatarget,indent=0]
+----
+<1> Create a `DataTarget` bound to given `Test` JPA entity class using the `JpaTarget` interface
+
+=== JPA Write options
+
+The additional `WriteOption` link:{apidir}/com/holonplatform/datastore/jpa/JpaWriteOption.html#FLUSH[JpaWriteOption.FLUSH^] is supported by the JPA Datastore, and can be used to synchronize the persistence context to the underlying database after a data manipulation operation, automatically calling the `EntityManager.flush()` method.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=flush,indent=0]
+----
+
+=== Relational expressions
+
+As a _relational_ Datastore, the JPA Datastore supports core relational expressions for data access and manipulation:
+
+*1. Sub-query:*
+
+The link:{apidir}/com/holonplatform/core/datastore/relational/SubQuery.html[SubQuery^] interface can be used to represent a _sub-query_,  which can be used in a query definition to express query restrictions (filters) that involve a sub-query as filter operand.
+
+See the link:../../holon-core/core.html#subquery[Sub query documentation] for further information and code examples.
+
+*2. Alias and Joins:*
+
+The link:{apidir}/com/holonplatform/core/datastore/relational/RelationalTarget.html[RelationalTarget^] interface can be used to express *alias* and *joins* for a `DataTarget`.
+
+See the link:../../holon-core/core.html#joins[Alias and Joins documentation] for further information and code examples.
+
+=== Auto-generated ids
+
+The JPA datastore support the retrieving of auto-generated id column values, if supported by the underlying JDBC driver and ORM platform.
+
+The auto-generated id values can be obtained from the `OperationResult` object, returned by Datastore data manipulation operations, through the `getInsertedKeys()` method.
+
+The default *BRING_BACK_GENERATED_IDS* `WriteOption` can be provided to Datastore data manipulation method to bring back any auto-generated id value into the `PropertyBox` which was subject of the operation, if a corresponding `Property` (using the property name) is available in the box property set.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=ids,indent=0]
+----
+<1> The `id` column is supposed to be auto-generated by the ORM/database
+<2> Create the `PropertyBox` to insert, not providing the `id` value
+<3> Execute the insert operation using the *BRING_BACK_GENERATED_IDS* write option and the *FLUSH* JPA write option to ensure the id auto-generation is triggered
+<4> The `ID` property of the inserted PropertyBox is updated with the auto-generated value
+
+=== Extensions
+
+=== Expression resolvers
+
+The JPA Datastore supports `ExpressionResolver` automatic registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreExpressionResolver.html[JpaDatastoreExpressionResolver^] base type and default _Java service extensions_.
+
+To automatically register an `ExpressionResolver` this way, a class implementing `JpaDatastoreExpressionResolver` has to be created and its qualified full name must be specified in a file named `com.holonplatform.datastore.jpa.config.JpaDatastoreExpressionResolver` placed in a `META-INF/services` folder in classpath.
+
+[[CommodityFactories]]
+=== Commodity factories
+
+The JPA Datastore supports `DatastoreCommodityFactory` automatic registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityFactory.html[JpaDatastoreCommodityFactory^] base type and default _Java service extensions_.
+
+To automatically register an `DatastoreCommodityFactory` this way, a class implementing `JpaDatastoreCommodityFactory` has to be created and its qualified full name must be specified in a file named `com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory` placed in a `META-INF/services` folder in classpath.
+
+The link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityContext.html[JpaDatastoreCommodityContext^] interface represents the JPA Datastore specific commodity context and it is provided at commodity creation time to the factories.
+
+The context extends the `JpaDatastore` interface itself and provides the following additional resources:
+
+* The `EntityManagerFactory` bound the JPA Datastore;
+* A `getEntityManager()` method to obtain a `EntityManager` instance;
+* The `ORMPlatform` used by the JPA Datastore, if available;
+* Whether the Datastore _auto-flush_ mode is enabled.
+* Whether the Datastore _trace_ mode is enabled.

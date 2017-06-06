@@ -1,8 +1,50 @@
 = Holon JPA Datastore
 :revnumber: {project-version}
-
-Todo documentation.
+:apidir: ../../api/holon-datastore-jpa
+:linkattrs:
+:sectnums:
+:toc: left
+:toclevels: 3
 
 == Introduction
 
-The introduction goes here.
+The Holon *JPA Datastore* is the _Java Persistence API_ reference implementation of the link:../../api/holon-core/com/holonplatform/core/datastore/Datastore.html[Datastore^] abstraction. 
+
+TIP: See the link:../../holon-core/core.html#Datastore[Datastore] documentation for further informations about Datastores.
+
+This `Datastore` uses the JPA link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] interface as a factory to obtain link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager] instances, used by the `Datastore` to perform persistence operations and queries through the `JPQL` language.
+
+The `holon-datastore-jpa` artifact is the main entry point to use the JPA Datastore.
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-datastore-jpa</artifactId>
+<version>{revnumber}</version>
+----
+
+NOTE: To use a JPA Datastore, an link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] instance must be configured and available. `EntityManagerFactory` setup (including any ORM platform configuration concerns) is beyond the scope of this documentation.
+
+include::holon-datastore-jpa/_datastore.adoc[]
+
+include::holon-datastore-jpa/_spring.adoc[]
+
+== Maven BOM
+
+A Maven _Bill of materials_ (BOM) artifact which provides all available dependencies for the JPA Datastore module is available:
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-datastore-jpa-bom</artifactId>
+<version>{revnumber}</version>
+----
+
+== Loggers
+
+By default, the Holon platform uses the https://www.slf4j.org[SLF4J^] API for logging. The use of SLF4J is optional: it is enabled when the presence of SLF4J is detected in the classpath. Otherwise, logging will fall back to JUL (`java.util.logging`).
+
+The logger name for the *JPA Datastore* module is `com.holonplatform.datastore.jpa`.
+

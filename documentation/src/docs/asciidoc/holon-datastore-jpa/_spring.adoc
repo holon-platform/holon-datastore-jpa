@@ -1,0 +1,95 @@
+== Spring framework integration
+
+The `holon-datastore-jpa-spring` artifact provides integration with the https://spring.io[Spring^] framework for the JPA Datastore.
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-datastore-jpa-spring</artifactId>
+<version>{revnumber}</version>
+----
+
+=== Datastore setup
+
+To create a JPA Datastore and register it as a Spring bean, the link:{apidir}/com/holonplatform/jpa/spring/SpringJpaDatastore.html[SpringJpaDatastore^] interface is provided, with the convenience `builder()` method.
+
+This interface creates and represents a JPA Datastore implementation wich supports Spring JPA and JTA transaction management architecture, using a Spring _transactional EntityManager proxy_ as Datastore `EntityManager`.
+
+=== Datastore auto-configuration
+
+The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpaDatastore.html[EnableJpaDatastore^] 
+annotation can be used on Spring configuration classes to enable automatic JPA Datastore configuration. An available `EntityManagerFactory` type bean must be present in context to enable the JPA Datastore.
+
+The _data context id_ to which the JPA Datastore is bound can be configured using the `dataContextId` annotation attribute, useful when multiple JPA persistence units are available and it is required to configure multiple JPA Datastore instances.
+
+When a _data context id_ is not specified, the JPA Datastore is bound to the unique `EntityManagerFactory` type bean registered in context. If the bean is not unique or is not present, a configuration error is thrown. The `entityManagerFactoryReference` annotation attribute can be used to specify the explicit `EntityManagerFactory` bean name to use for the JPA Datastore.
+
+When a _data context id_ is specified, the registered Datastore is bound to the `EntityManagerFactory` with a matching
+_data context id_, if available. During registration phase, if a `entityManagerFactoryReference` is not specified, an `EntityManagerFactory` bean is searched in context using the bean name pattern: `entityManagerFactory_[datacontextid]` where `[datacontextid]` is equal to the 
+`dataContextId` annotation attribute.
+
+The _auto-flush_ mode can be specified using the `autoFlush` annotation attribute.
+
+The `transactional` annotation attribute (`true` by default) can be used to control the Spring transactions architecture integration, i.e. if a `Transactional` behaviour must be configured for the JPA Datastore data manipulation methods, to automatically create or partecipate in a Spring transaction when these methods are invoked. 
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=spring,indent=0]
+----
+
+=== Commodity factories
+
+To use the `DatastoreCommodityFactory` annotation on beans to automatically register them into the `Datastore`, the `JpaDatastoreCommodityFactory` base type must be used for such beans.
+
+See <<CommodityFactories>> for additional details about the `JpaDatastoreCommodityFactory` type.
+
+== Spring Boot integration
+
+The `holon-datastore-jpa-spring-boot` artifact provides integration with https://projects.spring.io/spring-boot[Spring Boot^] for JPA Datastore auto-configuration.
+
+To enable Spring Boot auto-configuration the following artifact must be included in your project dependencies:
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-datastore-jpa-spring-boot</artifactId>
+<version>{revnumber}</version>
+----
+
+The JPA datastore is auto-configured only when:
+
+* A `JpaDatastore` type bean is not already registered in Spring context
+* A valid `EntityManagerFactory` type bean is available in Spring context
+
+To disable this auto-configuration feature the `JpaDatastoreAutoConfiguration` class can be excluded:
+
+[source, java]
+----
+@EnableAutoConfiguration(exclude={JpaDatastoreAutoConfiguration.class})
+----
+
+=== Spring Boot starters
+
+The following _starter_ artifacts are available to provide a quick project configuration setup using Maven dependency system:
+
+*1.* *JPA Datastore starter using Hibernate* provides the dependencies to the Holon JPA Datastore Spring Boot integration artifacts, in addition to default Holon _core_ Spring Boot starters (see the documentation for further information) and base Spring Boot starter (`spring-boot-starter`). Futhermore, this starter provides the *Hibernate ORM* and the *HikariCP* DataSource dependencies.
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-starter-jpa-datastore-hibernate</artifactId>
+<version>{revnumber}</version>
+----
+
+*2.* *JPA Datastore starter using Eclipselink* provides the dependencies to the Holon JPA Datastore Spring Boot integration artifacts, in addition to default Holon _core_ Spring Boot starters (see the documentation for further information) and base Spring Boot starter (`spring-boot-starter`). Futhermore, this starter provides the *Eclipselink ORM* and the *HikariCP* DataSource dependencies.
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-starter-jpa-datastore-eclipselink</artifactId>
+<version>{revnumber}</version>
+----
