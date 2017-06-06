@@ -38,12 +38,12 @@
 			<!-- Spring boot starters -->
 			<dependency>
 				<groupId>com.holon-platform.jpa</groupId>
-				<artifactId>holon-starter-hibernate</artifactId>
+				<artifactId>holon-starter-jpa-hibernate</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.holon-platform.jpa</groupId>
-				<artifactId>holon-starter-eclipselink</artifactId>
+				<artifactId>holon-starter-jpa-eclipselink</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

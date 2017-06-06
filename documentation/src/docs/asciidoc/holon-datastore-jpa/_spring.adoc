@@ -80,7 +80,7 @@ _Maven coordinates_:
 [source, xml, subs="attributes+"]
 ----
 <groupId>com.holon-platform.jpa</groupId>
-<artifactId>holon-starter-jpa-datastore-hibernate</artifactId>
+<artifactId>holon-starter-jpa-hibernate</artifactId>
 <version>{revnumber}</version>
 ----
 
@@ -90,6 +90,6 @@ _Maven coordinates_:
 [source, xml, subs="attributes+"]
 ----
 <groupId>com.holon-platform.jpa</groupId>
-<artifactId>holon-starter-jpa-datastore-eclipselink</artifactId>
+<artifactId>holon-starter-jpa-eclipselink</artifactId>
 <version>{revnumber}</version>
 ----
