@@ -20,14 +20,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 
 import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.config.ConfigPropertySet;
 import com.holonplatform.core.datastore.DataContextBound;
 import com.holonplatform.core.internal.config.DefaultConfigPropertySet;
 import com.holonplatform.core.internal.utils.ClassUtils;
-import com.holonplatform.core.query.Query;
 import com.holonplatform.jdbc.DatabasePlatform;
 
 /**
@@ -66,14 +64,6 @@ public interface JpaConfigProperties extends ConfigPropertySet, DataContextBound
 	 * Set JPA ORM platform to use. Must be one of the names enumerated in {@link ORMPlatform}.
 	 */
 	static final ConfigProperty<ORMPlatform> ORM_PLATFORM = ConfigProperty.create("orm", ORMPlatform.class);
-
-	/**
-	 * {@link Query} parameter to set lock mode (use {@link Query#parameter(String, Object)} to set query parameters).
-	 * <p>
-	 * Value must be {@link LockModeType} enum value.
-	 * </p>
-	 */
-	public static final String QUERY_PARAMETER_LOCK_MODE = "jpaQueryLockMode";
 
 	/**
 	 * Enumeration for common ORM platforms

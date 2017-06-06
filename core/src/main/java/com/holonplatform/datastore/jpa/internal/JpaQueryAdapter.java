@@ -29,7 +29,7 @@ import com.holonplatform.core.query.Query.QueryBuildException;
 import com.holonplatform.core.query.QueryConfiguration;
 import com.holonplatform.core.query.QueryProjection;
 import com.holonplatform.core.query.QueryResults.QueryExecutionException;
-import com.holonplatform.datastore.jpa.JpaConfigProperties;
+import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.JpaQueryHint;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLQueryComposition;
@@ -115,7 +115,7 @@ public class JpaQueryAdapter implements QueryAdapter<QueryConfiguration> {
 
 			configuration.getParameter(JpaQueryHint.QUERY_PARAMETER_HINT, JpaQueryHint.class)
 					.ifPresent(p -> q.setHint(p.getName(), p.getValue()));
-			configuration.getParameter(JpaConfigProperties.QUERY_PARAMETER_LOCK_MODE, LockModeType.class)
+			configuration.getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE, LockModeType.class)
 					.ifPresent(p -> q.setLockMode(p));
 
 			JpaDatastoreUtils.setupQueryParameters(q, resolutionContext);
