@@ -794,12 +794,11 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 
 		/*
 		 * (non-Javadoc)
-		 * @see
-		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#setEntityManagerFinalizer(com.holonplatform.datastore.
+		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerFinalizer(com.holonplatform.datastore.
 		 * jpa.JpaDatastore.EntityManagerFinalizer)
 		 */
 		@Override
-		public JpaDatastore.Builder<D> setEntityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
+		public JpaDatastore.Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
 			datastore.setEntityManagerFinalizer(entityManagerFinalizer);
 			return this;
 		}

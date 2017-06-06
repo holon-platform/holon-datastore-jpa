@@ -96,7 +96,7 @@ public interface JpaDatastore extends Datastore, DatastoreCommodityRegistrar<Jpa
 		 * @param entityManagerFinalizer the {@link EntityManagerFinalizer} to set
 		 * @return this
 		 */
-		Builder<D> setEntityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer);
+		Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer);
 
 		/**
 		 * Set whether to auto-flush mode is enabled. When auto-flush mode is enabled, {@link EntityManager#flush()} is
