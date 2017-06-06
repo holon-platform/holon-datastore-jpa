@@ -28,7 +28,7 @@ import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler;
 import com.holonplatform.core.ExpressionResolver.ResolutionContext;
 import com.holonplatform.core.internal.utils.ObjectUtils;
-import com.holonplatform.datastore.jpa.JpaConfigProperties.ORMPlatform;
+import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
 
 /**

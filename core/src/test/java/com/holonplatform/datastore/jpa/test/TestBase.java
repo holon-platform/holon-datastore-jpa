@@ -40,8 +40,7 @@ import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.internal.property.EnumByOrdinalConverter;
 import com.holonplatform.core.internal.utils.TestUtils;
 import com.holonplatform.core.temporal.TemporalType;
-import com.holonplatform.datastore.jpa.JpaConfigProperties;
-import com.holonplatform.datastore.jpa.JpaConfigProperties.ORMPlatform;
+import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.JpaPropertyConfiguration;
 import com.holonplatform.datastore.jpa.test.domain.TestJpaDomain;
 import com.holonplatform.jdbc.DataSourceBuilder;
@@ -83,12 +82,9 @@ public class TestBase {
 	private EntityManager entityManager;
 
 	@Test
-	public void testBase() {
-		TestUtils.checkEnum(JpaConfigProperties.ORMPlatform.class);
-	}
-
-	@Test
 	public void testORM() {
+
+		TestUtils.checkEnum(ORMPlatform.class);
 
 		ORMPlatform ptf = ORMPlatform.detectFromClasspath();
 		assertNotNull(ptf);

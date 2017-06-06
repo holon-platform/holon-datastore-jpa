@@ -21,8 +21,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.datastore.DatastoreCommodityContext;
-import com.holonplatform.datastore.jpa.JpaConfigProperties.ORMPlatform;
 import com.holonplatform.datastore.jpa.JpaDatastore;
+import com.holonplatform.datastore.jpa.ORMPlatform;
 
 /**
  * JPA Datastore {@link DatastoreCommodityContext}.

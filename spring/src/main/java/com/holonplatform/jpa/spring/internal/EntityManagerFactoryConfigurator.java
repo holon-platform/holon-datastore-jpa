@@ -44,7 +44,7 @@ import org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter;
 
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ObjectUtils;
-import com.holonplatform.datastore.jpa.JpaConfigProperties.ORMPlatform;
+import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.jdbc.DatabasePlatform;
 

@@ -13,19 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.datastore.jpa;
+package com.holonplatform.jpa.spring;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-
-import javax.persistence.EntityManager;
 
 import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.config.ConfigPropertySet;
 import com.holonplatform.core.datastore.DataContextBound;
 import com.holonplatform.core.internal.config.DefaultConfigPropertySet;
-import com.holonplatform.core.internal.utils.ClassUtils;
+import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.jdbc.DatabasePlatform;
 
 /**
@@ -64,107 +60,7 @@ public interface JpaConfigProperties extends ConfigPropertySet, DataContextBound
 	 * Set JPA ORM platform to use. Must be one of the names enumerated in {@link ORMPlatform}.
 	 */
 	static final ConfigProperty<ORMPlatform> ORM_PLATFORM = ConfigProperty.create("orm", ORMPlatform.class);
-
-	/**
-	 * Enumeration for common ORM platforms
-	 */
-	public enum ORMPlatform {
-
-		HIBERNATE("org.hibernate.Session", "org.hibernate.ejb.HibernateEntityManager"),
-
-		ECLIPSELINK("org.eclipse.persistence.jpa.JpaEntityManager"),
-
-		OPENJPA("org.apache.openjpa.persistence.OpenJPAEntityManager"),
-
-		DATANUCLEUS("org.datanucleus.jpa.EntityManagerImpl", "org.datanucleus.ObjectManager",
-				"org.datanucleus.ObjectManagerImpl"),
-
-		BATOO("org.batoo.jpa.core.impl.manager.EntityManagerImpl");
-
-		/*
-		 * EntitManager delegates class names
-		 */
-		private final List<String> delegates;
-
-		/**
-		 * @param delegates
-		 */
-		private ORMPlatform(String... delegates) {
-			this.delegates = Arrays.asList(delegates);
-		}
-
-		/**
-		 * EntitManager delegates class names
-		 * @return Delegates class names
-		 */
-		public List<String> getDelegates() {
-			return delegates;
-		}
-
-		/**
-		 * Try to detect ORM platform to use form classpath
-		 * @return Detected ORMPlatform, or <code>null</code> if not found
-		 * @throws IllegalStateException If more than one ORM provide is found in classpath
-		 */
-		public static ORMPlatform detectFromClasspath() throws IllegalStateException {
-			ORMPlatform platform = null;
-			for (ORMPlatform p : values()) {
-				for (String className : p.getDelegates()) {
-					try {
-						Class.forName(className);
-						if (platform != null) {
-							throw new IllegalStateException(
-									"More than one ORM provider found in classpath: " + platform + ", " + p);
-						}
-						platform = p;
-					} catch (@SuppressWarnings("unused") Exception e) {
-						// not found
-					}
-				}
-			}
-			return platform;
-		}
-
-		/**
-		 * Determines the ORMPlatform from the given {@link EntityManager}
-		 * @param em EntityManager (must be not null)
-		 * @return Resolved ORMPlatform. If none of know platforms match, <code>null</code> is returned
-		 */
-		public static ORMPlatform resolve(EntityManager em) {
-			if (em == null) {
-				throw new IllegalArgumentException("Null EntityManager");
-			}
-			for (ORMPlatform platform : values()) {
-				for (String entityManagerClassName : platform.getDelegates()) {
-
-					if (isEntityManagerOfType(em, entityManagerClassName)) {
-						return platform;
-					}
-				}
-			}
-			return null;
-		}
-
-		/**
-		 * Returns whether the given {@link EntityManager} is of the given type.
-		 * @param em EntityManager (must be not null)
-		 * @param type the fully qualified expected EntityManager type
-		 * @return True if type match
-		 */
-		private static boolean isEntityManagerOfType(EntityManager em, String type) {
-			try {
-				Class<?> emType = ClassUtils.forName(type, em.getDelegate().getClass().getClassLoader());
-				if (emType.isAssignableFrom(em.getDelegate().getClass())) {
-					return true;
-				}
-			} catch (@SuppressWarnings("unused") Exception e) {
-				// ignore
-			}
-			return false;
-		}
-
-	}
-
+	
 	/**
 	 * Builder to create property set instances bound to a property data source.
 	 * @param dataContextId Optional data context id to which DataSource is bound

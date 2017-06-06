@@ -46,7 +46,7 @@ import com.holonplatform.core.query.FunctionExpression;
 import com.holonplatform.core.query.PathExpression;
 import com.holonplatform.core.query.PropertySetProjection;
 import com.holonplatform.core.query.QueryExpression;
-import com.holonplatform.datastore.jpa.JpaConfigProperties.ORMPlatform;
+import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.converters.BeanResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.BeanTupleConverter;

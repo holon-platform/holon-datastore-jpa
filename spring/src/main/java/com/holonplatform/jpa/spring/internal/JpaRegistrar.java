@@ -44,13 +44,13 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import com.holonplatform.core.datastore.DatastoreConfigProperties;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.datastore.jpa.JpaConfigProperties;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.jdbc.DataSourceConfigProperties;
 import com.holonplatform.jdbc.DatabasePlatform;
 import com.holonplatform.jdbc.spring.EnableDataSource;
 import com.holonplatform.jdbc.spring.internal.DataSourceRegistrar;
 import com.holonplatform.jpa.spring.EnableJpa;
+import com.holonplatform.jpa.spring.JpaConfigProperties;
 import com.holonplatform.spring.EnvironmentConfigPropertyProvider;
 import com.holonplatform.spring.internal.AbstractConfigPropertyRegistrar;
 import com.holonplatform.spring.internal.BeanRegistryUtils;
