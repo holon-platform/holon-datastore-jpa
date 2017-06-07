@@ -60,6 +60,14 @@
 			<version>${bytebuddy.version}</version>
 		</dependency>
 
+		<!-- JPA 2.1 API -->
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<version>${hibernate.jpa.api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- ORMs -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -70,7 +78,7 @@
 		<!-- EclipseLink -->
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>org.eclipse.persistence.core</artifactId>
+			<artifactId>org.eclipse.persistence.jpa</artifactId>
 			<version>${eclipselink.version}</version>
 			<optional>true</optional>
 		</dependency>
