@@ -60,7 +60,7 @@ public interface JpaConfigProperties extends ConfigPropertySet, DataContextBound
 	 * Set JPA ORM platform to use. Must be one of the names enumerated in {@link ORMPlatform}.
 	 */
 	static final ConfigProperty<ORMPlatform> ORM_PLATFORM = ConfigProperty.create("orm", ORMPlatform.class);
-	
+
 	/**
 	 * Builder to create property set instances bound to a property data source.
 	 * @param dataContextId Optional data context id to which DataSource is bound
@@ -89,10 +89,6 @@ public interface JpaConfigProperties extends ConfigPropertySet, DataContextBound
 			super((dataContextId != null && !dataContextId.trim().equals("")) ? (DEFAULT_NAME + "." + dataContextId)
 					: DEFAULT_NAME);
 			this.dataContextId = (dataContextId != null && !dataContextId.trim().equals("")) ? dataContextId : null;
-			if (dataContextId == null) {
-				// add alias for spring config
-				addAliasName("spring.jpa");
-			}
 		}
 
 		/*
