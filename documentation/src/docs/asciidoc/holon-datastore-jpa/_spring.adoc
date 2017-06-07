@@ -10,6 +10,7 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
+[[SpringJpaDatastore]]
 === Datastore setup
 
 To create a JPA Datastore and register it as a Spring bean, the link:{apidir}/com/holonplatform/jpa/spring/SpringJpaDatastore.html[SpringJpaDatastore^] interface is provided, with the convenience `builder()` method.
@@ -108,16 +109,72 @@ See link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJp
 
 ==== `EnableJpa`: JPA Datastore configuration
 
-. TODO
+By defaut, using the `EnableJpa` annotation a JPA Datastore is automatically created and configured suing the `EntityManagerFactory` of the JPA beans stack. The JPA Datastore instanc will be a <<SpringJpaDatastore>>, enabling all the Spring-related auto-configuration features described above.
+
+To disable automatic JPA Datastore configuration, the `enableDatastore` annotation attribute can be used.
+
+The `EnableJpa` annotation makes available two additional configuration attributes related to the JPA Datastore setup:
+
+* `autoFlush` : to enable the JPA Datastore _auto flush_ mode. When auto-flush mode is enabled,
+the `EntityManager.flush()` method is invoked after each Datastore data manipulation operation to ensure the underlying database synchronization.
+
+* `transactionalDatastore` : to add _transactional_ behaviour to
+suitable Datastore methods, i.e. to automatically create or partecipate in a transaction when methods are invoked.
 
 ==== Using _data context id_ for multiple data sources
 
-When a _data context id_ is specified through the `dataContextId` annotation attribute,
+When a _data context id_ is specified through the `dataContextId` annotation attribute, all the JPA stack beans auto-configured with the `EnableJpa` annotation are bound to the specified _data context id_ name, allowing the support for multiple data sources and persistence units.
+
+When a _data context id_ is specified:
+
+* Any configuration property (for `DataSource` or JPA beans configuration) must be provided using the _data context id_ as prefix. For example, if the _data context id_ is named `test`, the JDBC DataSource url must be specified the following way: `holon.datasource.test.url=...` and so on;
+
+* The _data context id_ will be used as persistence unit name;
+
+* Each of the auto-configured JPA stack bean will be _qualified_ using the _data context id_ name, to allow dependency injection using a Spring `Qualifier`.
+
+In case of multiple data context ids, the `primary()` attribute of the `EnableJpa` annotation can be used to mark one the JPA beans stack as primary candidate for dependency injection when a qualifier is not specified.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=multi,indent=0]
+----
 
 [[JPA configuration properties]]
 === JPA configuration properties
 
-. TODO
+link:{apidir}/com/holonplatform/jpa/spring/JpaConfigProperties.html[JpaConfigProperties^] interface provides a set of configuration properties to be used with JPA stack beans auto-configuration. Extends a default `ConfigPropertySet` bound to the property name prefix *holon.jpa*.
+
+The available configuration properties are listed below:
+
+.JPA configuration properties
+|===
+|Name |Type |Meaning
+
+|_holon.jpa._ *orm*
+|link:{apidir}/com/holonplatform/datastore/jpa/ORMPlatform.html[ORMPlatform^] enumeration
+|ORM platform to use as persistence provider.
+
+|_holon.jpa._ *dialect*
+|String
+|ORM dialect class name to use, if supported by the ORM platform.
+
+| _holon.jpa._ *database*
+|`com.holonplatform.jdbc.DatabasePlatform` enumeration
+|Database platform to which the `DataSource` is connected (auto-detected by default).
+
+|_holon.jpa._ *generate-ddl*
+|Boolean (true/false)
+|Whether to initialize the database schema on startup.
+
+|_holon.jpa._ *show-sql*
+|Boolean (true/false)
+|Whether to instruct JPA ORM engine to show executed SQL statements, if supported by ORM platform.
+|===
+
+The `JpaConfigProperties` can be loaded from a number a sources using the default `ConfigPropertySet` builder interface.
+
+Using the Spring integration, all `Environment` registered PropertySources will be enabled as a `JpaConfigProperties` source.
 
 == Spring Boot integration
 
