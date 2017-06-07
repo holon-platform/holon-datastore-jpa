@@ -22,10 +22,28 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.springframework.context.annotation.Import;
 
 import com.holonplatform.jpa.spring.boot.internal.JpaEntityScanPackages;
 
+/**
+ * Configures the base packages used by auto-configuration when scanning for JPA entity classes, when
+ * {@link EntityManagerFactory} auto-configuration is enabled.
+ * 
+ * <p>
+ * One of {@link #basePackageClasses()} or {@link #basePackages()} may be specified to define specific packages to scan.
+ * If specific packages are not defined scanning will occur from the package of the class with this annotation.
+ * </p>
+ * 
+ * <p>
+ * A data context id can be specified through the {@link #value()} attribute to declare the data context id to which
+ * this entity scan configuration is bound.
+ * </p>
+ * 
+ * @since 5.0.0
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
