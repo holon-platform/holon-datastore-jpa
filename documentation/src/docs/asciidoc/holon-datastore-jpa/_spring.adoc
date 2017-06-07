@@ -38,6 +38,12 @@ The `transactional` annotation attribute (`true` by default) can be used to cont
 include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=spring,indent=0]
 ----
 
+== Full JPA auto-configuration
+
+The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] 
+annotation can be used on Spring configuration classes to enable automatic JPA Datastore configuration. An available `EntityManagerFactory` type bean must be present in context to enable the JPA Datastore.
+
+
 === Commodity factories
 
 To use the `DatastoreCommodityFactory` annotation on beans to automatically register them into the `Datastore`, the `JpaDatastoreCommodityFactory` base type must be used for such beans.

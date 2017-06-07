@@ -20,7 +20,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.holonplatform.jdbc.spring.EnableDataSource;
 import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 
@@ -28,7 +27,6 @@ import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 public class TestEnableJpaFull extends AbstractEnableJpaTest {
 
 	@PropertySource("test.properties")
-	@EnableDataSource
 	@EnableJpa(entityPackageClasses = TestJpaDomain1.class)
 	@EnableTransactionManagement
 	@Configuration
