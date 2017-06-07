@@ -41,8 +41,8 @@ import com.holonplatform.jpa.spring.internal.JpaRegistrar;
 import com.holonplatform.spring.internal.PrimaryMode;
 
 /**
- * Annotation to be used on Spring Configuration classes to setup a full JPA enviroment bean stack: DataSource,
- * EntityManagerFactory and PlatformTransactionManager.
+ * Annotation to be used on Spring Configuration classes to setup a full JPA enviroment bean stack: DataSource (if not
+ * already available in Spring context), EntityManagerFactory and PlatformTransactionManager.
  * 
  * <p>
  * If a {@link DataSource} is not available in Spring context, a DataSource instance will be automatically configured

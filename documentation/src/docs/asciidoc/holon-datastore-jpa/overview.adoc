@@ -14,6 +14,8 @@ TIP: See the link:../../holon-core/core.html#Datastore[Datastore] documentation 
 
 This `Datastore` uses the JPA link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] interface as a factory to obtain link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager] instances, used by the `Datastore` to perform persistence operations and queries through the `JPQL` language.
 
+IMPORTANT: The Holon Platform JPA modules and components require *JPA 2.0 or higher*, so a JPA 2.0/2.1 compliant persistence provider is needed at runtime.
+
 The `holon-datastore-jpa` artifact is the main entry point to use the JPA Datastore.
 
 _Maven coordinates_:

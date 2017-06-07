@@ -38,17 +38,86 @@ The `transactional` annotation attribute (`true` by default) can be used to cont
 include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=spring,indent=0]
 ----
 
-== Full JPA auto-configuration
-
-The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] 
-annotation can be used on Spring configuration classes to enable automatic JPA Datastore configuration. An available `EntityManagerFactory` type bean must be present in context to enable the JPA Datastore.
-
-
-=== Commodity factories
+==== Commodity factories
 
 To use the `DatastoreCommodityFactory` annotation on beans to automatically register them into the `Datastore`, the `JpaDatastoreCommodityFactory` base type must be used for such beans.
 
 See <<CommodityFactories>> for additional details about the `JpaDatastoreCommodityFactory` type.
+
+=== Full JPA auto-configuration
+
+The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] 
+annotation can be used on Spring configuration classes to setup a full JPA enviroment bean stack: 
+
+* *DataSource:* If a `javax.sql.DataSource` type bean is not already registered in Spring context, a `DataSource` instance is created and configured using standard JDBC `DataSourceConfigProperties`;
+* *EntityManagerFactory:* A `javax.persistence.EntityManagerFactory` bean is registered and configured, along with a suitable Spring `JpaVendorAdapter` instance for ORM configuration;
+* *PlatformTransactionManager:* A `org.springframework.transaction.PlatformTransactionManager` bean is registered to be used within the Spring transaction infrastructure;
+* *Datastore:* A `JpaDatastore` is configured and bound to the `EntityManagerFactory` of the JPA stack.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=jpa,indent=0]
+----
+
+==== `EnableJpa`: DataSource configuration
+
+A `DataSource` type bean is automatically configured if:
+
+* A `javax.sql.DataSource` type bean is not already registered in Spring context;
+* The `dataSourceReference` attribute of the `EnableJpa` is not specified. If specified, indicates the `DataSource` bean name to use, which must be available in Spring context.
+
+In order to auto-configure the `DataSource` bean, a suitable set of configuration properties must be available in Spring environment (typically using one or more `PropertySource`).
+
+See link:../../holon-jdbc/overview.html#DataSourceConfigProperties[DataSource configuration properties^] for details.
+
+==== `EnableJpa`: EntityManagerFactory configuration
+
+A Spring `LocalContainerEntityManagerFactoryBean` instance is used as `javax.persistence.EntityManagerFactory` implementation to ensure a full integration with Spring JPA architecture and provide functionalities such as automatic JPA persistence unit configuration without the need of a `persistence.xml` configuration file.
+
+If a `persistence.xml` configuration file is not available, automatic persistence unit _entity_ classes configuration can be performed using either the annotation attribute:
+
+* `entityPackages` : providing a list of package names to scan to map JPA _entity_ classes into EntityManagerFactory,
+
+or the annotation attribute:
+
+* `entityPackageClasses` : providing a list of classes from which to obtain the package names to scan to map JPA _entity_ classes into EntityManagerFactory. Represents a type-safe alternative to `entityPackages` attribute.
+
+Two more annotation attributes are available for persistence unit configuration:
+
+* `validationMode` : Specify the JPA 2.0 validation mode for the persistence unit;
+* `sharedCacheMode` : Specify the JPA 2.0 shared cache mode for the persistence unit.
+
+See the JPA documentation for further details about persistence unit configuration.
+
+==== `EnableJpa`: Persistence provider (ORM) configuration
+
+The JPA Persistence provider (ORM) to use is auto-detected from classpath and a suitable Spring `JpaVendorAdapter` instance is configured and bound to the `EntityManagerFactory`.
+
+See link:{apidir}/com/holonplatform/datastore/jpa/ORMPlatform.html[ORMPlatform^] enumeration for a list of supported persistence provider implementations.
+
+If more than one persistence provider implementation is present in classpath (or to explicitly specify a persistence provider implementation to use, anyway) the `orm` configuration property can be used. See <<JPA configuration properties>> for details.
+
+==== `EnableJpa`: Transaction manager configuration
+
+A Spring JPA `PlatformTransactionManager` is auto-configured and bound to the 
+`EntityManagerFactory` to enable Spring's transaction infrastructure support.
+
+A set of attributes are made available by the `EnableJpa` the annotation to fine tune the transaction manager configuration: `transactionSynchronization`, `defaultTimeout`, `validateExistingTransaction`, `failEarlyOnGlobalRollbackOnly`, `rollbackOnCommitFailure`.
+
+See link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] Javadocs for informations about each of these configuration attributes.
+
+==== `EnableJpa`: JPA Datastore configuration
+
+. TODO
+
+==== Using _data context id_ for multiple data sources
+
+When a _data context id_ is specified through the `dataContextId` annotation attribute,
+
+[[JPA configuration properties]]
+=== JPA configuration properties
+
+. TODO
 
 == Spring Boot integration
 

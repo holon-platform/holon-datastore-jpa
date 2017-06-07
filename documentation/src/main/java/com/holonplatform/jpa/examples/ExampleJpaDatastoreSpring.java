@@ -27,10 +27,13 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.jdbc.spring.EnableDataSource;
+import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.EnableJpaDatastore;
+import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 
 @SuppressWarnings("unused")
 public class ExampleJpaDatastoreSpring {
@@ -65,5 +68,18 @@ public class ExampleJpaDatastoreSpring {
 
 	}
 	// end::spring[]
+
+	// tag::jpa[]
+	@PropertySource("jpa.properties")
+	@EnableJpa(entityPackageClasses = Test.class)
+	@Configuration
+	class JpaConfig {
+
+	}
+	// end::jpa[]
+
+	class Test {
+
+	}
 
 }
