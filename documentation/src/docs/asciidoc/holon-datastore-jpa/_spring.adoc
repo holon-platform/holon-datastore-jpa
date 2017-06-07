@@ -17,6 +17,7 @@ To create a JPA Datastore and register it as a Spring bean, the link:{apidir}/co
 
 This interface creates and represents a JPA Datastore implementation wich supports Spring JPA and JTA transaction management architecture, using a Spring _transactional EntityManager proxy_ as Datastore `EntityManager`.
 
+[[EnableJpaDatastore]]
 === Datastore auto-configuration
 
 The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpaDatastore.html[EnableJpaDatastore^] 
@@ -45,6 +46,7 @@ To use the `DatastoreCommodityFactory` annotation on beans to automatically regi
 
 See <<CommodityFactories>> for additional details about the `JpaDatastoreCommodityFactory` type.
 
+[[EnableJpa]]
 === Full JPA auto-configuration
 
 The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] 
@@ -178,7 +180,7 @@ Using the Spring integration, all `Environment` registered PropertySources will 
 
 == Spring Boot integration
 
-The `holon-datastore-jpa-spring-boot` artifact provides integration with https://projects.spring.io/spring-boot[Spring Boot^] for JPA Datastore auto-configuration.
+The `holon-datastore-jpa-spring-boot` artifact provides integration with https://projects.spring.io/spring-boot[Spring Boot^] for JPA stack and Datastore auto-configuration.
 
 To enable Spring Boot auto-configuration the following artifact must be included in your project dependencies:
 
@@ -190,10 +192,14 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
+=== JPA Datastore auto-configuration
+
 The JPA datastore is auto-configured only when:
 
 * A `JpaDatastore` type bean is not already registered in Spring context
 * A valid `EntityManagerFactory` type bean is available in Spring context
+
+The JPA Datastore auto-configuration behaviour is the same of the one adopted by the `EnableJpaDatastore` annotation. See <<EnableJpaDatastore>> for details.
 
 To disable this auto-configuration feature the `JpaDatastoreAutoConfiguration` class can be excluded:
 
@@ -201,6 +207,25 @@ To disable this auto-configuration feature the `JpaDatastoreAutoConfiguration` c
 ----
 @EnableAutoConfiguration(exclude={JpaDatastoreAutoConfiguration.class})
 ----
+
+=== Full JPA stack auto-configuration
+
+A full JPA beans stack is auto-configured only when:
+
+* An `EntityManagerFactory` type bean is not already registered in Spring context.
+
+The JPA stack auto-configuration behaviour is the same of the one adopted by the `EnableJpa` annotation. See <<EnableJpa>> for details.
+
+To disable this auto-configuration feature the `JpaAutoConfiguration` class can be excluded:
+
+[source, java]
+----
+@EnableAutoConfiguration(exclude={JpaAutoConfiguration.class})
+----
+
+==== JPA entities scan
+
+When the full JPA stack auto-configuration is enabled, the link:{apidir}/com/holonplatform/jpa/spring/boot/JpaEntityScan.html[JpaEntityScan^] rpeatable annotation can be used on Spring configuration classes to specify the base packages to scan for JPA entity classes.
 
 === Spring Boot starters
 
