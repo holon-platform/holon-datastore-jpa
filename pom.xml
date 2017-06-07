@@ -66,14 +66,14 @@
 		<hibernate.jpa.api.version>1.0.0.Final</hibernate.jpa.api.version>
 
 		<!-- ORM -->
-		<hibernate.version>5.2.6.Final</hibernate.version>
+		<hibernate.version>5.2.10.Final</hibernate.version>
 		<eclipselink.version>2.6.4</eclipselink.version>
 
 		<!-- Hibernate validator -->
 		<hibernate.validator.version>5.4.0.Final</hibernate.validator.version>
 
 		<!-- HikariCP -->
-		<hikaricp.version>2.6.0</hikaricp.version>
+		<hikaricp.version>2.6.2</hikaricp.version>
 
 		<!-- ByteBuddy -->
 		<bytebuddy.version>1.6.9</bytebuddy.version>
