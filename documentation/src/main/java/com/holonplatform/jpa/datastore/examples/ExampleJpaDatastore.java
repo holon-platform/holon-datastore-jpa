@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.jpa.examples;
+package com.holonplatform.jpa.datastore.examples;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
