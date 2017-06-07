@@ -42,6 +42,10 @@ import com.holonplatform.jpa.spring.boot.internal.JpaEntityScanPackages;
  * this entity scan configuration is bound.
  * </p>
  * 
+ * <p>
+ * This is a repeatable annotation.
+ * </p>
+ * 
  * @since 5.0.0
  */
 @Target(ElementType.TYPE)
