@@ -33,9 +33,9 @@ _Maven coordinates_:
 
 NOTE: To use a JPA Datastore, an link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] instance must be configured and available. `EntityManagerFactory` setup (including any ORM platform configuration concerns) is beyond the scope of this documentation.
 
-include::holon-datastore-jpa/_datastore.adoc[]
+include::_datastore.adoc[]
 
-include::holon-datastore-jpa/_spring.adoc[]
+include::_spring.adoc[]
 
 == Maven BOM
 
