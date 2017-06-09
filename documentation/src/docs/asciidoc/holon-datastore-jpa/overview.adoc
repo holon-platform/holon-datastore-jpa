@@ -3,6 +3,7 @@
 :apidir: ../../api/holon-datastore-jpa
 :linkattrs:
 :sectnums:
+:nofooter:
 :toc: left
 :toclevels: 3
 
@@ -53,4 +54,21 @@ _Maven coordinates_:
 By default, the Holon platform uses the https://www.slf4j.org[SLF4J^] API for logging. The use of SLF4J is optional: it is enabled when the presence of SLF4J is detected in the classpath. Otherwise, logging will fall back to JUL (`java.util.logging`).
 
 The logger name for the *JPA Datastore* module is `com.holonplatform.datastore.jpa`.
+
+== System requirements
+
+=== Java
+
+The Holon Platform JPA Datastore module requires https://www.java.com[Java] *8* or higher.
+
+=== JPA
+
+The *Java Persistence API version 2.0 or higher* is required for the JPA Datastore module proper use. To use most recent JPA features, such as _left joins_ and the _ON_ clause, the *Java Persistence API version 2.1* is required.
+
+=== Persistence providers
+
+Altough any JPA 2.0 or higher compliant persistence provider (ORM) is supported, the Holon Platform JPA Datastore module is tested and certified with the followings:
+
+* http://hibernate.org/orm[Hibernate ORM] version *4.x* or *5.x*
+* http://www.eclipse.org/eclipselink[EclipseLink] version *2.5 or higher*
 
