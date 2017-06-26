@@ -21,25 +21,15 @@ This `Datastore` uses the JPA link:https://docs.oracle.com/javaee/7/api/javax/pe
 
 IMPORTANT: The Holon Platform JPA modules and components require *JPA 2.0 or higher*, so a JPA 2.0/2.1 compliant persistence provider is needed at runtime.
 
-The `holon-datastore-jpa` artifact is the main entry point to use the JPA Datastore.
-
-_Maven coordinates_:
-[source, xml, subs="attributes+"]
-----
-<groupId>com.holon-platform.jpa</groupId>
-<artifactId>holon-datastore-jpa</artifactId>
-<version>{revnumber}</version>
-----
-
 NOTE: To use a JPA Datastore, an link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] instance must be configured and available. `EntityManagerFactory` setup (including any ORM platform configuration concerns) is beyond the scope of this documentation.
 
-include::_datastore.adoc[]
+== Obtaining the artifacts
 
-include::_spring.adoc[]
+The Holon Platform uses https://maven.apache.org[Maven^] for projects build and configuration. All the platform artifacts are published in the *Maven Central Repository*, so there is no need to explicitly declare additional repositories in your project `pom` file.
 
-== Maven BOM
+At the top of each _section_ of this documentation you will find the Maven _coordinates_ (group id, artifact id and version) to obtain the artifact(s) as a dependency for your project.
 
-A Maven _Bill of materials_ (BOM) artifact which provides all available dependencies for the JPA Datastore module is available:
+A *BOM (Bill Of Materials)* `pom` is provided to import the available dependencies for a specific version in your projects. The Maven coordinates for the core BOM are the following:
 
 _Maven coordinates_:
 [source, xml, subs="attributes+"]
@@ -48,6 +38,35 @@ _Maven coordinates_:
 <artifactId>holon-datastore-jpa-bom</artifactId>
 <version>{revnumber}</version>
 ----
+
+The BOM can be imported in a Maven project in the following way:
+
+[source, xml, subs="verbatim,quotes,attributes+"]
+----
+<dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>com.holon-platform.jpa</groupId>
+			<artifactId>holon-datastore-jpa-bom</artifactId>
+			<version>{revnumber}</version>
+			*<type>pom</type>*
+			*<scope>import</scope>*
+		</dependency>
+	</dependencies>
+</dependencyManagement>
+----
+
+=== Using the Platform BOM
+
+The Holon Platform provides an *overall Maven BOM (Bill of Materials)* to easily obtain all the available platform artifacts.
+
+See link:index.html#obtain-the-platform-artifacts[Obtain the platform artifacts] for details.
+
+// Inclusions
+
+include::_datastore.adoc[]
+
+include::_spring.adoc[]
 
 == Loggers
 

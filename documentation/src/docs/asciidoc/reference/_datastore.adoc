@@ -1,5 +1,15 @@
 == Datastore
 
+The `holon-datastore-jpa` artifact is the main entry point to use the JPA Datastore.
+
+_Maven coordinates_:
+[source, xml, subs="attributes+"]
+----
+<groupId>com.holon-platform.jpa</groupId>
+<artifactId>holon-datastore-jpa</artifactId>
+<version>{revnumber}</version>
+----
+
 The link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.html[JpaDatastore^] interface represents the *JPA Datastore*, which extends the core *Datastore* interface.
 
 The `withEntityManager` method can be used to execute a JPA operation using a Datastore managed link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager], providing the operation execution code through the `EntityManagerOperation` functional interface. Any `EntityManager` initialization and finalization operation is executed by the JPA Datastore before and after the execution of the provided operation.
