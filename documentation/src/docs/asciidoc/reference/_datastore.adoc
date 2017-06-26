@@ -40,7 +40,7 @@ The JPA `Datastore` relies on the following conventions regarding *DataTarget*s 
 * The *DataTarget* _name_ is interpreted as the JPA _entity_ name (i.e. the simple Entity class name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation)
 * The *Path* _name_ is interpreted as a JPA _entity_ attribute name, supporting nested classes through the conventional _dot_ notation (e.g. `address.city`)
 
-TIP: See the core link:../../holon-core/core.html#Datastore[Datastore] documentation for more informations about *DataTarget*s and *Path*s, and about the use of extension hooks such as *DataTargetResolver* for target names resolution.
+TIP: See the core link:holon-core.html#Datastore[Datastore] documentation for more informations about *DataTarget*s and *Path*s, and about the use of extension hooks such as *DataTargetResolver* for target names resolution.
 
 === JpaTarget
 
@@ -69,13 +69,13 @@ As a _relational_ Datastore, the JPA Datastore supports core relational expressi
 
 The link:{apidir}/com/holonplatform/core/datastore/relational/SubQuery.html[SubQuery^] interface can be used to represent a _sub-query_,  which can be used in a query definition to express query restrictions (filters) that involve a sub-query as filter operand.
 
-See the link:../../holon-core/core.html#subquery[Sub query documentation] for further information and code examples.
+See the link:holon-core.html#subquery[Sub query documentation] for further information and code examples.
 
 *2. Alias and Joins:*
 
 The link:{apidir}/com/holonplatform/core/datastore/relational/RelationalTarget.html[RelationalTarget^] interface can be used to express *alias* and *joins* for a `DataTarget`.
 
-See the link:../../holon-core/core.html#joins[Alias and Joins documentation] for further information and code examples.
+See the link:holon-core.html#joins[Alias and Joins documentation] for further information and code examples.
 
 === Auto-generated ids
 

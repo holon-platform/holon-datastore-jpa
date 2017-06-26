@@ -15,7 +15,7 @@ _Copies of this document may be made for your own use and for distribution to ot
 
 The Holon *JPA Datastore* is the _Java Persistence API_ reference implementation of the link:../../api/holon-core/com/holonplatform/core/datastore/Datastore.html[Datastore^] abstraction. 
 
-TIP: See the link:../../holon-core/core.html#Datastore[Datastore] documentation for further informations about Datastores.
+TIP: See the link:holon-core.html#Datastore[Datastore] documentation for further informations about Datastores.
 
 This `Datastore` uses the JPA link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] interface as a factory to obtain link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager] instances, used by the `Datastore` to perform persistence operations and queries through the `JPQL` language.
 
