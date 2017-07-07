@@ -71,6 +71,7 @@ The additional `WriteOption` link:{apidir}/com/holonplatform/datastore/jpa/JpaWr
 include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=flush,indent=0]
 ----
 
+[[Relational-expressions]]
 === Relational expressions
 
 As a _relational_ Datastore, the JPA Datastore supports core relational expressions for data access and manipulation:
