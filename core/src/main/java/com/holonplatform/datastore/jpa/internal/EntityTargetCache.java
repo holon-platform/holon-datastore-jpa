@@ -76,9 +76,14 @@ public final class EntityTargetCache implements Serializable {
 			return Optional.of(mappings.get(name));
 		}
 
-		// try to resolve
-		Optional<Class<?>> entityClass = metamodel.getEntities().stream()
-				.filter(e -> e.getJavaType().getName().equals(name)).findFirst().map(e -> e.getJavaType());
+		// try to resolve by entity name
+		Optional<Class<?>> entityClass = metamodel.getEntities().stream().filter(e -> e.getName().equals(name))
+				.findFirst().map(e -> e.getJavaType());
+		// try to resolve by entity type
+		if (!entityClass.isPresent()) {
+			entityClass = metamodel.getEntities().stream().filter(e -> e.getJavaType().getName().equals(name))
+					.findFirst().map(e -> e.getJavaType());
+		}
 
 		// cache value
 		entityClass.ifPresent(e -> ENTITY_TARGETS.computeIfAbsent(cl, c -> new HashMap<>()).put(name, e));
