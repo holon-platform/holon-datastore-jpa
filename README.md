@@ -4,10 +4,10 @@ This is the reference __JPA__ `Datastore` implementation of the [Holon Platform]
 
 The JPA Datastore relies on the following conventions regarding __DataTarget__ and __Path__ naming strategy:
 
-* The [DataTarget](https://holon-platform.com/docs/current/reference/holon-core.html#DataTarget) _name_ is interpreted as the JPA _entity_ name.
-* The [Path](https://holon-platform.com/docs/current/reference/holon-core.html#Path) _name_ is interpreted as a JPA _entity_ attribute name, supporting nested classes through the conventional _dot_ notation.
+* The [DataTarget](https://docs.holon-platform.com/current/reference/holon-core.html#DataTarget) _name_ is interpreted as the JPA _entity_ name.
+* The [Path](https://docs.holon-platform.com/current/reference/holon-core.html#Path) _name_ is interpreted as a JPA _entity_ attribute name, supporting nested classes through the conventional _dot_ notation.
 
-As a _relational Datastore_, standard [relational expressions](https://holon-platform.com/docs/current/reference/holon-datastore-jpa.html#Relational-expressions) are supported (alias, joins and sub-queries).
+As a _relational Datastore_, standard [relational expressions](https://docs.holon-platform.com/current/reference/holon-datastore-jpa.html#Relational-expressions) are supported (alias, joins and sub-queries).
 
 The JPA Datastore supports any standard JPA __ORM__ library, altough is tested and optimized specifically for:
 
@@ -80,7 +80,7 @@ You can build the sources using Maven (version 3.3.x or above is recommended) li
 
 ## Getting help
 
-* Check the [platform documentation](https://holon-platform.com/docs/current/reference) or the specific [module documentation](https://holon-platform.com/docs/current/reference/holon-datastore-jpa.html).
+* Check the [platform documentation](https://docs.holon-platform.com/current/reference) or the specific [module documentation](https://docs.holon-platform.com/current/reference/holon-datastore-jpa.html).
 
 * Ask a question on [Stack Overflow](http://stackoverflow.com). We monitor the [`holon-platform`](http://stackoverflow.com/tags/holon-platform) tag.
 
