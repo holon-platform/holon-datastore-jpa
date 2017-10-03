@@ -73,7 +73,7 @@
 		<hibernate.validator.version>6.0.2.Final</hibernate.validator.version>
 
 		<!-- HikariCP -->
-		<hikaricp.version>2.7.1</hikaricp.version>
+		<hikaricp.version>2.7.2</hikaricp.version>
 
 		<!-- ByteBuddy -->
 		<bytebuddy.version>1.7.5</bytebuddy.version>
