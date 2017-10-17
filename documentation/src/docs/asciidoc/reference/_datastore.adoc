@@ -19,7 +19,7 @@ The `withEntityManager` method can be used to execute a JPA operation using a Da
 include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=wem,indent=0]
 ----
 
-IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core *Datastore* interface should be used as a reference for persistence operations, instead of the specific *JpaDatastore* interface. This way, the concrete Datastore implementation may be replaced by a different one at any time, without any change to rest of the code.
+IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core *Datastore* interface should be used as a reference for persistence operations, instead of the specific *JpaDatastore* interface. This way, the concrete Datastore implementation may be replaced by a different one at any time, without any change to the rest of the code.
 
 === Setup
 
@@ -90,7 +90,7 @@ See the link:holon-core.html#joins[Alias and Joins documentation] for further in
 
 === Auto-generated ids
 
-The JPA datastore support the retrieving of auto-generated id column values, if supported by the underlying JDBC driver and ORM platform.
+The JPA datastore supports the retrieving of auto-generated id column values, if supported by the underlying JDBC driver and ORM platform.
 
 The auto-generated id values can be obtained from the `OperationResult` object, returned by Datastore data manipulation operations, through the `getInsertedKeys()` method.
 

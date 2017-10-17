@@ -15,7 +15,7 @@ _Maven coordinates_:
 
 To create a JPA Datastore and register it as a Spring bean, the link:{apidir}/com/holonplatform/jpa/spring/SpringJpaDatastore.html[SpringJpaDatastore^] interface is provided, with the convenience `builder()` method.
 
-This interface creates and represents a JPA Datastore implementation wich supports Spring JPA and JTA transaction management architecture, using a Spring _transactional EntityManager proxy_ as Datastore `EntityManager`.
+This interface creates and represents a JPA Datastore implementation which supports Spring JPA and JTA transaction management architecture, using a Spring _transactional EntityManager proxy_ as Datastore `EntityManager`.
 
 [[EnableJpaDatastore]]
 === Datastore auto-configuration
@@ -67,7 +67,7 @@ include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatast
 A `DataSource` type bean is automatically configured if:
 
 * A `javax.sql.DataSource` type bean is not already registered in Spring context;
-* The `dataSourceReference` attribute of the `EnableJpa` is not specified. If specified, indicates the `DataSource` bean name to use, which must be available in Spring context.
+* The `dataSourceReference` attribute of the `EnableJpa` is not specified. If specified, it indicates the `DataSource` bean name to use, which must be available in Spring context.
 
 In order to auto-configure the `DataSource` bean, a suitable set of configuration properties must be available in Spring environment (typically using one or more `PropertySource`).
 
@@ -79,11 +79,11 @@ A Spring `LocalContainerEntityManagerFactoryBean` instance is used as `javax.per
 
 If a `persistence.xml` configuration file is not available, automatic persistence unit _entity_ classes configuration can be performed using either the annotation attribute:
 
-* `entityPackages` : providing a list of package names to scan to map JPA _entity_ classes into EntityManagerFactory,
+* `entityPackages` : providing a list of package names to scan in order to map JPA _entity_ classes into the  `EntityManagerFactory`,
 
 or the annotation attribute:
 
-* `entityPackageClasses` : providing a list of classes from which to obtain the package names to scan to map JPA _entity_ classes into EntityManagerFactory. Represents a type-safe alternative to `entityPackages` attribute.
+* `entityPackageClasses` : providing a list of classes from which to obtain the package names to scan in order to map JPA _entity_ classes into the `EntityManagerFactory`. Represents a type-safe alternative to `entityPackages` attribute.
 
 Two more annotation attributes are available for persistence unit configuration:
 
@@ -105,13 +105,13 @@ If more than one persistence provider implementation is present in classpath (or
 A Spring JPA `PlatformTransactionManager` is auto-configured and bound to the 
 `EntityManagerFactory` to enable Spring's transaction infrastructure support.
 
-A set of attributes are made available by the `EnableJpa` the annotation to fine tune the transaction manager configuration: `transactionSynchronization`, `defaultTimeout`, `validateExistingTransaction`, `failEarlyOnGlobalRollbackOnly`, `rollbackOnCommitFailure`.
+A set of attributes are made available by the `@EnableJpa` annotation to fine tune the transaction manager configuration: `transactionSynchronization`, `defaultTimeout`, `validateExistingTransaction`, `failEarlyOnGlobalRollbackOnly`, `rollbackOnCommitFailure`.
 
 See link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] Javadocs for informations about each of these configuration attributes.
 
 ==== `EnableJpa`: JPA Datastore configuration
 
-By defaut, using the `EnableJpa` annotation a JPA Datastore is automatically created and configured suing the `EntityManagerFactory` of the JPA beans stack. The JPA Datastore instanc will be a <<SpringJpaDatastore>>, enabling all the Spring-related auto-configuration features described above.
+By default, using the `EnableJpa` annotation a JPA Datastore is automatically created and configured suing the `EntityManagerFactory` of the JPA beans stack. The JPA Datastore instanc will be a <<SpringJpaDatastore>>, enabling all the Spring-related auto-configuration features described above.
 
 To disable automatic JPA Datastore configuration, the `enableDatastore` annotation attribute can be used.
 
@@ -145,7 +145,7 @@ include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatast
 [[JPA configuration properties]]
 === JPA configuration properties
 
-link:{apidir}/com/holonplatform/jpa/spring/JpaConfigProperties.html[JpaConfigProperties^] interface provides a set of configuration properties to be used with JPA stack beans auto-configuration. Extends a default `ConfigPropertySet` bound to the property name prefix *holon.jpa*.
+link:{apidir}/com/holonplatform/jpa/spring/JpaConfigProperties.html[JpaConfigProperties^] interface provides a set of configuration properties to be used with JPA stack beans auto-configuration. It extends a default `ConfigPropertySet` bound to the property name prefix *holon.jpa*.
 
 The available configuration properties are listed below:
 
@@ -225,7 +225,7 @@ To disable this auto-configuration feature the `JpaAutoConfiguration` class can 
 
 ==== JPA entities scan
 
-When the full JPA stack auto-configuration is enabled, the link:{apidir}/com/holonplatform/jpa/spring/boot/JpaEntityScan.html[JpaEntityScan^] rpeatable annotation can be used on Spring configuration classes to specify the base packages to scan for JPA entity classes.
+When the full JPA stack auto-configuration is enabled, the link:{apidir}/com/holonplatform/jpa/spring/boot/JpaEntityScan.html[JpaEntityScan^] repeatable annotation can be used on Spring configuration classes to specify the base packages to scan for JPA entity classes.
 
 === Spring Boot starters
 
