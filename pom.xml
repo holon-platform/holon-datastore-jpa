@@ -76,7 +76,7 @@
 		<hikaricp.version>2.7.2</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.7.5</bytebuddy.version>
+		<bytebuddy.version>1.7.9</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.196</h2.version>
