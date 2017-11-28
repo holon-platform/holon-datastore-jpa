@@ -34,3 +34,10 @@ create table if not exists test3 (
 	,value varchar(10)
 );
 
+create table if not exists test_recur (
+	 code bigint primary key auto_increment
+	,name varchar(100) not null
+	,parent varchar(100)
+);
+
+

@@ -8,3 +8,7 @@ INSERT INTO test1bis (keycode,strv,decv,datv,enmv,nbv,nst1,nst2,nss1,nss2) VALUE
 INSERT INTO test1bis (keycode,strv,decv,datv,enmv,nbv,nst1,nst2,nss1,nss2) VALUES (2, 'Two', 5, null, 1, 0, 'n2', 3, 's2', null);
 INSERT INTO test1bis (keycode,strv,decv,datv,enmv,nbv,nst1,nst2,nss1,nss2) VALUES (3, 'Three', 5, null, 1, 0, 'n1', 3, 's3', null);
 INSERT INTO test1bis (keycode,strv,decv,datv,enmv,nbv,nst1,nst2,nss1,nss2) VALUES (4, 'Three', 6, null, 0, 1, 'n1', 4, 's1', null);
+
+INSERT INTO test_recur (name, parent) VALUES ('test1', null);
+INSERT INTO test_recur (name, parent) VALUES ('test2', 'test1');
+INSERT INTO test_recur (name, parent) VALUES ('test3', 'test2');

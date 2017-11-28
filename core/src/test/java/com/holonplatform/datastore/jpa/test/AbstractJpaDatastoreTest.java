@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,7 @@ import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.DefaultWriteOption;
 import com.holonplatform.core.datastore.bulk.BulkDelete;
 import com.holonplatform.core.datastore.bulk.BulkUpdate;
+import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.datastore.relational.SubQuery;
 import com.holonplatform.core.internal.query.filter.NotFilter;
 import com.holonplatform.core.property.PathProperty;
@@ -61,6 +63,7 @@ import com.holonplatform.datastore.jpa.test.domain.TestJpaDomain;
 import com.holonplatform.datastore.jpa.test.domain.TestJpaDomainBis;
 import com.holonplatform.datastore.jpa.test.domain.TestNested;
 import com.holonplatform.datastore.jpa.test.domain.TestOtherDomain;
+import com.holonplatform.datastore.jpa.test.domain.TestRecur;
 
 public abstract class AbstractJpaDatastoreTest {
 
@@ -593,6 +596,41 @@ public abstract class AbstractJpaDatastoreTest {
 		assertEquals(1, result.getAffectedCount());
 		assertEquals(1, result.getInsertedKeys().size());
 		assertEquals(Long.valueOf(2), box.getValue(CODE));
+	}
+
+	@Test
+	public void testAlias() {
+		List<String> parents = new ArrayList<>();
+		findParents(parents, "test3");
+
+		assertEquals(2, parents.size());
+	}
+
+	private void findParents(List<String> parents, String name) {
+		if (name != null) {
+
+			final DataTarget<?> R_TARGET = DataTarget.named("test_recur");
+
+			RelationalTarget<?> group_alias_1 = RelationalTarget.of(R_TARGET).alias("g1");
+			RelationalTarget<?> group_alias_2 = RelationalTarget.of(R_TARGET).alias("g2");
+
+			QueryFilter f1 = group_alias_1.property(TestRecur.PROPERTIES.requireProperty("parent")).isNotNull();
+			QueryFilter f2 = group_alias_2.property(TestRecur.PROPERTIES.requireProperty("name"))
+					.eq(group_alias_1.property(TestRecur.PROPERTIES.requireProperty("parent")));
+
+			RelationalTarget<?> target = group_alias_1.innerJoin(group_alias_2).on(f1.and(f2)).add();
+
+			List<String> group_parents = getDatastore().query().target(target)
+					.filter(group_alias_1.property(TestRecur.PROPERTIES.requireProperty("name")).eq(name))
+					.list(group_alias_2.property(TestRecur.PROPERTIES.requireProperty("name")));
+
+			if (!group_parents.isEmpty()) {
+				parents.addAll(group_parents);
+				for (String p : group_parents) {
+					findParents(parents, p);
+				}
+			}
+		}
 	}
 
 }
