@@ -44,7 +44,7 @@ _Maven BOM:_
     <dependency>
         <groupId>com.holon-platform.jpa</groupId>
         <artifactId>holon-datastore-jpa-bom</artifactId>
-        <version>5.0.2</version>
+        <version>5.0.3</version>
         <type>pom</type>
         <scope>import</scope>
     </dependency>
