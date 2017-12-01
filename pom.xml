@@ -60,7 +60,7 @@
 		<!-- Holon core -->
 		<holon.core.version>5.0.5</holon.core.version>
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.0.3</holon.jdbc.version>
+		<holon.jdbc.version>5.0.4</holon.jdbc.version>
 
 		<!-- JPA -->
 		<hibernate.jpa.api.version>1.0.0.Final</hibernate.jpa.api.version>
