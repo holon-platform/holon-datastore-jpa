@@ -28,7 +28,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.holonplatform.jdbc.internal.BasicDataSource;
+import com.holonplatform.jdbc.BasicDataSource;
 import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 
@@ -46,10 +46,9 @@ public class TestEnableJpaFullSkipDs extends AbstractEnableJpaTest {
 
 		@Bean("testds")
 		public DataSource dataSource() {
-			BasicDataSource ds = new BasicDataSource();
-			ds.setUrl(env.getProperty("holon.datasource.url"));
-			ds.setUsername(env.getProperty("holon.datasource.username"));
-			ds.setPassword(env.getProperty("holon.datasource.password"));
+			DataSource ds = BasicDataSource.builder().url(env.getProperty("holon.datasource.url"))
+					.username(env.getProperty("holon.datasource.username"))
+					.password(env.getProperty("holon.datasource.password")).build();
 			return ds;
 		}
 
