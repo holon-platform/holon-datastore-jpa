@@ -40,4 +40,12 @@ create table if not exists test_recur (
 	,parent varchar(100)
 );
 
+create table if not exists testtp (
+	 id bigint primary key 
+	,datv date 
+	,tmsv timestamp
+	,ldatv date 
+	,ltmsv timestamp
+);
+
 

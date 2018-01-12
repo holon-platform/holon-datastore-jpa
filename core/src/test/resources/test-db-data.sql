@@ -12,3 +12,6 @@ INSERT INTO test1bis (keycode,strv,decv,datv,enmv,nbv,nst1,nst2,nss1,nss2) VALUE
 INSERT INTO test_recur (name, parent) VALUES ('test1', null);
 INSERT INTO test_recur (name, parent) VALUES ('test2', 'test1');
 INSERT INTO test_recur (name, parent) VALUES ('test3', 'test2');
+
+INSERT INTO testtp (id,datv,tmsv,ldatv,ltmsv) VALUES (1, parsedatetime('19-05-2016', 'dd-MM-yyyy'), parsedatetime('23-03-2017 15:30:25', 'dd-MM-yyyy HH:mm:ss'), parsedatetime('19-05-2016', 'dd-MM-yyyy'), parsedatetime('23-03-2017 15:30:25', 'dd-MM-yyyy HH:mm:ss'));
+INSERT INTO testtp (id,datv,tmsv,ldatv,ltmsv) VALUES (2, parsedatetime('11-01-2018', 'dd-MM-yyyy'), parsedatetime('11-01-2018 15:30:25', 'dd-MM-yyyy HH:mm:ss'), parsedatetime('11-01-2018', 'dd-MM-yyyy'), parsedatetime('11-01-2018 15:30:25', 'dd-MM-yyyy HH:mm:ss'));
