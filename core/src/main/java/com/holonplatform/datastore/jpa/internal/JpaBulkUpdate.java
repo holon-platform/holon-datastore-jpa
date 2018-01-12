@@ -37,6 +37,8 @@ import com.holonplatform.core.datastore.bulk.BulkUpdate;
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ObjectUtils;
+import com.holonplatform.core.query.ConstantExpression;
+import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.core.query.QueryFilter;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
@@ -84,7 +86,7 @@ public class JpaBulkUpdate implements BulkUpdate, ExpressionResolverHandler {
 	/**
 	 * Values to update
 	 */
-	private Map<Path<?>, Object> values = new HashMap<>();
+	private Map<Path<?>, QueryExpression<?>> values = new HashMap<>();
 
 	/**
 	 * Constructor
@@ -114,7 +116,18 @@ public class JpaBulkUpdate implements BulkUpdate, ExpressionResolverHandler {
 	@Override
 	public <T> BulkUpdate set(Path<T> path, T value) {
 		ObjectUtils.argumentNotNull(path, "Path must be not null");
-		values.put(path, value);
+		values.put(path, ConstantExpression.create(value));
+		return this;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.holonplatform.core.datastore.bulk.BulkClause#set(com.holonplatform.core.Path, com.holonplatform.core.query.QueryExpression)
+	 */
+	@Override
+	public <T> BulkUpdate set(Path<T> path, QueryExpression<? super T> expression) {
+		ObjectUtils.argumentNotNull(path, "Path must be not null");
+		ObjectUtils.argumentNotNull(expression, "Expression must be not null");
+		values.put(path, expression);
 		return this;
 	}
 
@@ -125,7 +138,7 @@ public class JpaBulkUpdate implements BulkUpdate, ExpressionResolverHandler {
 	@Override
 	public BulkUpdate setNull(@SuppressWarnings("rawtypes") Path path) {
 		ObjectUtils.argumentNotNull(path, "Path must be not null");
-		values.put(path, null);
+		values.put(path, ConstantExpression.nullValue());
 		return this;
 	}
 

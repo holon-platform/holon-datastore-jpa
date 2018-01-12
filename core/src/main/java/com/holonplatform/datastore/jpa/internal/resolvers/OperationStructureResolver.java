@@ -27,8 +27,8 @@ import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.Path;
 import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
-import com.holonplatform.core.internal.query.QueryUtils;
 import com.holonplatform.core.internal.utils.TypeUtils;
+import com.holonplatform.core.property.Property;
 import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
@@ -113,12 +113,12 @@ public enum OperationStructureResolver implements ExpressionResolver<OperationSt
 		// values
 		if (type == OperationType.UPDATE) {
 
-			final Map<Path<?>, Object> pathValues = expression.getValues();
+			final Map<Path<?>, QueryExpression<?>> pathValues = expression.getValues();
 			final List<String> paths = new ArrayList<>(pathValues.size());
 			final List<String> values = new ArrayList<>(pathValues.size());
 
 			// resolve path and value
-			for (Entry<Path<?>, Object> entry : pathValues.entrySet()) {
+			for (Entry<Path<?>, QueryExpression<?>> entry : pathValues.entrySet()) {
 				paths.add(resolveExpression(entry.getKey(), context));
 				values.add(resolvePathValue(entry.getKey(), entry.getValue(), context, true));
 			}
@@ -171,16 +171,23 @@ public enum OperationStructureResolver implements ExpressionResolver<OperationSt
 	 * @throws InvalidExpressionException If expression cannot be resolved
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static String resolvePathValue(Path<?> path, Object value, JpaResolutionContext context,
+	private static String resolvePathValue(Path<?> path, QueryExpression<?> expression, JpaResolutionContext context,
 			boolean allowNull) {
 
-		if (value != null && TypeUtils.isString(value.getClass())
-				&& (value.toString().startsWith(":") || "?".equals(value))) {
-			return value.toString();
-		}
+		if (expression instanceof ConstantExpression) {
+			final Object value = ((ConstantExpression) expression).getValue();
+			if (value != null && TypeUtils.isString(value.getClass())
+					&& (value.toString().startsWith(":") || "?".equals(value))) {
+				return value.toString();
+			}
 
-		QueryExpression<?> expression = (QueryExpression.class.isAssignableFrom(path.getClass()))
-				? QueryUtils.asConstantExpression((QueryExpression) path, value) : ConstantExpression.create(value);
+			// check converter
+			if (path instanceof Property) {
+				return JpaDatastoreUtils.resolveExpression(context,
+						ConstantExpression.create(((Property<Object>) path).getConvertedValue(value)), JPQLToken.class,
+						context).getValue();
+			}
+		}
 
 		return JpaDatastoreUtils.resolveExpression(context, expression, JPQLToken.class, context).getValue();
 	}

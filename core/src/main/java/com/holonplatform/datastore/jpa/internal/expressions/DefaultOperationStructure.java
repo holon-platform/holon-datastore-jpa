@@ -23,6 +23,7 @@ import com.holonplatform.core.Path;
 import com.holonplatform.core.datastore.DataTarget;
 import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.internal.utils.ObjectUtils;
+import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.core.query.QueryFilter;
 
 /**
@@ -35,7 +36,7 @@ public class DefaultOperationStructure implements OperationStructure {
 	private final OperationType operationType;
 	private final DataTarget<?> target;
 
-	private final Map<Path<?>, Object> values = new LinkedHashMap<>();
+	private final Map<Path<?>, QueryExpression<?>> values = new LinkedHashMap<>();
 
 	private QueryFilter filter;
 
@@ -68,7 +69,7 @@ public class DefaultOperationStructure implements OperationStructure {
 	 * @see com.holonplatform.datastore.jpa.internal.expressions.OperationStructure#getValues()
 	 */
 	@Override
-	public Map<Path<?>, Object> getValues() {
+	public Map<Path<?>, QueryExpression<?>> getValues() {
 		return values;
 	}
 
@@ -86,7 +87,7 @@ public class DefaultOperationStructure implements OperationStructure {
 	 * @param path Path (not null)
 	 * @param value Value
 	 */
-	public void addValue(Path<?> path, Object value) {
+	public void addValue(Path<?> path, QueryExpression<?> value) {
 		ObjectUtils.argumentNotNull(path, "Path must be not null");
 		values.put(path, value);
 	}
@@ -153,24 +154,12 @@ public class DefaultOperationStructure implements OperationStructure {
 			instance = new DefaultOperationStructure(operationType, target);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see
-		 * com.holonplatform.datastore.jpa.internal.expressions.OperationStructure.Builder#withValue(com.holonplatform.
-		 * core.Path, java.lang.Object)
-		 */
 		@Override
-		public Builder withValue(Path<?> path, Object value) {
+		public Builder withValue(Path<?> path, QueryExpression<?> value) {
 			instance.addValue(path, value);
 			return this;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see
-		 * com.holonplatform.datastore.jpa.internal.expressions.OperationStructure.Builder#withFilter(com.holonplatform
-		 * .core.query.QueryFilter)
-		 */
 		@Override
 		public Builder withFilter(QueryFilter filter) {
 			instance.addFilter(filter);

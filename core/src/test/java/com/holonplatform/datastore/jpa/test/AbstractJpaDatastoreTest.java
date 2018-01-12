@@ -43,11 +43,13 @@ import com.holonplatform.core.datastore.bulk.BulkUpdate;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.datastore.relational.SubQuery;
 import com.holonplatform.core.internal.query.filter.NotFilter;
+import com.holonplatform.core.property.NumericProperty;
 import com.holonplatform.core.property.PathProperty;
 import com.holonplatform.core.property.Property;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.property.PropertySet;
 import com.holonplatform.core.property.PropertyValueConverter;
+import com.holonplatform.core.property.StringProperty;
 import com.holonplatform.core.query.BeanProjection;
 import com.holonplatform.core.query.QueryAggregation;
 import com.holonplatform.core.query.QueryFilter;
@@ -71,8 +73,8 @@ public abstract class AbstractJpaDatastoreTest {
 	protected final static JpaTarget<TestJpaDomain> ENTITY_TARGET = JpaTarget.of(TestJpaDomain.class);
 	protected final static DataTarget<TestJpaDomainBis> ENTITY_TARGET_BIS = JpaTarget.of(TestJpaDomainBis.class);
 
-	protected final static PathProperty<Long> KEY = PathProperty.create("key", long.class);
-	protected final static PathProperty<String> STR = PathProperty.create("stringValue", String.class);
+	protected final static NumericProperty<Long> KEY = NumericProperty.create("key", long.class);
+	protected final static StringProperty STR = StringProperty.create("stringValue");
 	protected final static PathProperty<Double> DBL = PathProperty.create("decimalValue", Double.class);
 	protected final static PathProperty<Date> DAT = PathProperty.create("dateValue", Date.class);
 	protected final static PathProperty<TestEnum> ENM = PathProperty.create("enumValue", TestEnum.class);

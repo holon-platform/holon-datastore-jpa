@@ -59,8 +59,8 @@ public class KeyIs implements QueryFilter {
 		 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 		 */
 		@Override
-		public Optional<QueryFilter> resolve(KeyIs expression,
-				com.holonplatform.core.ExpressionResolver.ResolutionContext context) throws InvalidExpressionException {
+		public Optional<QueryFilter> resolve(KeyIs expression, ResolutionContext context)
+				throws InvalidExpressionException {
 			return Optional.of(KEY.eq(expression.getValue()));
 		}
 
