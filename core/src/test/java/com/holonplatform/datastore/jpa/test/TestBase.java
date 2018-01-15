@@ -42,6 +42,7 @@ import com.holonplatform.core.internal.utils.TestUtils;
 import com.holonplatform.core.temporal.TemporalType;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.JpaPropertyConfiguration;
+import com.holonplatform.datastore.jpa.test.domain.Test2;
 import com.holonplatform.datastore.jpa.test.domain.TestJpaDomain;
 import com.holonplatform.jdbc.DataSourceBuilder;
 import com.holonplatform.jdbc.DataSourceConfigProperties;
@@ -126,6 +127,17 @@ public class TestBase {
 				.getParameter(JpaPropertyConfiguration.COLUMN_NAME).orElse(null));
 		assertEquals("nested", set.getProperty("nested").get().getConfiguration()
 				.getParameter(JpaPropertyConfiguration.COLUMN_NAME).orElse(null));
+		
+		// identifier
+		
+		assertTrue(set.getFirstIdentifier().isPresent());
+		assertEquals("key", set.getFirstIdentifier().get().getName());
+		
+		// embedded id
+		BeanPropertySet<Test2> set2 = BeanPropertySet.create(Test2.class);
+		
+		assertTrue(set2.getFirstIdentifier().isPresent());
+		assertEquals("pk.code", set2.getFirstIdentifier().get().relativeName());
 
 	}
 
