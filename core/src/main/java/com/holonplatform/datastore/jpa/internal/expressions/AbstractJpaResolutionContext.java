@@ -19,10 +19,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.holonplatform.core.Expression;
+import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.Path;
 import com.holonplatform.core.datastore.relational.Aliasable.AliasablePath;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
+import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ObjectUtils;
+import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 
 /**
  * Base {@link JpaResolutionContext} class.
@@ -30,6 +34,8 @@ import com.holonplatform.core.internal.utils.ObjectUtils;
  * @since 5.0.0
  */
 public abstract class AbstractJpaResolutionContext implements JpaResolutionContext {
+	
+	protected final static Logger LOGGER = JpaDatastoreLogger.create();
 
 	private static final String ALIAS_CHARS = "abcdefghijklmnopqrstuvwxyw0123456789_";
 
@@ -137,6 +143,30 @@ public abstract class AbstractJpaResolutionContext implements JpaResolutionConte
 		target.getJoins().forEach(j -> {
 			getOrCreatePathAlias(j).ifPresent(a -> pathAlias.put(j.getName(), a));
 		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext#resolveExpression(com.holonplatform.
+	 * core.Expression, java.lang.Class)
+	 */
+	@Override
+	public <E extends Expression, R extends Expression> R resolveExpression(E expression, Class<R> resolutionType)
+			throws InvalidExpressionException {
+		// resolve
+		R resolved = resolve(expression, resolutionType, this).map(e -> {
+			// validate
+			e.validate();
+			return e;
+		}).orElse(null);
+		// check
+		if (resolved == null) {
+			LOGGER.debug(() -> "No ExpressionResolver available to resolve expression [" + expression + "]");
+			LOGGER.debug(() -> "Available ExpressionResolvers: " + getExpressionResolvers());
+			throw new InvalidExpressionException("Failed to resolve expression [" + expression + "]");
+		}
+		return resolved;
 	}
 
 	private Optional<String> getOrCreatePathAlias(AliasablePath<?, ?> path) {

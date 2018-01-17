@@ -20,8 +20,11 @@ import java.util.Optional;
 
 import javax.persistence.EntityManagerFactory;
 
+import com.holonplatform.core.Expression;
 import com.holonplatform.core.Expression.InvalidExpressionException;
+import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler;
+import com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport;
 import com.holonplatform.core.ExpressionResolver.ResolutionContext;
 import com.holonplatform.core.Path;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
@@ -34,7 +37,7 @@ import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
  *
  * @since 5.0.0
  */
-public interface JpaResolutionContext extends ResolutionContext {
+public interface JpaResolutionContext extends ResolutionContext, ExpressionResolverSupport {
 
 	public enum AliasMode {
 
@@ -103,6 +106,22 @@ public interface JpaResolutionContext extends ResolutionContext {
 	 * @return Optional resolution context data target
 	 */
 	Optional<RelationalTarget<?>> getTarget();
+	
+	/**
+	 * Resolve given <code>expression</code> to obtain a <code>resolutionType</code>
+	 * type expression. If no {@link ExpressionResolver} is available to resolve given expression, an
+	 * {@link InvalidExpressionException} is thrown. The resolved expression is validate using
+	 * {@link Expression#validate()} before returning it to caller.
+	 * @param <E> Expression type
+	 * @param <R> Resolution type
+	 * @param expression Expression to resolve
+	 * @param resolutionType Expression type to obtain
+	 * @return Resolved expression
+	 * @throws InvalidExpressionException If an error occurred during resolution, or if no {@link ExpressionResolver} is
+	 *         available to resolve given expression or if expression validation failed
+	 */
+	<E extends Expression, R extends Expression> R resolveExpression(E expression, Class<R> resolutionType)
+			throws InvalidExpressionException;
 
 	/**
 	 * Create a new {@link JpaResolutionContext} as child of this context

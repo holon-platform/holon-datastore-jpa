@@ -31,7 +31,6 @@ import com.holonplatform.core.internal.utils.TypeUtils;
 import com.holonplatform.core.property.Property;
 import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.core.query.QueryExpression;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.FromExpression;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
@@ -101,14 +100,12 @@ public enum OperationStructureResolver implements ExpressionResolver<OperationSt
 
 		// from
 
-		RelationalTarget<?> target = JpaDatastoreUtils.resolveExpression(context, expression.getTarget(),
-				RelationalTarget.class, context);
+		RelationalTarget<?> target = context.resolveExpression(expression.getTarget(), RelationalTarget.class);
 
 		context.setTarget(target);
 
 		// configure statement
-		operation
-				.append(JpaDatastoreUtils.resolveExpression(context, target, FromExpression.class, context).getValue());
+		operation.append(context.resolveExpression(target, FromExpression.class).getValue());
 
 		// values
 		if (type == OperationType.UPDATE) {
@@ -138,7 +135,7 @@ public enum OperationStructureResolver implements ExpressionResolver<OperationSt
 		// filter
 		expression.getFilter().ifPresent(f -> {
 			operation.append(" WHERE ");
-			operation.append(JpaDatastoreUtils.resolveExpression(context, f, JPQLToken.class, context).getValue());
+			operation.append(context.resolveExpression(f, JPQLToken.class).getValue());
 		});
 
 		// return SQL statement
@@ -183,13 +180,13 @@ public enum OperationStructureResolver implements ExpressionResolver<OperationSt
 
 			// check converter
 			if (path instanceof Property) {
-				return JpaDatastoreUtils.resolveExpression(context,
-						ConstantExpression.create(((Property<Object>) path).getConvertedValue(value)), JPQLToken.class,
-						context).getValue();
+				return context.resolveExpression(
+						ConstantExpression.create(((Property<Object>) path).getConvertedValue(value)), JPQLToken.class)
+						.getValue();
 			}
 		}
 
-		return JpaDatastoreUtils.resolveExpression(context, expression, JPQLToken.class, context).getValue();
+		return context.resolveExpression(expression, JPQLToken.class).getValue();
 	}
 
 }

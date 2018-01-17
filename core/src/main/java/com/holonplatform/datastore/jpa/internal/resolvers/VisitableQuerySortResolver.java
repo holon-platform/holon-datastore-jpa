@@ -30,7 +30,6 @@ import com.holonplatform.core.internal.query.QueryUtils;
 import com.holonplatform.core.query.QuerySort.CompositeQuerySort;
 import com.holonplatform.core.query.QuerySort.PathQuerySort;
 import com.holonplatform.core.query.QuerySort.SortDirection;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 
@@ -87,7 +86,7 @@ public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQu
 	@Override
 	public JPQLToken visit(PathQuerySort<?> sort, JpaResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(JpaDatastoreUtils.resolveExpression(context, sort.getPath(), JPQLToken.class, context).getValue());
+		sb.append(context.resolveExpression(sort.getPath(), JPQLToken.class).getValue());
 		sb.append(" ");
 		if (sort.getDirection() == SortDirection.ASCENDING) {
 			sb.append("asc");
@@ -106,7 +105,7 @@ public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQu
 	public JPQLToken visit(CompositeQuerySort sort, JpaResolutionContext context) {
 		List<String> resolved = new LinkedList<>();
 		QueryUtils.flattenQuerySort(sort).forEach(s -> {
-			resolved.add(JpaDatastoreUtils.resolveExpression(context, s, JPQLToken.class, context).getValue());
+			resolved.add(context.resolveExpression(s, JPQLToken.class).getValue());
 		});
 		return JPQLToken.create(resolved.stream().collect(Collectors.joining(",")));
 	}

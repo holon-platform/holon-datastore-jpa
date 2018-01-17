@@ -40,7 +40,6 @@ import com.holonplatform.core.query.TemporalFunction.Hour;
 import com.holonplatform.core.query.TemporalFunction.Month;
 import com.holonplatform.core.query.TemporalFunction.Year;
 import com.holonplatform.datastore.jpa.ORMPlatform;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 
@@ -85,6 +84,8 @@ public enum QueryFunctionResolver implements ExpressionResolver<QueryFunction, J
 		// validate
 		expression.validate();
 
+		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
+
 		// check no args
 		if (CurrentDate.class.isAssignableFrom(expression.getClass()))
 			return Optional.of(JPQLToken.create("CURRENT_DATE"));
@@ -101,13 +102,10 @@ public enum QueryFunctionResolver implements ExpressionResolver<QueryFunction, J
 
 		final String functionArgument;
 		if (arguments != null && !arguments.isEmpty()) {
-			functionArgument = JpaDatastoreUtils.resolveExpression(context, arguments.get(0), JPQLToken.class, context)
-					.getValue();
+			functionArgument = jpaContext.resolveExpression(arguments.get(0), JPQLToken.class).getValue();
 		} else {
 			functionArgument = null;
 		}
-
-		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
 
 		// resolve function
 		return serializeFunction(expression, functionArgument, jpaContext.getORMPlatform().orElse(null)).map(f -> {

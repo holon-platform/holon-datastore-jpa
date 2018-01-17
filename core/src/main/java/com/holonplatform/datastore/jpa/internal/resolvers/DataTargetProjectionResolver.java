@@ -24,7 +24,6 @@ import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.DataTarget;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.query.PathExpression;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.converters.SingleSelectionResultConverter;
 import com.holonplatform.datastore.jpa.internal.expressions.DefaultProjectionContext;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
@@ -58,14 +57,11 @@ public enum DataTargetProjectionResolver implements ExpressionResolver<DataTarge
 		// context
 		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
 
-		final RelationalTarget<?> target = JpaDatastoreUtils.resolveExpression(context, expression,
-				RelationalTarget.class, context);
+		final RelationalTarget<?> target = jpaContext.resolveExpression(expression, RelationalTarget.class);
 		DefaultProjectionContext ctx = new DefaultProjectionContext(jpaContext, target.getType());
-		ctx.addSelection(JpaDatastoreUtils.resolveExpression(context, target, JPQLToken.class, context).getValue(),
-				false);
-		ctx.setConverter(
-				new SingleSelectionResultConverter(PathExpression.create(target.getName(), target.getType())));
-		
+		ctx.addSelection(jpaContext.resolveExpression(target, JPQLToken.class).getValue(), false);
+		ctx.setConverter(new SingleSelectionResultConverter(PathExpression.create(target.getName(), target.getType())));
+
 		return Optional.of(ctx);
 	}
 

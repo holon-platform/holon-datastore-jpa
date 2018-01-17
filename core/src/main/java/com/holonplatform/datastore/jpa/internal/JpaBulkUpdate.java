@@ -120,8 +120,10 @@ public class JpaBulkUpdate implements BulkUpdate, ExpressionResolverHandler {
 		return this;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.holonplatform.core.datastore.bulk.BulkClause#set(com.holonplatform.core.Path, com.holonplatform.core.query.QueryExpression)
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.core.datastore.bulk.BulkClause#set(com.holonplatform.core.Path,
+	 * com.holonplatform.core.query.QueryExpression)
 	 */
 	@Override
 	public <T> BulkUpdate set(Path<T> path, QueryExpression<? super T> expression) {
@@ -193,13 +195,26 @@ public class JpaBulkUpdate implements BulkUpdate, ExpressionResolverHandler {
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler#getExpressionResolvers()
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Iterable<ExpressionResolver> getExpressionResolvers() {
+		return expressionResolverRegistry.getExpressionResolvers();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.core.datastore.bulk.DMLClause#execute()
 	 */
 	@Override
 	public OperationResult execute() {
 
 		final JpaResolutionContext resolutionContext = JpaResolutionContext.create(context.getEntityManagerFactory(),
-				context.getORMPlatform().orElse(null), this, AliasMode.AUTO);
+				context.getORMPlatform().orElse(null), context, AliasMode.AUTO);
+
+		// add operation specific resolvers
+		resolutionContext.addExpressionResolvers(getExpressionResolvers());
 
 		final String jpql;
 		try {
@@ -209,8 +224,7 @@ public class JpaBulkUpdate implements BulkUpdate, ExpressionResolverHandler {
 			getFilter().ifPresent(f -> builder.withFilter(f));
 
 			// resolve OperationStructure
-			jpql = JpaDatastoreUtils.resolveExpression(this, builder.build(), JPQLToken.class, resolutionContext)
-					.getValue();
+			jpql = resolutionContext.resolveExpression(builder.build(), JPQLToken.class).getValue();
 
 		} catch (InvalidExpressionException e) {
 			throw new DataAccessException("Failed to configure update operation", e);

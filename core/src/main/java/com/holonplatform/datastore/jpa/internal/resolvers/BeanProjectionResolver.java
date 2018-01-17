@@ -34,7 +34,6 @@ import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.query.BeanProjection;
 import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.datastore.jpa.ORMPlatform;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.converters.BeanResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.BeanTupleConverter;
 import com.holonplatform.datastore.jpa.internal.expressions.DefaultProjectionContext;
@@ -87,8 +86,8 @@ public enum BeanProjectionResolver implements ExpressionResolver<BeanProjection,
 		for (Path<?> path : selection) {
 			if (QueryExpression.class.isAssignableFrom(path.getClass())) {
 				selectionPaths.add(path);
-				final String alias = ctx.addSelection(JpaDatastoreUtils
-						.resolveExpression(context, (QueryExpression<?>) path, JPQLToken.class, context).getValue());
+				final String alias = ctx.addSelection(
+						jpaContext.resolveExpression((QueryExpression<?>) path, JPQLToken.class).getValue());
 				selectionAlias.put(path, alias);
 			}
 		}
@@ -96,8 +95,7 @@ public enum BeanProjectionResolver implements ExpressionResolver<BeanProjection,
 		if (tupleSupported) {
 			ctx.setConverter(new BeanTupleConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
 		} else {
-			ctx.setConverter(
-					new BeanResultArrayConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
+			ctx.setConverter(new BeanResultArrayConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
 		}
 
 		return Optional.of(ctx);

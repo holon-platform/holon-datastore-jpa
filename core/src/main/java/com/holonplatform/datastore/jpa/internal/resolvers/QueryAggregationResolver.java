@@ -24,8 +24,8 @@ import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.Path;
 import com.holonplatform.core.query.QueryAggregation;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
+import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 
 /**
  * {@link QueryAggregation} expression resolver.
@@ -66,18 +66,20 @@ public enum QueryAggregationResolver implements ExpressionResolver<QueryAggregat
 		// validate
 		expression.validate();
 
+		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
+
 		final StringBuilder sb = new StringBuilder();
 
 		// group by
 		List<String> groupBys = new ArrayList<>(expression.getAggregationPaths().length);
 		for (Path<?> path : expression.getAggregationPaths()) {
-			groupBys.add(JpaDatastoreUtils.resolveExpression(context, path, JPQLToken.class, context).getValue());
+			groupBys.add(jpaContext.resolveExpression(path, JPQLToken.class).getValue());
 		}
 		sb.append(groupBys.stream().collect(Collectors.joining(",")));
 		// having
 		expression.getAggregationFilter().ifPresent(f -> {
 			sb.append(" HAVING ");
-			sb.append(JpaDatastoreUtils.resolveExpression(context, f, JPQLToken.class, context).getValue());
+			sb.append(jpaContext.resolveExpression(f, JPQLToken.class).getValue());
 		});
 
 		return Optional.of(JPQLToken.create(sb.toString()));

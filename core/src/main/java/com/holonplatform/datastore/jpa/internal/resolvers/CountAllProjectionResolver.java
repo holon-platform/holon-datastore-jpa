@@ -24,7 +24,6 @@ import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.query.CountAllProjection;
 import com.holonplatform.core.query.QueryFunction.Count;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 import com.holonplatform.datastore.jpa.internal.expressions.ProjectionContext;
 import com.holonplatform.datastore.jpa.internal.expressions.SimpleTargetExpression;
@@ -58,8 +57,8 @@ public enum CountAllProjectionResolver implements ExpressionResolver<CountAllPro
 		RelationalTarget<?> target = jpaContext.getTarget()
 				.orElseThrow(() -> new InvalidExpressionException("Missing context data target"));
 
-		return Optional.ofNullable(JpaDatastoreUtils.resolveExpression(context,
-				Count.create(new SimpleTargetExpression<>(target)), ProjectionContext.class, context));
+		return Optional.ofNullable(jpaContext.resolveExpression(Count.create(new SimpleTargetExpression<>(target)),
+				ProjectionContext.class));
 	}
 
 	/*

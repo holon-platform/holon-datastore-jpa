@@ -26,7 +26,6 @@ import com.holonplatform.core.Path;
 import com.holonplatform.core.datastore.relational.Join;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.internal.utils.ObjectUtils;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.FromExpression;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
@@ -137,7 +136,7 @@ public enum RelationalTargetResolver implements ExpressionResolver<RelationalTar
 		// ON condition
 		join.getOn().ifPresent(o -> {
 			sb.append(" ON ");
-			sb.append(JpaDatastoreUtils.resolveExpression(context, o, JPQLToken.class, context).getValue());
+			sb.append(context.resolveExpression(o, JPQLToken.class).getValue());
 		});
 
 		return sb.toString();

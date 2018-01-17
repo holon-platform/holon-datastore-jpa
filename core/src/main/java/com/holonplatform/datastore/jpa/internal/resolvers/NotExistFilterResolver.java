@@ -22,8 +22,8 @@ import javax.annotation.Priority;
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.internal.datastore.relational.NotExistsFilter;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
+import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 
 /**
  * {@link NotExistsFilter} expression resolver.
@@ -65,12 +65,13 @@ public enum NotExistFilterResolver implements ExpressionResolver<NotExistsFilter
 		// validate
 		expression.validate();
 
+		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("NOT EXISTS (");
 
 		// resolve sub query
-		sb.append(JpaDatastoreUtils.resolveExpression(context, expression.getSubQuery(), JPQLToken.class, context)
-				.getValue());
+		sb.append(jpaContext.resolveExpression(expression.getSubQuery(), JPQLToken.class).getValue());
 
 		sb.append(")");
 

@@ -30,7 +30,6 @@ import com.holonplatform.core.property.Property;
 import com.holonplatform.core.query.PropertySetProjection;
 import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.datastore.jpa.ORMPlatform;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.converters.PropertyBoxResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.PropertyBoxTupleConverter;
 import com.holonplatform.datastore.jpa.internal.expressions.DefaultProjectionContext;
@@ -75,9 +74,8 @@ public enum PropertySetProjectionResolver implements ExpressionResolver<Property
 		for (Property<?> property : expression.getPropertySet()) {
 			if (QueryExpression.class.isAssignableFrom(property.getClass())) {
 				selection.add(property);
-				final String alias = ctx.addSelection(JpaDatastoreUtils
-						.resolveExpression(context, (QueryExpression<?>) property, JPQLToken.class, context)
-						.getValue());
+				final String alias = ctx.addSelection(
+						jpaContext.resolveExpression((QueryExpression<?>) property, JPQLToken.class).getValue());
 				selectionAlias.put(property, alias);
 			}
 		}

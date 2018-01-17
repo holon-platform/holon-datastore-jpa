@@ -22,17 +22,17 @@ import javax.persistence.TypedQuery;
 
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.query.QueryAdapter;
-import com.holonplatform.core.internal.query.QueryStructure;
 import com.holonplatform.core.internal.query.QueryUtils;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.core.query.Query.QueryBuildException;
 import com.holonplatform.core.query.QueryConfiguration;
-import com.holonplatform.core.query.QueryProjection;
+import com.holonplatform.core.query.QueryExecution;
 import com.holonplatform.core.query.QueryResults.QueryExecutionException;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.JpaQueryHint;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLQueryComposition;
+import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext.AliasMode;
 import com.holonplatform.datastore.jpa.internal.expressions.QueryResultConverter;
 
@@ -66,26 +66,29 @@ public class JpaQueryAdapter implements QueryAdapter<QueryConfiguration> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.internal.query.QueryAdapter#stream(com.holonplatform.core.query.QueryConfiguration,
-	 * com.holonplatform.core.query.QueryProjection)
+	 * @see com.holonplatform.core.internal.query.QueryAdapter#stream(com.holonplatform.core.query.QueryExecution)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public <R> Stream<R> stream(QueryConfiguration configuration, QueryProjection<R> projection)
+	public <R> Stream<R> stream(final QueryExecution<QueryConfiguration, R> queryExecution)
 			throws QueryExecutionException {
 
+		// validate
+		queryExecution.validate();
+
 		// context
-		final com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext resolutionContext = com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
-				.create(context.getEntityManagerFactory(), context.getORMPlatform().orElse(null), configuration,
-						AliasMode.AUTO);
+		final JpaResolutionContext resolutionContext = JpaResolutionContext.create(context.getEntityManagerFactory(),
+				context.getORMPlatform().orElse(null), context, AliasMode.AUTO);
+
+		// add query specific resolvers
+		context.addExpressionResolvers(queryExecution.getConfiguration().getExpressionResolvers());
 
 		final JPQLQueryComposition<?, R> query;
 		final String jpql;
 		try {
 
 			// resolve query
-			query = resolutionContext.resolve(QueryStructure.create(configuration, projection),
-					JPQLQueryComposition.class, resolutionContext)
+			query = resolutionContext.resolve(queryExecution, JPQLQueryComposition.class, resolutionContext)
 					.orElseThrow(() -> new QueryBuildException("Failed to resolve query"));
 
 			query.validate();
@@ -110,12 +113,12 @@ public class JpaQueryAdapter implements QueryAdapter<QueryConfiguration> {
 			// configure query
 			final TypedQuery q = entityManager.createQuery(jpql, query.getProjection().getQueryResultType());
 
-			configuration.getLimit().ifPresent((l) -> q.setMaxResults(l));
-			configuration.getOffset().ifPresent((o) -> q.setFirstResult(o));
+			queryExecution.getConfiguration().getLimit().ifPresent((l) -> q.setMaxResults(l));
+			queryExecution.getConfiguration().getOffset().ifPresent((o) -> q.setFirstResult(o));
 
-			configuration.getParameter(JpaQueryHint.QUERY_PARAMETER_HINT, JpaQueryHint.class)
+			queryExecution.getConfiguration().getParameter(JpaQueryHint.QUERY_PARAMETER_HINT, JpaQueryHint.class)
 					.ifPresent(p -> q.setHint(p.getName(), p.getValue()));
-			configuration.getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE, LockModeType.class)
+			queryExecution.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE, LockModeType.class)
 					.ifPresent(p -> q.setLockMode(p));
 
 			JpaDatastoreUtils.setupQueryParameters(q, resolutionContext);

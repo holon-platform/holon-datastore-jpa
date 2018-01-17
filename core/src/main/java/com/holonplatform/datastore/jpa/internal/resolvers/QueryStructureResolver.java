@@ -18,13 +18,14 @@ package com.holonplatform.datastore.jpa.internal.resolvers;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hibernate.query.criteria.internal.QueryStructure;
+
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
-import com.holonplatform.core.internal.query.QueryStructure;
 import com.holonplatform.core.query.Query.QueryBuildException;
 import com.holonplatform.core.query.QueryConfiguration;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
+import com.holonplatform.core.query.QueryExecution;
 import com.holonplatform.datastore.jpa.internal.expressions.DefaultJPQLQueryComposition;
 import com.holonplatform.datastore.jpa.internal.expressions.FromExpression;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLQueryComposition;
@@ -38,7 +39,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.ProjectionContext;
  * @since 5.0.0
  */
 @SuppressWarnings("rawtypes")
-public enum QueryStructureResolver implements ExpressionResolver<QueryStructure, JPQLQueryComposition> {
+public enum QueryStructureResolver implements ExpressionResolver<QueryExecution, JPQLQueryComposition> {
 
 	INSTANCE;
 
@@ -47,8 +48,8 @@ public enum QueryStructureResolver implements ExpressionResolver<QueryStructure,
 	 * @see com.holonplatform.core.ExpressionResolver#getExpressionType()
 	 */
 	@Override
-	public Class<? extends QueryStructure> getExpressionType() {
-		return QueryStructure.class;
+	public Class<? extends QueryExecution> getExpressionType() {
+		return QueryExecution.class;
 	}
 
 	/*
@@ -67,7 +68,7 @@ public enum QueryStructureResolver implements ExpressionResolver<QueryStructure,
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<JPQLQueryComposition> resolve(QueryStructure expression, ResolutionContext resolutionContext)
+	public Optional<JPQLQueryComposition> resolve(QueryExecution expression, ResolutionContext resolutionContext)
 			throws InvalidExpressionException {
 
 		// validate
@@ -86,33 +87,31 @@ public enum QueryStructureResolver implements ExpressionResolver<QueryStructure,
 		configuration.getOffset().ifPresent(o -> query.setOffset(o));
 
 		// from
-		RelationalTarget<?> target = JpaDatastoreUtils.resolveExpression(context,
+		RelationalTarget<?> target = context.resolveExpression(
 				configuration.getTarget().orElseThrow(() -> new QueryBuildException("Missing query target")),
-				RelationalTarget.class, context);
+				RelationalTarget.class);
 		context.setTarget(target);
 
-		query.setFrom(JpaDatastoreUtils.resolveExpression(context, target, FromExpression.class, context).getValue());
+		query.setFrom(context.resolveExpression(target, FromExpression.class).getValue());
 
 		// where
 		configuration.getFilter().ifPresent(f -> {
-			query.setWhere(JpaDatastoreUtils.resolveExpression(context, f, JPQLToken.class, context).getValue());
+			query.setWhere(context.resolveExpression(f, JPQLToken.class).getValue());
 		});
 
 		// group by
 		configuration.getAggregation().ifPresent(a -> {
-			query.setGroupBy(JpaDatastoreUtils.resolveExpression(context, a, JPQLToken.class, context).getValue());
+			query.setGroupBy(context.resolveExpression(a, JPQLToken.class).getValue());
 		});
 
 		// order by
 		configuration.getSort().ifPresent(s -> {
-			query.setOrderBy(JpaDatastoreUtils.resolveExpression(context, s, JPQLToken.class, context).getValue());
+			query.setOrderBy(context.resolveExpression(s, JPQLToken.class).getValue());
 		});
 
 		// select
-		final ProjectionContext<?, ?> projectionContext = context
-				.resolve(expression.getProjection(), ProjectionContext.class, context)
-				.orElseThrow(() -> new InvalidExpressionException(
-						"Failed to resolve projection [" + expression.getProjection() + "]"));
+		final ProjectionContext<?, ?> projectionContext = context.resolveExpression(expression.getProjection(),
+				ProjectionContext.class);
 		projectionContext.validate();
 
 		// check selection

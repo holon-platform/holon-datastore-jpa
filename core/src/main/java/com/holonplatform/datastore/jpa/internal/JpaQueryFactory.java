@@ -47,7 +47,7 @@ public class JpaQueryFactory implements DatastoreCommodityFactory<JpaDatastoreCo
 	 */
 	@Override
 	public Query createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
-		return new QueryAdapterQuery<>(context, new JpaQueryAdapter(context), new DefaultQueryDefinition());
+		return new QueryAdapterQuery<>(new JpaQueryAdapter(context), new DefaultQueryDefinition());
 	}
 
 }

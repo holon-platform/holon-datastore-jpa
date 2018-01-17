@@ -44,7 +44,6 @@ import com.holonplatform.core.internal.query.filter.StringMatchFilter;
 import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.core.query.QueryFilter;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
 import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
 import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
@@ -318,8 +317,7 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	public JPQLToken visit(NotFilter filter, JpaResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("NOT (");
-		sb.append(JpaDatastoreUtils.resolveExpression(context, filter.getComposition().get(0), JPQLToken.class, context)
-				.getValue());
+		sb.append(context.resolveExpression(filter.getComposition().get(0), JPQLToken.class).getValue());
 		sb.append(")");
 		return JPQLToken.create(sb.toString());
 	}
@@ -337,7 +335,7 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 			throws InvalidExpressionException {
 		List<String> resolved = new LinkedList<>();
 		filters.forEach(f -> {
-			resolved.add(JpaDatastoreUtils.resolveExpression(context, f, JPQLToken.class, context).getValue());
+			resolved.add(context.resolveExpression(f, JPQLToken.class).getValue());
 		});
 		return resolved.stream().collect(Collectors.joining(separator));
 	}
@@ -351,7 +349,7 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 */
 	private static String resolve(Expression expression, JpaResolutionContext context)
 			throws InvalidExpressionException {
-		return JpaDatastoreUtils.resolveExpression(context, expression, JPQLToken.class, context).getValue();
+		return context.resolveExpression(expression, JPQLToken.class).getValue();
 	}
 
 	/**
@@ -365,7 +363,7 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 			throws InvalidExpressionException {
 		QueryExpression<?> operand = filter.getRightOperand()
 				.orElseThrow(() -> new InvalidExpressionException("Missing right operand in filter [" + filter + "]"));
-		return JpaDatastoreUtils.resolveExpression(context, operand, JPQLToken.class, context).getValue();
+		return context.resolveExpression(operand, JPQLToken.class).getValue();
 	}
 
 }

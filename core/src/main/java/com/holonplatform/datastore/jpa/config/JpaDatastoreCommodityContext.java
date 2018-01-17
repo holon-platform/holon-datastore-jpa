@@ -20,6 +20,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler;
 import com.holonplatform.core.datastore.DatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.ORMPlatform;
@@ -29,7 +30,7 @@ import com.holonplatform.datastore.jpa.ORMPlatform;
  *
  * @since 5.0.0
  */
-public interface JpaDatastoreCommodityContext extends DatastoreCommodityContext, JpaDatastore {
+public interface JpaDatastoreCommodityContext extends DatastoreCommodityContext, JpaDatastore, ExpressionResolverHandler {
 
 	/**
 	 * Get the EntityManagerFactory.

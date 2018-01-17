@@ -114,6 +114,16 @@ public class JpaBulkDelete implements BulkDelete, ExpressionResolverHandler {
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler#getExpressionResolvers()
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Iterable<ExpressionResolver> getExpressionResolvers() {
+		return expressionResolverRegistry.getExpressionResolvers();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see
 	 * com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler#resolve(com.holonplatform.core.Expression,
 	 * java.lang.Class, com.holonplatform.core.ExpressionResolver.ResolutionContext)
@@ -156,7 +166,10 @@ public class JpaBulkDelete implements BulkDelete, ExpressionResolverHandler {
 	public OperationResult execute() {
 
 		final JpaResolutionContext resolutionContext = JpaResolutionContext.create(context.getEntityManagerFactory(),
-				context.getORMPlatform().orElse(null), this, AliasMode.AUTO);
+				context.getORMPlatform().orElse(null), context, AliasMode.AUTO);
+
+		// add operation specific resolvers
+		resolutionContext.addExpressionResolvers(getExpressionResolvers());
 
 		final String jpql;
 		try {
@@ -165,8 +178,7 @@ public class JpaBulkDelete implements BulkDelete, ExpressionResolverHandler {
 			getFilter().ifPresent(f -> builder.withFilter(f));
 
 			// resolve OperationStructure
-			jpql = JpaDatastoreUtils.resolveExpression(this, builder.build(), JPQLToken.class, resolutionContext)
-					.getValue();
+			jpql = resolutionContext.resolveExpression(builder.build(), JPQLToken.class).getValue();
 
 		} catch (InvalidExpressionException e) {
 			throw new DataAccessException("Failed to configure delete operation", e);

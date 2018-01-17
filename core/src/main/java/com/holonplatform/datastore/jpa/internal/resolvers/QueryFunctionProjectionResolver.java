@@ -23,7 +23,6 @@ import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.internal.utils.TypeUtils;
 import com.holonplatform.core.query.QueryFunction;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
 import com.holonplatform.datastore.jpa.internal.converters.SingleSelectionResultConverter;
 import com.holonplatform.datastore.jpa.internal.expressions.DefaultProjectionContext;
 import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
@@ -58,8 +57,7 @@ public enum QueryFunctionProjectionResolver implements ExpressionResolver<QueryF
 		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
 
 		DefaultProjectionContext ctx = new DefaultProjectionContext(jpaContext, TypeUtils.box(expression.getType()));
-		ctx.addSelection(JpaDatastoreUtils.resolveExpression(context, expression, JPQLToken.class, context).getValue(),
-				false);
+		ctx.addSelection(jpaContext.resolveExpression(expression, JPQLToken.class).getValue(), false);
 		ctx.setConverter(new SingleSelectionResultConverter(expression));
 
 		return Optional.of(ctx);

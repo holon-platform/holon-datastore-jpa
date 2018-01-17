@@ -142,6 +142,15 @@ public class JpaBulkInsert implements BulkInsert, ExpressionResolverHandler {
 		return expressionResolverRegistry.resolve(expression, resolutionType, context);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler#getExpressionResolvers()
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Iterable<ExpressionResolver> getExpressionResolvers() {
+		return expressionResolverRegistry.getExpressionResolvers();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.holonplatform.core.datastore.bulk.BulkInsert#add(com.holonplatform.core.property.PropertyBox)
@@ -194,8 +203,11 @@ public class JpaBulkInsert implements BulkInsert, ExpressionResolverHandler {
 
 			// Get the JPA entity class
 			final JpaResolutionContext resolutionContext = JpaResolutionContext.create(
-					context.getEntityManagerFactory(), context.getORMPlatform().orElse(null), this,
+					context.getEntityManagerFactory(), context.getORMPlatform().orElse(null), context,
 					AliasMode.UNSUPPORTED);
+			
+			// add operation specific resolvers
+			resolutionContext.addExpressionResolvers(getExpressionResolvers());
 
 			JpaEntity<?> jpaEntity = resolutionContext.resolve(target, JpaEntity.class, resolutionContext).orElseThrow(
 					() -> new InvalidExpressionException("Failed to resolve data target [" + target + "]"));

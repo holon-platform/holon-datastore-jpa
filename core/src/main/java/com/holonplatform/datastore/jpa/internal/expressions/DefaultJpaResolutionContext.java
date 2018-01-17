@@ -25,8 +25,10 @@ import javax.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.core.Expression.InvalidExpressionException;
+import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler;
 import com.holonplatform.core.ExpressionResolver.ResolutionContext;
+import com.holonplatform.core.ExpressionResolverRegistry;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
@@ -38,9 +40,10 @@ import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
  */
 public class DefaultJpaResolutionContext extends AbstractJpaResolutionContext {
 
+	private final ExpressionResolverRegistry expressionResolverRegistry = ExpressionResolverRegistry.create();
+
 	private final EntityManagerFactory entityManagerFactory;
 	private final ORMPlatform platform;
-	private final ExpressionResolverHandler expressionResolverHandler;
 
 	private int parameterSequence = 0;
 
@@ -55,7 +58,9 @@ public class DefaultJpaResolutionContext extends AbstractJpaResolutionContext {
 		ObjectUtils.argumentNotNull(expressionResolverHandler, "ExpressionResolverHandler must be not null");
 		this.entityManagerFactory = entityManagerFactory;
 		this.platform = platform;
-		this.expressionResolverHandler = expressionResolverHandler;
+
+		// inherit resolvers
+		addExpressionResolvers(expressionResolverHandler.getExpressionResolvers());
 	}
 
 	/*
@@ -97,7 +102,41 @@ public class DefaultJpaResolutionContext extends AbstractJpaResolutionContext {
 	@Override
 	public <E extends Expression, R extends Expression> Optional<R> resolve(E expression, Class<R> resolutionType,
 			ResolutionContext context) throws InvalidExpressionException {
-		return expressionResolverHandler.resolve(expression, resolutionType, context);
+		return expressionResolverRegistry.resolve(expression, resolutionType, context);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler#getExpressionResolvers()
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Iterable<ExpressionResolver> getExpressionResolvers() {
+		return expressionResolverRegistry.getExpressionResolvers();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#addExpressionResolver(com.holonplatform.core.
+	 * ExpressionResolver)
+	 */
+	@Override
+	public <E extends Expression, R extends Expression> void addExpressionResolver(
+			ExpressionResolver<E, R> expressionResolver) {
+		expressionResolverRegistry.addExpressionResolver(expressionResolver);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#removeExpressionResolver(com.holonplatform.
+	 * core.ExpressionResolver)
+	 */
+	@Override
+	public <E extends Expression, R extends Expression> void removeExpressionResolver(
+			ExpressionResolver<E, R> expressionResolver) {
+		expressionResolverRegistry.removeExpressionResolver(expressionResolver);
 	}
 
 	@Override
@@ -182,6 +221,39 @@ public class DefaultJpaResolutionContext extends AbstractJpaResolutionContext {
 		public <E extends Expression, R extends Expression> Optional<R> resolve(E expression, Class<R> resolutionType,
 				ResolutionContext context) throws InvalidExpressionException {
 			return parent().resolve(expression, resolutionType, context);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#addExpressionResolver(com.holonplatform.
+		 * core.ExpressionResolver)
+		 */
+		@Override
+		public <E extends Expression, R extends Expression> void addExpressionResolver(
+				ExpressionResolver<E, R> expressionResolver) {
+			parent().addExpressionResolver(expressionResolver);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#removeExpressionResolver(com.
+		 * holonplatform.core.ExpressionResolver)
+		 */
+		@Override
+		public <E extends Expression, R extends Expression> void removeExpressionResolver(
+				ExpressionResolver<E, R> expressionResolver) {
+			parent().removeExpressionResolver(expressionResolver);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverHandler#getExpressionResolvers()
+		 */
+		@SuppressWarnings("rawtypes")
+		@Override
+		public Iterable<ExpressionResolver> getExpressionResolvers() {
+			return parent().getExpressionResolvers();
 		}
 
 		/*

@@ -357,31 +357,32 @@ public abstract class AbstractJpaDatastoreTest {
 		final PathProperty<Long> OTHER_SEQ = PathProperty.create("sequence", long.class);
 
 		long count = getDatastore().query()
-				.target(ENTITY_TARGET).filter(KEY.in(SubQuery.create(getDatastore(), Long.class)
+				.target(ENTITY_TARGET).filter(KEY.in(SubQuery.create(Long.class)
 						.target(JpaTarget.of(TestOtherDomain.class)).filter(OTHER_CODE.eq("CODE1")).select(OTHER_SEQ)))
 				.count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(ENTITY_TARGET).filter(KEY.nin(SubQuery.create(getDatastore(), OTHER_SEQ)
-				.target(JpaTarget.of(TestOtherDomain.class)).filter(OTHER_CODE.eq("CODE1")))).count();
+		count = getDatastore().query().target(ENTITY_TARGET).filter(KEY.nin(
+				SubQuery.create(OTHER_SEQ).target(JpaTarget.of(TestOtherDomain.class)).filter(OTHER_CODE.eq("CODE1"))))
+				.count();
 		assertEquals(1, count);
 
 		final PathProperty<Long> TARGETED_KEY = PathProperty.create("key", long.class).parent(ENTITY_TARGET);
 
 		count = getDatastore().query().target(ENTITY_TARGET)
-				.filter(SubQuery.create(getDatastore()).target(JpaTarget.of(TestOtherDomain.class))
+				.filter(SubQuery.create().target(JpaTarget.of(TestOtherDomain.class))
 						.filter(OTHER_CODE.eq("CODE1").and(OTHER_SEQ.eq(TARGETED_KEY))).exists())
 				.count();
 		assertEquals(1, count);
 
 		count = getDatastore().query().target(ENTITY_TARGET)
-				.filter(SubQuery.create(getDatastore()).target(JpaTarget.of(TestOtherDomain.class))
+				.filter(SubQuery.create().target(JpaTarget.of(TestOtherDomain.class))
 						.filter(OTHER_CODE.eq("CODE1").and(OTHER_SEQ.eq(TARGETED_KEY))).notExists())
 				.count();
 		assertEquals(1, count);
 
 		count = getDatastore().query().target(ENTITY_TARGET)
-				.filter(SubQuery.create(getDatastore()).target(JpaTarget.of(TestOtherDomain.class))
+				.filter(SubQuery.create().target(JpaTarget.of(TestOtherDomain.class))
 						.filter(OTHER_CODE.eq("CODE1").and(OTHER_SEQ.eq(ENTITY_TARGET.property("key", long.class))))
 						.notExists())
 				.count();
