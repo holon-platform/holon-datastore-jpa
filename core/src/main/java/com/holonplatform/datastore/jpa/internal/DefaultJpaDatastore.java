@@ -71,7 +71,6 @@ import com.holonplatform.datastore.jpa.internal.resolvers.NotExistFilterResolver
 import com.holonplatform.datastore.jpa.internal.resolvers.OperationStructureResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.PathExpressionProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.PathResolver;
-import com.holonplatform.datastore.jpa.internal.resolvers.PropertyConstantExpressionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.PropertySetProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.QueryAggregationResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.QueryFilterResolver;
@@ -164,7 +163,6 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		addExpressionResolver(QueryFunctionResolver.INSTANCE);
 		addExpressionResolver(PathResolver.INSTANCE);
 		addExpressionResolver(ConstantExpressionResolver.INSTANCE);
-		addExpressionResolver(PropertyConstantExpressionResolver.INSTANCE);
 		addExpressionResolver(LiteralValueResolver.INSTANCE);
 		addExpressionResolver(SubQueryResolver.INSTANCE);
 		addExpressionResolver(ExistFilterResolver.INSTANCE);

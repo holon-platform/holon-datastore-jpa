@@ -29,13 +29,11 @@ public class DefaultLiteralValue implements LiteralValue {
 	private static final long serialVersionUID = -2035716965294417477L;
 
 	private final Object value;
-	private final Class<?> type;
 	private final TemporalType temporalType;
 
-	public DefaultLiteralValue(Object value, Class<?> type, TemporalType temporalType) {
+	public DefaultLiteralValue(Object value, TemporalType temporalType) {
 		super();
 		this.value = value;
-		this.type = type;
 		this.temporalType = temporalType;
 	}
 
@@ -58,15 +56,6 @@ public class DefaultLiteralValue implements LiteralValue {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.internal.jpql.expressions.ExpressionValue#getType()
-	 */
-	@Override
-	public Class<?> getType() {
-		return type;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.internal.jpql.expressions.ExpressionValue#getTemporalType()
 	 */
 	@Override
@@ -80,7 +69,7 @@ public class DefaultLiteralValue implements LiteralValue {
 	 */
 	@Override
 	public String toString() {
-		return "LiteralValue expression [value=" + value + ", type=" + type + "]";
+		return "LiteralValue expression [value=" + value + "]";
 	}
 
 }

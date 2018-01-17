@@ -67,8 +67,10 @@ public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExp
 		expression.validate();
 
 		// resolve
-		return context.resolve(LiteralValue.create(expression.getValue(), expression.getType(), null), JPQLToken.class,
-				context);
+		return context.resolve(
+				LiteralValue.create(expression.getModelValue(),
+						((ConstantExpression<?, ?>) expression).getTemporalType().orElse(null)),
+				JPQLToken.class, context);
 	}
 
 }

@@ -79,7 +79,7 @@ public enum LiteralValueResolver implements ExpressionResolver<LiteralValue, JPQ
 			final List<String> tokens = new ArrayList<>(((Collection<?>) expression.getValue()).size());
 			for (Object value : (Collection<?>) expression.getValue()) {
 				tokens.add(serialize(
-						LiteralValue.create(value, expression.getType(), expression.getTemporalType().orElse(null)),
+						LiteralValue.create(value, expression.getTemporalType().orElse(null)),
 						ctx));
 			}
 			serialized = tokens.stream().collect(Collectors.joining(","));
@@ -98,8 +98,7 @@ public enum LiteralValueResolver implements ExpressionResolver<LiteralValue, JPQ
 	 * @return Serialized value
 	 */
 	private static String serialize(LiteralValue value, JpaResolutionContext context) {
-		final Class<?> type = (value.getType() != null) ? value.getType()
-				: ((value.getValue() != null ? value.getValue().getClass() : Object.class));
+		final Class<?> type = (value.getValue() != null ? value.getValue().getClass() : Object.class);
 
 		final ParameterValue parameter = ParameterValue.create(type, value.getValue(),
 				value.getTemporalType().orElse(null));

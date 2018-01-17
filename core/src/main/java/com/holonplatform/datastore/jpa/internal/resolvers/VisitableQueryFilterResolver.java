@@ -27,7 +27,6 @@ import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.internal.query.QueryFilterVisitor;
 import com.holonplatform.core.internal.query.QueryFilterVisitor.VisitableQueryFilter;
-import com.holonplatform.core.internal.query.QueryUtils;
 import com.holonplatform.core.internal.query.filter.AndFilter;
 import com.holonplatform.core.internal.query.filter.BetweenFilter;
 import com.holonplatform.core.internal.query.filter.EqualFilter;
@@ -231,12 +230,15 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	@Override
 	public JPQLToken visit(StringMatchFilter filter, JpaResolutionContext context) {
 
-		Object resolved = QueryUtils.getConstantExpressionValue(filter.getRightOperand()
-				.orElseThrow(() -> new InvalidExpressionException("Missing right operand in filter [" + filter + "]")));
-		if (resolved == null) {
-			throw new InvalidExpressionException(
-					"Invalid right operand value for StringMatchFilter: [" + resolved + "]");
+		// right operand
+		if (!filter.getRightOperand().isPresent()) {
+			throw new InvalidExpressionException("Invalid StringMatchFilter right operand");
 		}
+		if (!(filter.getRightOperand().get() instanceof ConstantExpression)) {
+			throw new InvalidExpressionException(
+					"Invalid right operand expression for StringMatchFilter: [" + filter.getRightOperand().get() + "]");
+		}
+		Object resolved = ((ConstantExpression<?, ?>) filter.getRightOperand().get()).getModelValue();
 
 		String value = resolved.toString();
 
