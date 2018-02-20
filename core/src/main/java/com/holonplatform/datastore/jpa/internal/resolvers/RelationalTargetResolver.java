@@ -21,14 +21,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.Path;
 import com.holonplatform.core.datastore.relational.Join;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.internal.utils.ObjectUtils;
-import com.holonplatform.datastore.jpa.internal.expressions.FromExpression;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link RelationalTarget} expression resolver.
@@ -37,7 +36,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum RelationalTargetResolver implements ExpressionResolver<RelationalTarget, FromExpression> {
+public enum RelationalTargetResolver implements JPQLContextExpressionResolver<RelationalTarget, JPQLExpression> {
 
 	INSTANCE;
 
@@ -55,35 +54,33 @@ public enum RelationalTargetResolver implements ExpressionResolver<RelationalTar
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends FromExpression> getResolvedType() {
-		return FromExpression.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.Expression.ExpressionResolverFunction#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<FromExpression> resolve(RelationalTarget expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(RelationalTarget expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
-		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
-
 		final StringBuilder sb = new StringBuilder();
 
 		// root path
-		sb.append(getJPQLPath(jpaContext, expression));
+		sb.append(getJPQLPath(context, expression));
 
 		// resolve joins
-		sb.append(expression.getJoins().stream().map(j -> resolveJoin((Join<?>) j, jpaContext))
+		// resolve joins
+		sb.append(((RelationalTarget<?>) expression).getJoins().stream().map(j -> resolveJoin(context, j))
 				.collect(Collectors.joining(" ")));
 
-		return Optional.of(FromExpression.create(sb.toString().trim()));
+		return Optional.of(JPQLExpression.create(sb.toString().trim()));
 	}
 
 	/**
@@ -92,25 +89,25 @@ public enum RelationalTargetResolver implements ExpressionResolver<RelationalTar
 	 * @param path Path to convert
 	 * @return JPQL expression
 	 */
-	private static String getJPQLPath(JpaResolutionContext context, final Path<?> path) {
-		return context.getTargetAlias(path).map(a -> {
+	private static String getJPQLPath(JPQLResolutionContext context, final Path<?> path) {
+		return context.isStatementCompositionContext().flatMap(ctx -> ctx.getAlias(path, false).map(a -> {
 			StringBuilder pb = new StringBuilder();
 			pb.append(path.getName());
 			pb.append(" ");
 			pb.append(a);
 			return pb.toString();
-		}).orElse(path.getName());
+		})).orElse(path.getName());
 	}
 
 	/**
 	 * Resolve a {@link Join} clause.
 	 * @param sb String builder to use to append the resolved join JPQL
-	 * @param join Join to resolve
 	 * @param context Resolution context
+	 * @param join Join to resolve
 	 * @return Resolved join JPQL
 	 * @throws InvalidExpressionException If an error occurred
 	 */
-	private static String resolveJoin(Join<?> join, JpaResolutionContext context) throws InvalidExpressionException {
+	private static String resolveJoin(JPQLResolutionContext context, Join<?> join) throws InvalidExpressionException {
 		ObjectUtils.argumentNotNull(join, "Join must be not null");
 
 		final StringBuilder sb = new StringBuilder();
@@ -136,7 +133,7 @@ public enum RelationalTargetResolver implements ExpressionResolver<RelationalTar
 		// ON condition
 		join.getOn().ifPresent(o -> {
 			sb.append(" ON ");
-			sb.append(context.resolveExpression(o, JPQLToken.class).getValue());
+			sb.append(context.resolveOrFail(o, JPQLExpression.class).getValue());
 		});
 
 		return sb.toString();

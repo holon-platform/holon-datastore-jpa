@@ -22,7 +22,7 @@ import javax.annotation.Priority;
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.query.QuerySort;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link QuerySort} expression resolver.
@@ -30,7 +30,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
  * @since 5.0.0
  */
 @Priority(Integer.MAX_VALUE)
-public enum QuerySortResolver implements ExpressionResolver<QuerySort, JPQLToken> {
+public enum QuerySortResolver implements ExpressionResolver<QuerySort, JPQLExpression> {
 
 	INSTANCE;
 
@@ -48,8 +48,8 @@ public enum QuerySortResolver implements ExpressionResolver<QuerySort, JPQLToken
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
@@ -58,7 +58,7 @@ public enum QuerySortResolver implements ExpressionResolver<QuerySort, JPQLToken
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(QuerySort expression,
+	public Optional<JPQLExpression> resolve(QuerySort expression,
 			com.holonplatform.core.ExpressionResolver.ResolutionContext context) throws InvalidExpressionException {
 
 		// intermediate resolution and validation
@@ -66,7 +66,7 @@ public enum QuerySortResolver implements ExpressionResolver<QuerySort, JPQLToken
 
 		if (sort.isPresent()) {
 			sort.get().validate();
-			return context.resolve(sort.get(), JPQLToken.class, context);
+			return context.resolve(sort.get(), JPQLExpression.class, context);
 		}
 
 		return Optional.empty();

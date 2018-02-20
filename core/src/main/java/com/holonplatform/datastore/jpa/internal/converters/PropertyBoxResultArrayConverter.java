@@ -17,10 +17,11 @@ package com.holonplatform.datastore.jpa.internal.converters;
 
 import java.util.Map;
 
+import com.holonplatform.core.TypedExpression;
+import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.property.Property;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.property.PropertySet;
-import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
 
 /**
  * {@link PropertyBox} results array converter.
@@ -29,25 +30,38 @@ import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
  */
 public class PropertyBoxResultArrayConverter extends AbstractPropertyBoxConverter<Object[]> {
 
-	public PropertyBoxResultArrayConverter(PropertySet<?> propertySet, Property<?>[] selection,
-			Map<Property<?>, String> selectionAlias) {
-		super(propertySet, selection, selectionAlias);
+	/**
+	 * Constructor.
+	 * @param propertySet Property set to use to build the {@link PropertyBox} instance (not null)
+	 * @param selection Query selection (not null)
+	 * @param selectionAlias Selection aliases
+	 * @param selectionProperties Selection properties
+	 */
+	public PropertyBoxResultArrayConverter(PropertySet<?> propertySet, TypedExpression<?>[] selection,
+			Map<TypedExpression<?>, String> selectionAlias, Map<TypedExpression<?>, Property<?>> selectionProperties) {
+		super(propertySet, selection, selectionAlias, selectionProperties);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.internal.jpql.converters.AbstractPropertyBoxConverter#getResult(com.holonplatform
-	 * .core.property.Property, java.lang.Object, java.lang.String, int)
+	 * @see com.holonplatform.datastore.jpa.operation.JpaResultConverter#getQueryResultType()
 	 */
 	@Override
-	protected Object getResult(Property<?> property, Object[] queryResult, String alias, int index)
-			throws QueryResultConversionException {
+	public Class<? extends Object[]> getQueryResultType() {
+		return Object[].class;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.internal.converters.AbstractPropertyBoxConverter#getResult(java.lang.Object,
+	 * java.lang.String, int)
+	 */
+	@Override
+	protected Object getResult(Object[] queryResult, String alias, int index) throws DataAccessException {
 		if (index < 0 || index > (queryResult.length - 1)) {
-			throw new QueryResultConversionException(
-					"Invalid index [" + index + "] - Tuple size: " + queryResult.length);
+			throw new DataAccessException("Invalid result index [" + index + "] - Tuple size: " + queryResult.length);
 		}
-		return getResult(property, queryResult[index]);
+		return queryResult[index];
 	}
 
 }

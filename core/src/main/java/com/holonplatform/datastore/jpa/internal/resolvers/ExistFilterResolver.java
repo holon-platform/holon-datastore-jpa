@@ -20,10 +20,10 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.internal.datastore.relational.ExistsFilter;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link ExistsFilter} expression resolver.
@@ -31,7 +31,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  * @since 5.0.0
  */
 @Priority(Integer.MAX_VALUE - 50)
-public enum ExistFilterResolver implements ExpressionResolver<ExistsFilter, JPQLToken> {
+public enum ExistFilterResolver implements JPQLContextExpressionResolver<ExistsFilter, JPQLExpression> {
 
 	INSTANCE;
 
@@ -49,33 +49,31 @@ public enum ExistFilterResolver implements ExpressionResolver<ExistsFilter, JPQL
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(ExistsFilter expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(ExistsFilter expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
-		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("EXISTS (");
 
 		// resolve sub query
-		sb.append(jpaContext.resolveExpression(expression.getSubQuery(), JPQLToken.class).getValue());
+		sb.append(context.resolveOrFail(expression.getSubQuery(), JPQLExpression.class).getValue());
 
 		sb.append(")");
 
-		return Optional.of(JPQLToken.create(sb.toString()));
+		return Optional.of(JPQLExpression.create(sb.toString()));
 	}
 
 }

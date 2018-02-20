@@ -22,7 +22,7 @@ import javax.annotation.Priority;
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.query.QueryFilter;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link QueryFilter} expression resolver.
@@ -30,7 +30,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
  * @since 5.0.0
  */
 @Priority(Integer.MAX_VALUE)
-public enum QueryFilterResolver implements ExpressionResolver<QueryFilter, JPQLToken> {
+public enum QueryFilterResolver implements ExpressionResolver<QueryFilter, JPQLExpression> {
 
 	INSTANCE;
 
@@ -48,8 +48,8 @@ public enum QueryFilterResolver implements ExpressionResolver<QueryFilter, JPQLT
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
@@ -58,7 +58,7 @@ public enum QueryFilterResolver implements ExpressionResolver<QueryFilter, JPQLT
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(QueryFilter expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(QueryFilter expression, ResolutionContext context)
 			throws InvalidExpressionException {
 
 		// intermediate resolution and validation
@@ -66,7 +66,7 @@ public enum QueryFilterResolver implements ExpressionResolver<QueryFilter, JPQLT
 
 		if (filter.isPresent()) {
 			filter.get().validate();
-			return context.resolve(filter.get(), JPQLToken.class, context);
+			return context.resolve(filter.get(), JPQLExpression.class, context);
 		}
 
 		return Optional.empty();

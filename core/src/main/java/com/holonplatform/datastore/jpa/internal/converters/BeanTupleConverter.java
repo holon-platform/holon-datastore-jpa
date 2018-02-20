@@ -21,8 +21,8 @@ import javax.persistence.Tuple;
 
 import com.holonplatform.core.Path;
 import com.holonplatform.core.beans.BeanPropertySet;
+import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.query.BeanProjection;
-import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
 
 /**
  * {@link BeanProjection} {@link Tuple} converter.
@@ -33,6 +33,12 @@ import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
  */
 public class BeanTupleConverter<T> extends AbstractBeanConverter<Tuple, T> {
 
+	/**
+	 * Constructor.
+	 * @param beanPropertySet Bean property set (not null)
+	 * @param selection Selection paths (not null)
+	 * @param selectionAlias Selection aliases
+	 */
 	public BeanTupleConverter(BeanPropertySet<T> beanPropertySet, Path<?>[] selection,
 			Map<Path<?>, String> selectionAlias) {
 		super(beanPropertySet, selection, selectionAlias);
@@ -40,21 +46,28 @@ public class BeanTupleConverter<T> extends AbstractBeanConverter<Tuple, T> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.internal.jpql.converters.AbstractBeanConverter#getResult(com.holonplatform.core.
-	 * Path, java.lang.Object, java.lang.String, int)
+	 * @see com.holonplatform.datastore.jpa.operation.JpaResultConverter#getQueryResultType()
 	 */
 	@Override
-	protected Object getResult(Path<?> path, Tuple queryResult, String alias, int index)
-			throws QueryResultConversionException {
-		if (alias == null) {
-			throw new QueryResultConversionException("Missing selection alias for selection path [" + path + "]");
-		}
+	public Class<? extends Tuple> getQueryResultType() {
+		return Tuple.class;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.internal.converters.AbstractResultConverter#getResult(java.lang.Object,
+	 * java.lang.String, int)
+	 */
+	@Override
+	protected Object getResult(Tuple queryResult, String alias, int index) throws DataAccessException {
 		try {
-			return getResult(path, queryResult.get(alias));
-		} catch (IllegalArgumentException e) {
-			throw new QueryResultConversionException("Failed to obtain result from tuple using alias [" + alias + "]",
-					e);
+			if (alias == null) {
+				return queryResult.get(index);
+			}
+			return queryResult.get(alias);
+		} catch (Exception e) {
+			throw new DataAccessException("Failed to obtain result from tuple [" + queryResult + "] at index [" + index
+					+ "] with alias [" + alias + "]", e);
 		}
 	}
 

@@ -20,9 +20,10 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.DataTarget;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 
 /**
  * {@link DataTarget} expression resolver.
@@ -31,7 +32,7 @@ import com.holonplatform.core.datastore.relational.RelationalTarget;
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum DataTargetResolver implements ExpressionResolver<DataTarget, RelationalTarget> {
+public enum DataTargetResolver implements JPQLContextExpressionResolver<DataTarget, RelationalTarget> {
 
 	INSTANCE;
 
@@ -55,22 +56,22 @@ public enum DataTargetResolver implements ExpressionResolver<DataTarget, Relatio
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<RelationalTarget> resolve(DataTarget expression, ResolutionContext context)
+	public Optional<RelationalTarget> resolve(DataTarget expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
+		// validate
 		expression.validate();
 
 		if (expression instanceof RelationalTarget) {
 			return Optional.of((RelationalTarget) expression);
 		}
 
-		// intermediate resolution and validation
-		DataTarget<?> target = context.resolve(expression, DataTarget.class, context).orElse(expression);
-		target.validate();
+		// intermediate resolution
+		DataTarget<?> target = context.resolve(expression, DataTarget.class).orElse(expression);
 
 		// resolve as RelationalTarget
 		return Optional.of(RelationalTarget.of(target));

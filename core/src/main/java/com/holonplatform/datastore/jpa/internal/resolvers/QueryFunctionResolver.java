@@ -15,43 +15,32 @@
  */
 package com.holonplatform.datastore.jpa.internal.resolvers;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
-import com.holonplatform.core.query.QueryExpression;
+import com.holonplatform.core.TypedExpression;
 import com.holonplatform.core.query.QueryFunction;
-import com.holonplatform.core.query.QueryFunction.Avg;
-import com.holonplatform.core.query.QueryFunction.Count;
-import com.holonplatform.core.query.QueryFunction.Max;
-import com.holonplatform.core.query.QueryFunction.Min;
-import com.holonplatform.core.query.QueryFunction.Sum;
-import com.holonplatform.core.query.StringFunction.Lower;
-import com.holonplatform.core.query.StringFunction.Upper;
-import com.holonplatform.core.query.TemporalFunction.CurrentDate;
-import com.holonplatform.core.query.TemporalFunction.CurrentLocalDate;
-import com.holonplatform.core.query.TemporalFunction.CurrentLocalDateTime;
-import com.holonplatform.core.query.TemporalFunction.CurrentTimestamp;
-import com.holonplatform.core.query.TemporalFunction.Day;
-import com.holonplatform.core.query.TemporalFunction.Hour;
-import com.holonplatform.core.query.TemporalFunction.Month;
-import com.holonplatform.core.query.TemporalFunction.Year;
-import com.holonplatform.datastore.jpa.ORMPlatform;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
 
 /**
- * JPA {@link QueryFunction} expression resolver.
+ * {@link QueryFunction} resolver.
  *
- * @since 5.0.0
+ * @since 5.1.0
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum QueryFunctionResolver implements ExpressionResolver<QueryFunction, JPQLToken> {
+public enum QueryFunctionResolver implements JPQLContextExpressionResolver<QueryFunction, JPQLExpression> {
 
+	/**
+	 * Singleton instance.
+	 */
 	INSTANCE;
 
 	/*
@@ -68,90 +57,52 @@ public enum QueryFunctionResolver implements ExpressionResolver<QueryFunction, J
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(QueryFunction expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(QueryFunction expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
-		final JpaResolutionContext jpaContext = JpaResolutionContext.checkContext(context);
+		// try to resolve as a JPQLFunction
+		return context.resolve(expression, JPQLFunction.class)
+				.map(function -> serializeJPQLFunction(context, expression, function));
 
-		// check no args
-		if (CurrentDate.class.isAssignableFrom(expression.getClass()))
-			return Optional.of(JPQLToken.create("CURRENT_DATE"));
-		if (CurrentLocalDate.class.isAssignableFrom(expression.getClass()))
-			return Optional.of(JPQLToken.create("CURRENT_DATE"));
-		if (CurrentTimestamp.class.isAssignableFrom(expression.getClass()))
-			return Optional.of(JPQLToken.create("CURRENT_TIMESTAMP"));
-		if (CurrentLocalDateTime.class.isAssignableFrom(expression.getClass()))
-			return Optional.of(JPQLToken.create("CURRENT_TIMESTAMP"));
-
-		// resolve arguments
-		@SuppressWarnings("unchecked")
-		List<QueryExpression> arguments = expression.getExpressionArguments();
-
-		final String functionArgument;
-		if (arguments != null && !arguments.isEmpty()) {
-			functionArgument = jpaContext.resolveExpression(arguments.get(0), JPQLToken.class).getValue();
-		} else {
-			functionArgument = null;
-		}
-
-		// resolve function
-		return serializeFunction(expression, functionArgument, jpaContext.getORMPlatform().orElse(null)).map(f -> {
-			return JPQLToken.create(f);
-		});
 	}
 
-	private static Optional<String> serializeFunction(QueryFunction function, String argument, ORMPlatform platform) {
-		if (Count.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("COUNT(" + argument + ")");
-		}
-		if (Avg.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("AVG(" + argument + ")");
-		}
-		if (Min.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("MIN(" + argument + ")");
-		}
-		if (Max.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("MAX(" + argument + ")");
-		}
-		if (Sum.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("SUM(" + argument + ")");
-		}
-		if (Lower.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("LOWER(" + argument + ")");
-		}
-		if (Upper.class.isAssignableFrom(function.getClass())) {
-			return Optional.of("UPPER(" + argument + ")");
+	/**
+	 * Serialize given function using provided {@link QueryFunction} expression arguments.
+	 * @param context JPQL context
+	 * @param expression Function expression
+	 * @param function JPQL function
+	 * @return Serialized function expression
+	 */
+	private static JPQLExpression serializeJPQLFunction(JPQLResolutionContext context, QueryFunction expression,
+			JPQLFunction function) {
+
+		// validate function
+		function.validate();
+
+		// resolve arguments
+		final List<String> arguments = new LinkedList<>();
+		if (expression.getExpressionArguments() != null) {
+			for (TypedExpression<?> argument : ((QueryFunction<?, ?>) expression).getExpressionArguments()) {
+				// resolve argument
+				arguments.add(context.resolveOrFail(argument, JPQLExpression.class).getValue());
+			}
 		}
 
-		// Temporals
-		boolean isHibernate = (platform != null && platform == ORMPlatform.HIBERNATE);
-		if (Year.class.isAssignableFrom(function.getClass())) {
-			return Optional.of(isHibernate ? ("YEAR(" + argument + ")") : "EXTRACT(YEAR FROM " + argument + ")");
-		}
-		if (Month.class.isAssignableFrom(function.getClass())) {
-			return Optional.of(isHibernate ? ("MONTH(" + argument + ")") : "EXTRACT(MONTH FROM " + argument + ")");
-		}
-		if (Day.class.isAssignableFrom(function.getClass())) {
-			return Optional.of(isHibernate ? ("DAY(" + argument + ")") : "EXTRACT(DAY FROM " + argument + ")");
-		}
-		if (Hour.class.isAssignableFrom(function.getClass())) {
-			return Optional.of(isHibernate ? ("HOUR(" + argument + ")") : "EXTRACT(HOUR FROM " + argument + ")");
-		}
+		return JPQLExpression.create(function.serialize(arguments));
 
-		return Optional.empty();
 	}
 
 }

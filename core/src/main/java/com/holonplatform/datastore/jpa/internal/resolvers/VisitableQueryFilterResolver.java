@@ -24,7 +24,7 @@ import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
+import com.holonplatform.core.TypedExpression;
 import com.holonplatform.core.internal.query.QueryFilterVisitor;
 import com.holonplatform.core.internal.query.QueryFilterVisitor.VisitableQueryFilter;
 import com.holonplatform.core.internal.query.filter.AndFilter;
@@ -42,11 +42,12 @@ import com.holonplatform.core.internal.query.filter.OperationQueryFilter;
 import com.holonplatform.core.internal.query.filter.OrFilter;
 import com.holonplatform.core.internal.query.filter.StringMatchFilter;
 import com.holonplatform.core.query.ConstantExpression;
-import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.core.query.QueryFilter;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
-import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
+import com.holonplatform.core.query.StringFunction.Lower;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLParameterizableExpression;
 
 /**
  * JPA {@link VisitableQueryFilter} expression resolver.
@@ -54,8 +55,8 @@ import com.holonplatform.datastore.jpa.internal.support.ParameterValue;
  * @since 5.0.0
  */
 @Priority(Integer.MAX_VALUE - 10)
-public enum VisitableQueryFilterResolver implements ExpressionResolver<VisitableQueryFilter, JPQLToken>,
-		QueryFilterVisitor<JPQLToken, JpaResolutionContext> {
+public enum VisitableQueryFilterResolver implements JPQLContextExpressionResolver<VisitableQueryFilter, JPQLExpression>,
+		QueryFilterVisitor<JPQLExpression, JPQLResolutionContext> {
 
 	INSTANCE;
 
@@ -73,8 +74,8 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
@@ -83,14 +84,14 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(VisitableQueryFilter expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(VisitableQueryFilter expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
 		// resolve using visitor
-		return Optional.ofNullable(expression.accept(this, JpaResolutionContext.checkContext(context)));
+		return Optional.ofNullable(expression.accept(this, context));
 	}
 
 	/*
@@ -99,11 +100,11 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * NullFilter, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(NullFilter filter, JpaResolutionContext context) {
+	public JPQLExpression visit(NullFilter filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(" IS NULL");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -112,11 +113,11 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * NotNullFilter, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(NotNullFilter filter, JpaResolutionContext context) {
+	public JPQLExpression visit(NotNullFilter filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(" IS NOT NULL");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -125,12 +126,12 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * EqualFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(EqualFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(EqualFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append("=");
-		sb.append(resolveRightOperand(filter, context));
-		return JPQLToken.create(sb.toString());
+		sb.append(serializeRightOperand(filter, context));
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -139,12 +140,12 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * NotEqualFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(NotEqualFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(NotEqualFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append("<>");
-		sb.append(resolveRightOperand(filter, context));
-		return JPQLToken.create(sb.toString());
+		sb.append(serializeRightOperand(filter, context));
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -153,12 +154,12 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * GreaterFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(GreaterFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(GreaterFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(filter.isIncludeEquals() ? ">=" : ">");
-		sb.append(resolveRightOperand(filter, context));
-		return JPQLToken.create(sb.toString());
+		sb.append(serializeRightOperand(filter, context));
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -167,12 +168,12 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * LessFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(LessFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(LessFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(filter.isIncludeEquals() ? "<=" : "<");
-		sb.append(resolveRightOperand(filter, context));
-		return JPQLToken.create(sb.toString());
+		sb.append(serializeRightOperand(filter, context));
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -181,13 +182,13 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * InFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(InFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(InFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(" IN (");
-		sb.append(resolveRightOperand(filter, context));
+		sb.append(serializeRightOperand(filter, context));
 		sb.append(")");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -196,13 +197,13 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * NotInFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(NotInFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(NotInFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(" NOT IN (");
-		sb.append(resolveRightOperand(filter, context));
+		sb.append(serializeRightOperand(filter, context));
 		sb.append(")");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -211,14 +212,16 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * BetweenFilter, java.lang.Object)
 	 */
 	@Override
-	public <T> JPQLToken visit(BetweenFilter<T> filter, JpaResolutionContext context) {
+	public <T> JPQLExpression visit(BetweenFilter<T> filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(resolve(filter.getLeftOperand(), context));
+		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(" BETWEEN ");
-		sb.append(resolve(ConstantExpression.create(filter.getFromValue()), context));
+		sb.append(serialize(JPQLParameterizableExpression.create(ConstantExpression.create(filter.getFromValue())),
+				context));
 		sb.append(" AND ");
-		sb.append(resolve(ConstantExpression.create(filter.getToValue()), context));
-		return JPQLToken.create(sb.toString());
+		sb.append(serialize(JPQLParameterizableExpression.create(ConstantExpression.create(filter.getToValue())),
+				context));
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -227,19 +230,13 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * LikeFilter, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(StringMatchFilter filter, JpaResolutionContext context) {
+	public JPQLExpression visit(StringMatchFilter filter, JPQLResolutionContext context) {
 
-		// right operand
-		if (!filter.getRightOperand().isPresent()) {
-			throw new InvalidExpressionException("Invalid StringMatchFilter right operand");
+		// check value
+		String value = filter.getValue();
+		if (value == null) {
+			throw new InvalidExpressionException("String match filter value cannot be null");
 		}
-		if (!(filter.getRightOperand().get() instanceof ConstantExpression)) {
-			throw new InvalidExpressionException(
-					"Invalid right operand expression for StringMatchFilter: [" + filter.getRightOperand().get() + "]");
-		}
-		Object resolved = ((ConstantExpression<?, ?>) filter.getRightOperand().get()).getModelValue();
-
-		String value = resolved.toString();
 
 		// escape
 		value = value.replace("!", "!!").replace("%", "!%").replace("_", "!_").replace("[", "![");
@@ -259,25 +256,27 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 			break;
 		}
 
-		final String path = resolve(filter.getLeftOperand(), context);
-
-		StringBuilder sb = new StringBuilder();
-
+		// check ignore case
+		TypedExpression<String> left = (filter.isIgnoreCase()) ? Lower.create(filter.getLeftOperand())
+				: filter.getLeftOperand();
 		if (filter.isIgnoreCase()) {
-			sb.append("lower(");
-			sb.append(path);
-			sb.append(")");
 			value = value.toLowerCase();
-		} else {
-			sb.append(path);
 		}
 
+		final String path = serialize(left, context);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(path);
+
 		sb.append(" LIKE ");
-		sb.append(":" + context.addNamedParameter(ParameterValue.create(String.class, value)));
+		sb.append(context
+				.resolveOrFail(JPQLParameterizableExpression.create(ConstantExpression.create(value, String.class)),
+						JPQLExpression.class)
+				.getValue());
 
 		sb.append(" ESCAPE '!'");
 
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -286,12 +285,12 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * AndFilter, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(AndFilter filter, JpaResolutionContext context) {
+	public JPQLExpression visit(AndFilter filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		sb.append(resolveFilterList(filter.getComposition(), ") AND (", context));
 		sb.append(")");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -300,12 +299,12 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * OrFilter, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(OrFilter filter, JpaResolutionContext context) {
+	public JPQLExpression visit(OrFilter filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		sb.append(resolveFilterList(filter.getComposition(), ") OR (", context));
 		sb.append(")");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -314,16 +313,16 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * NotFilter, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(NotFilter filter, JpaResolutionContext context) {
+	public JPQLExpression visit(NotFilter filter, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("NOT (");
-		sb.append(context.resolveExpression(filter.getComposition().get(0), JPQLToken.class).getValue());
+		sb.append(context.resolveOrFail(filter.getComposition().get(0), JPQLExpression.class).getValue());
 		sb.append(")");
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/**
-	 * Resolve a list of filters into {@link JPQLToken}s and returns the resolved tokens joined with given
+	 * Resolve a list of filters into {@link JPQLExpression}s and returns the resolved tokens joined with given
 	 * <code>separator</code>.
 	 * @param filters Filters to resolve
 	 * @param separator Token separator
@@ -331,25 +330,25 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * @return The resolved tokens joined with given <code>separator</code>
 	 * @throws InvalidExpressionException Failed to resolve a filter
 	 */
-	private static String resolveFilterList(List<QueryFilter> filters, String separator, JpaResolutionContext context)
+	private static String resolveFilterList(List<QueryFilter> filters, String separator, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 		List<String> resolved = new LinkedList<>();
 		filters.forEach(f -> {
-			resolved.add(context.resolveExpression(f, JPQLToken.class).getValue());
+			resolved.add(context.resolveOrFail(f, JPQLExpression.class).getValue());
 		});
 		return resolved.stream().collect(Collectors.joining(separator));
 	}
 
 	/**
-	 * Resolve given expression as {@link JPQLToken} and return the JPQL value
+	 * Resolve given expression as {@link JPQLExpression} and return the JPQL value
 	 * @param expression Expression to resolve
 	 * @param context Resolution context
 	 * @return JPQL value
 	 * @throws InvalidExpressionException Failed to resolve the expression
 	 */
-	private static String resolve(Expression expression, JpaResolutionContext context)
+	private static String serialize(Expression expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
-		return context.resolveExpression(expression, JPQLToken.class).getValue();
+		return context.resolveOrFail(expression, JPQLExpression.class).getValue();
 	}
 
 	/**
@@ -359,11 +358,11 @@ public enum VisitableQueryFilterResolver implements ExpressionResolver<Visitable
 	 * @return JPQL value
 	 * @throws InvalidExpressionException Failed to resolve the expression
 	 */
-	private static String resolveRightOperand(OperationQueryFilter<?> filter, JpaResolutionContext context)
+	private static String serializeRightOperand(OperationQueryFilter<?> filter, JPQLResolutionContext context)
 			throws InvalidExpressionException {
-		QueryExpression<?> operand = filter.getRightOperand()
+		TypedExpression<?> operand = filter.getRightOperand()
 				.orElseThrow(() -> new InvalidExpressionException("Missing right operand in filter [" + filter + "]"));
-		return context.resolveExpression(operand, JPQLToken.class).getValue();
+		return context.resolveOrFail(JPQLParameterizableExpression.create(operand), JPQLExpression.class).getValue();
 	}
 
 }

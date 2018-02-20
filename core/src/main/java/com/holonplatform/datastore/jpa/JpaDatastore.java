@@ -20,10 +20,13 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
 
 import com.holonplatform.core.datastore.Datastore;
+import com.holonplatform.core.datastore.DatastoreCommodity;
 import com.holonplatform.core.datastore.DatastoreCommodityRegistrar;
-import com.holonplatform.core.exceptions.DataAccessException;
+import com.holonplatform.core.datastore.transaction.Transactional;
 import com.holonplatform.core.query.Query;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
+import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory;
+import com.holonplatform.datastore.jpa.context.EntityManagerHandler;
 import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
 
 /**
@@ -31,7 +34,8 @@ import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
  * 
  * @since 5.0.0
  */
-public interface JpaDatastore extends Datastore, DatastoreCommodityRegistrar<JpaDatastoreCommodityContext> {
+public interface JpaDatastore extends Datastore, Transactional, EntityManagerHandler,
+		DatastoreCommodityRegistrar<JpaDatastoreCommodityContext> {
 
 	/**
 	 * {@link Query} parameter to set lock mode (use {@link Query#parameter(String, Object)} to set query parameters).
@@ -40,37 +44,6 @@ public interface JpaDatastore extends Datastore, DatastoreCommodityRegistrar<Jpa
 	 * </p>
 	 */
 	public static final String QUERY_PARAMETER_LOCK_MODE = "jpaQueryLockMode";
-
-	/**
-	 * Execute given <code>operation</code> using an {@link EntityManager} instance provided by the Datastore and return
-	 * the operation result.
-	 * <p>
-	 * The {@link EntityManager} lifecycle is managed by Datastore, obtaining an instance using
-	 * {@link EntityManagerInitializer} and performing any close operation using {@link EntityManagerFinalizer}.
-	 * </p>
-	 * @param <R> Operation result type
-	 * @param operation The operation to execute (not null)
-	 * @return Operation result
-	 * @throws IllegalStateException If a {@link EntityManagerFactory} is not available
-	 * @throws DataAccessException If an error occurred during {@link EntityManager} management or operation execution
-	 */
-	<R> R withEntityManager(EntityManagerOperation<R> operation);
-
-	/**
-	 * Represents an operation to be executed using a Datastore managed {@link EntityManager}.
-	 * @param <R> Operation result type
-	 */
-	public interface EntityManagerOperation<R> {
-
-		/**
-		 * Execute an operation and returns a result.
-		 * @param entityManager EntityManager to use
-		 * @return Operation result
-		 * @throws Exception If an operation execution error occurred
-		 */
-		R execute(EntityManager entityManager) throws Exception;
-
-	}
 
 	// Builder
 
@@ -119,9 +92,15 @@ public interface JpaDatastore extends Datastore, DatastoreCommodityRegistrar<Jpa
 		 */
 		Builder<D> autoFlush(boolean autoFlush);
 
-	}
+		/**
+		 * Register a {@link JpaDatastoreCommodityFactory}.
+		 * @param <C> Commodity type
+		 * @param commodityFactory The factory to register (not null)
+		 * @return this
+		 */
+		<C extends DatastoreCommodity> Builder<D> withCommodity(JpaDatastoreCommodityFactory<C> commodityFactory);
 
-	// Support
+	}
 
 	/**
 	 * Interface to provide {@link EntityManager} instance to use when executing a Datastore operation
@@ -135,6 +114,15 @@ public interface JpaDatastore extends Datastore, DatastoreCommodityRegistrar<Jpa
 		 * @return EntityManager to use
 		 */
 		EntityManager getEntityManager(EntityManagerFactory entityManagerFactory);
+
+		/**
+		 * Create a default {@link EntityManagerInitializer}, which uses
+		 * {@link EntityManagerFactory#createEntityManager()} to create a new {@link EntityManager} instance.
+		 * @return A default {@link EntityManagerInitializer}
+		 */
+		static EntityManagerInitializer createDefault() {
+			return emf -> emf.createEntityManager();
+		}
 
 	}
 
@@ -150,6 +138,15 @@ public interface JpaDatastore extends Datastore, DatastoreCommodityRegistrar<Jpa
 		 * @param entityManager EntityManager to finalize
 		 */
 		void finalizeEntityManager(EntityManager entityManager);
+
+		/**
+		 * Create a default {@link EntityManagerFinalizer}, which invokes the {@link EntityManager#close()} method to
+		 * finalize the {@link EntityManager} instance.
+		 * @return A default {@link EntityManagerFinalizer}
+		 */
+		static EntityManagerFinalizer createDefault() {
+			return em -> em.close();
+		}
 
 	}
 

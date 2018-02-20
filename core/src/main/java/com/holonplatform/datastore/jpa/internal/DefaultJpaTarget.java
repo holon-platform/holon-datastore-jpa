@@ -15,7 +15,12 @@
  */
 package com.holonplatform.datastore.jpa.internal;
 
+import java.util.Optional;
+
+import javax.persistence.Entity;
+
 import com.holonplatform.core.internal.datastore.DefaultDataTarget;
+import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.JpaTarget;
 
 /**
@@ -28,11 +33,28 @@ public class DefaultJpaTarget<T> extends DefaultDataTarget<T> implements JpaTarg
 	private static final long serialVersionUID = 1979070987995081298L;
 
 	/**
-	 * Constructor
-	 * @param entityClass Entity class
+	 * Constructor.
+	 * @param entityClass Entity class (not null)
 	 */
 	public DefaultJpaTarget(Class<? extends T> entityClass) {
-		super(JpaDatastoreUtils.getEntityName(entityClass), entityClass);
+		super(getEntityNameFromAnnotation(entityClass).orElse(entityClass.getSimpleName()), entityClass);
+	}
+
+	/**
+	 * Get the entity name using {@link Entity#name()} annotation attribute, if available.
+	 * @param entityClass Entity class (not null)
+	 * @return The entity name as specified using {@link Entity#name()} annotation attribute, or an empty Optional if
+	 *         the {@link Entity} annotation is not present or the <code>name</code> attribute has no value
+	 */
+	private static Optional<String> getEntityNameFromAnnotation(Class<?> entityClass) {
+		ObjectUtils.argumentNotNull(entityClass, "Entity class must be not null");
+		if (entityClass.isAnnotationPresent(Entity.class)) {
+			String name = entityClass.getAnnotation(Entity.class).name();
+			if (name != null && !name.trim().equals("")) {
+				return Optional.of(name);
+			}
+		}
+		return Optional.empty();
 	}
 
 }

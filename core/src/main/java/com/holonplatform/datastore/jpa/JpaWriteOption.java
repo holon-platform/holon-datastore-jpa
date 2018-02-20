@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa;
 
-import com.holonplatform.core.datastore.Datastore.WriteOption;
+import com.holonplatform.core.datastore.DatastoreOperations.WriteOption;
 
 /**
  * JPA {@link WriteOption}s enumeration.

@@ -20,11 +20,12 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.DataTarget;
+import com.holonplatform.datastore.jpa.JpaTarget;
 import com.holonplatform.datastore.jpa.internal.EntityTargetCache;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaEntity;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
  * {@link DataTarget} as {@link JpaEntity} resolver.
@@ -33,7 +34,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum DataTargetEntityResolver implements ExpressionResolver<DataTarget, JpaEntity> {
+public enum DataTargetEntityResolver implements JPQLContextExpressionResolver<DataTarget, JpaEntity> {
 
 	INSTANCE;
 
@@ -57,25 +58,33 @@ public enum DataTargetEntityResolver implements ExpressionResolver<DataTarget, J
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JpaEntity> resolve(DataTarget expression, ResolutionContext context)
+	public Optional<JpaEntity> resolve(DataTarget expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
-		// intermediate resolution and validation
-		DataTarget target = context.resolve(expression, DataTarget.class, context).orElse(expression);
-		target.validate();
+		// validate
+		expression.validate();
 
+		// intermediate resolution and validation
+		DataTarget target = context.resolve(expression, DataTarget.class).orElse(expression);
+
+		// check JPA target
+		if (target instanceof JpaTarget) {
+			return Optional
+					.of(JpaEntity.create(((JpaTarget<?>) target).getEntityClass(), ((JpaTarget<?>) target).getName()));
+		}
+
+		final String entityName = target.getName();
 		// resolve entity class
 		Class<?> entityClass = EntityTargetCache
-				.resolveEntityClass(expression.getName(),
-						JpaResolutionContext.checkContext(context).getEntityManagerFactory().getMetamodel())
-				.orElseThrow(() -> new InvalidExpressionException("Invalid data target name [" + expression.getName()
-						+ "]: no matching entity class is available from JPA metamodel"));
+				.resolveEntityClass(entityName, context.getEntityManagerFactory().getMetamodel())
+				.orElseThrow(() -> new InvalidExpressionException("Invalid data target name [" + entityName
+						+ "]: an entity class with given entity name is not available from JPA metamodel"));
 
-		return Optional.of(JpaEntity.create(entityClass));
+		return Optional.of(JpaEntity.create(entityClass, entityName));
 	}
 
 }

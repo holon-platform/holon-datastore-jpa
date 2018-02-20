@@ -22,8 +22,8 @@ import javax.annotation.Priority;
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.query.ConstantExpression;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.LiteralValue;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLLiteral;
 
 /**
  * {@link ConstantExpression} resolver.
@@ -32,7 +32,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.LiteralValue;
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExpression, JPQLToken> {
+public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExpression, JPQLExpression> {
 
 	INSTANCE;
 
@@ -50,8 +50,8 @@ public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExp
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
@@ -60,17 +60,15 @@ public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExp
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(ConstantExpression expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(ConstantExpression expression, ResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
-		// resolve
-		return context.resolve(
-				LiteralValue.create(expression.getModelValue(),
-						((ConstantExpression<?, ?>) expression).getTemporalType().orElse(null)),
-				JPQLToken.class, context);
+		// resolve as Literal
+		return context.resolve(JPQLLiteral.create(expression.getModelValue(),
+				((ConstantExpression<?>) expression).getTemporalType().orElse(null)), JPQLExpression.class, context);
 	}
 
 }
