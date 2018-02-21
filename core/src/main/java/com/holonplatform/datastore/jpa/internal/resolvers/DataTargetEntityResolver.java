@@ -80,7 +80,7 @@ public enum DataTargetEntityResolver implements JPQLContextExpressionResolver<Da
 		final String entityName = target.getName();
 		// resolve entity class
 		Class<?> entityClass = EntityTargetCache
-				.resolveEntityClass(entityName, context.getEntityManagerFactory().getMetamodel())
+				.resolveEntityClass(context.getEntityManagerFactory(), entityName)
 				.orElseThrow(() -> new InvalidExpressionException("Invalid data target name [" + entityName
 						+ "]: an entity class with given entity name is not available from JPA metamodel"));
 

@@ -13,11 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.datastore.jpa.test.model.entity;
+package com.holonplatform.datastore.jpa.test.model.oentity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -55,8 +52,9 @@ public class Test1 implements TestData {
 	@Column(name = "datv")
 	private Date dateValue;
 
+	@Temporal(TemporalType.DATE)
 	@Column(name = "datv2")
-	private LocalDate localDateValue;
+	private Date localDateValue;
 
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "enmv")
@@ -71,11 +69,13 @@ public class Test1 implements TestData {
 	@Column(name = "tms")
 	private Date datetimeValue;
 
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "tms2")
-	private LocalDateTime localDatetimeValue;
+	private Date localDatetimeValue;
 
+	@Temporal(TemporalType.TIME)
 	@Column(name = "tm")
-	private LocalTime localTimeValue;
+	private Date localTimeValue;
 
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
@@ -141,14 +141,6 @@ public class Test1 implements TestData {
 		this.numericBooleanValue = numericBooleanValue;
 	}
 
-	public LocalDate getLocalDateValue() {
-		return localDateValue;
-	}
-
-	public void setLocalDateValue(LocalDate localDateValue) {
-		this.localDateValue = localDateValue;
-	}
-
 	public Date getDatetimeValue() {
 		return datetimeValue;
 	}
@@ -157,19 +149,27 @@ public class Test1 implements TestData {
 		this.datetimeValue = datetimeValue;
 	}
 
-	public LocalDateTime getLocalDatetimeValue() {
+	public Date getLocalDateValue() {
+		return localDateValue;
+	}
+
+	public void setLocalDateValue(Date localDateValue) {
+		this.localDateValue = localDateValue;
+	}
+
+	public Date getLocalDatetimeValue() {
 		return localDatetimeValue;
 	}
 
-	public void setLocalDatetimeValue(LocalDateTime localDatetimeValue) {
+	public void setLocalDatetimeValue(Date localDatetimeValue) {
 		this.localDatetimeValue = localDatetimeValue;
 	}
 
-	public LocalTime getLocalTimeValue() {
+	public Date getLocalTimeValue() {
 		return localTimeValue;
 	}
 
-	public void setLocalTimeValue(LocalTime localTimeValue) {
+	public void setLocalTimeValue(Date localTimeValue) {
 		this.localTimeValue = localTimeValue;
 	}
 
@@ -195,6 +195,15 @@ public class Test1 implements TestData {
 
 	public void setNested(TestNested nested) {
 		this.nested = nested;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Test1 [key=" + key + "]";
 	}
 
 }

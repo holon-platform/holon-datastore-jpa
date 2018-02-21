@@ -276,6 +276,10 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 						e);
 			}
 
+			getORMPlatform().ifPresent(platform -> LOGGER.info("ORM platform: " + platform));
+			LOGGER.info("ORM dialect: [" + dialect.getClass().getName() + "] - Supported JPA version: "
+					+ dialect.getSupportedJPAMajorVersion() + "." + dialect.getSupportedJPAMinorVersion());
+
 			// default factories and resolvers
 			loadExpressionResolvers(classLoader);
 			loadCommodityFactories(classLoader);

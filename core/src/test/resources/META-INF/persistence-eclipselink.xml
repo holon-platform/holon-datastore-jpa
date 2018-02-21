@@ -4,10 +4,10 @@
              http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 	version="2.1">
 
-	<persistence-unit name="test_hibernate"
+	<persistence-unit name="test_eclipselink"
 		transaction-type="RESOURCE_LOCAL">
 		<!-- Persistence provider -->
-		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<!-- Entity classes -->
 		<class>com.holonplatform.datastore.jpa.test.model.entity.Test1</class>
 		<class>com.holonplatform.datastore.jpa.test.model.entity.Test2</class>
@@ -20,11 +20,12 @@
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
 			<property name="javax.persistence.jdbc.url"
-				value="jdbc:h2:mem:datastore1;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+				value="jdbc:h2:mem:datastore2;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
-			<!-- <property name="hibernate.show_sql" value="true" /> -->
-			<property name="hibernate.hbm2ddl.auto" value="none" />
+			<property name="eclipselink.weaving" value="false" />
+			<!-- <property name="eclipselink.logging.level.sql" value="FINE" /> -->
+			<!-- <property name="eclipselink.logging.parameters" value="true" /> -->
 		</properties>
 	</persistence-unit>
 

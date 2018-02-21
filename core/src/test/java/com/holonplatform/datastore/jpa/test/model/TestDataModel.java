@@ -16,9 +16,6 @@
 package com.holonplatform.datastore.jpa.test.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Date;
 
 import com.holonplatform.core.datastore.DataTarget;
@@ -30,20 +27,17 @@ import com.holonplatform.core.property.StringProperty;
 import com.holonplatform.core.property.TemporalProperty;
 import com.holonplatform.core.property.VirtualProperty;
 import com.holonplatform.core.temporal.TemporalType;
-import com.holonplatform.datastore.jpa.JpaTarget;
-import com.holonplatform.datastore.jpa.test.model.entity.Test1;
-import com.holonplatform.datastore.jpa.test.model.entity.Test3;
 
 public interface TestDataModel {
 
-	public final static JpaTarget<Test1> JPA_TARGET = JpaTarget.of(Test1.class);
+	// public final static JpaTarget<Test1> JPA_TARGET = JpaTarget.of(Test1.class);
 
 	public final static NumericProperty<Long> KEY = NumericProperty.create("key", long.class);
 	public final static StringProperty STR = StringProperty.create("stringValue");
 	public final static NumericProperty<Double> DBL = NumericProperty.doubleType("decimalValue");
 	public final static TemporalProperty<Date> DAT = TemporalProperty.create("dateValue", Date.class)
 			.temporalType(TemporalType.DATE);
-	public final static TemporalProperty<LocalDate> LDAT = TemporalProperty.localDate("localDateValue");
+	// public final static TemporalProperty<LocalDate> LDAT = TemporalProperty.localDate("localDateValue");
 	public final static PathProperty<TestEnum> ENM = PathProperty.create("enumValue", TestEnum.class);
 	public final static PathProperty<Boolean> NBOOL = PathProperty.create("numericBooleanValue", boolean.class)
 			.converter(PropertyValueConverter.numericBoolean(Integer.class));
@@ -55,15 +49,16 @@ public interface TestDataModel {
 
 	public final static TemporalProperty<Date> TMS = TemporalProperty.create("datetimeValue", Date.class)
 			.temporalType(TemporalType.DATE_TIME);
-	public final static TemporalProperty<LocalDateTime> LTMS = TemporalProperty.localDateTime("localDatetimeValue");
+	// public final static TemporalProperty<LocalDateTime> LTMS = TemporalProperty.localDateTime("localDatetimeValue");
 
-	public final static TemporalProperty<LocalTime> TIME = TemporalProperty.localTime("localTimeValue");
+	// public final static TemporalProperty<LocalTime> TIME = TemporalProperty.localTime("localTimeValue");
 
-	public final static PropertySet<?> PROPERTIES = PropertySet
-			.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME).identifier(KEY).build();
+	// public final static PropertySet<?> PROPERTIES = PropertySet
+	// .builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME).identifier(KEY).build();
 
-	public final static PropertySet<?> PROPERTIES_NOID = PropertySet.of(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR,
-			NST_DEC, TMS, LTMS, TIME);
+	// public final static PropertySet<?> PROPERTIES_NOID = PropertySet.of(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL,
+	// NST_STR,
+	// NST_DEC, TMS, LTMS, TIME);
 
 	// virtual
 
@@ -71,9 +66,9 @@ public interface TestDataModel {
 		return pb.getValueIfPresent(STR).map(str -> "[" + str + "]").orElse("NONE");
 	});
 
-	public final static PropertySet<?> PROPERTIES_V = PropertySet
-			.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
-			.identifier(KEY).build();
+	// public final static PropertySet<?> PROPERTIES_V = PropertySet
+	// .builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
+	// .identifier(KEY).build();
 
 	// lobs
 
@@ -82,10 +77,6 @@ public interface TestDataModel {
 	public final static PathProperty<byte[]> BLOB_BYS = PathProperty.create("blobValue", byte[].class);
 
 	public final static byte[] DEFAULT_BLOB_VALUE = hexStringToByteArray("C9CBBBCCCEB9C8CABCCCCEB9C9CBBB");
-
-	// with parent
-	public final static PathProperty<Long> KEY_P = JPA_TARGET.property(KEY);
-	public final static PathProperty<String> STR_P = JPA_TARGET.property(STR);
 
 	// recur
 
@@ -104,13 +95,10 @@ public interface TestDataModel {
 
 	// test3
 
-	public final static JpaTarget<Test3> TEST3 = JpaTarget.of(Test3.class);
+	// public final static JpaTarget<Test3> TEST3 = JpaTarget.of(Test3.class);
 
 	public final static PathProperty<Long> TEST3_CODE = PathProperty.create("pk.code", long.class);
 	public final static PathProperty<String> TEST3_TEXT = PathProperty.create("text", String.class);
-
-	public final static PathProperty<Long> TEST3_CODE_P = PathProperty.create("pk.code", long.class).parent(TEST3);
-	public final static PathProperty<String> TEST3_TEXT_P = PathProperty.create("text", String.class).parent(TEST3);
 
 	public final static PropertySet<?> TEST3_SET = PropertySet.builderOf(TEST3_CODE, TEST3_TEXT).identifier(TEST3_CODE)
 			.build();

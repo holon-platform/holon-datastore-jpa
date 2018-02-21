@@ -18,20 +18,20 @@ package com.holonplatform.datastore.jpa.test.suite;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.LDAT;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.LTMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES_NOID;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES_V;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TIME;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LTMS;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES_NOID;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES_V;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -41,6 +41,7 @@ import org.junit.Test;
 
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.property.PropertyBox;
+import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.test.model.TestEnum;
 import com.holonplatform.datastore.jpa.test.model.TestSampleData;
 
@@ -109,22 +110,24 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testUpdateNulls() {
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateNullsTest) {
+			inTransaction(() -> {
 
-			PropertyBox value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES)
-					.orElse(null);
-			assertNotNull(value);
+				PropertyBox value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES)
+						.orElse(null);
+				assertNotNull(value);
 
-			value.setValue(STR, null);
+				value.setValue(STR, null);
 
-			OperationResult result = getDatastore().update(JPA_TARGET, value);
-			assertEquals(1, result.getAffectedCount());
+				OperationResult result = getDatastore().update(JPA_TARGET, value, JpaWriteOption.FLUSH);
+				assertEquals(1, result.getAffectedCount());
 
-			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
-			assertNotNull(value);
-			assertNull(value.getValue(STR));
+				value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
+				assertNotNull(value);
+				assertNull(value.getValue(STR));
 
-		});
+			});
+		}
 	}
 
 	@Test

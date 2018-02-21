@@ -15,10 +15,18 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import com.holonplatform.core.datastore.Datastore;
+import com.holonplatform.core.property.PathProperty;
+import com.holonplatform.core.property.PropertySet;
+import com.holonplatform.core.property.TemporalProperty;
+import com.holonplatform.datastore.jpa.JpaTarget;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ QueryProjectionTest.class, QueryFilterTest.class, QuerySortTest.class, QueryAggregationTest.class,
@@ -31,11 +39,45 @@ import com.holonplatform.core.datastore.Datastore;
 public abstract class AbstractJpaDatastoreTestSuite {
 
 	public static Datastore datastore;
+	
+	public static JpaTarget<?> JPA_TARGET;
+	
+	public static TemporalProperty<LocalDate> LDAT;
+	public static TemporalProperty<LocalDateTime> LTMS;
+	public static TemporalProperty<LocalTime> TIME;
+	
+	public static PropertySet<?> PROPERTIES;
+	public static PropertySet<?> PROPERTIES_NOID;
+	public static PropertySet<?> PROPERTIES_V;
+	
+	public static PropertySet<?> CLOB_SET_STR;
+	
+	public static JpaTarget<?> TEST3;
+	
+	public static PathProperty<Long> TEST3_CODE_P;
+	public static PathProperty<String> TEST3_TEXT_P;
 
+	
 	public static boolean updateAliasTest = true;
 
 	public static boolean rightJoinTest = true;
 
 	public static boolean avgProjectionTest = true;
-
+	
+	public static boolean txExpectedErrorTest = true;
+	
+	public static boolean blobArrayProjectionTest = true;
+	
+	public static boolean entityProjectionTest = true;
+	
+	public static boolean temporalPartFunctionTest = true;
+	
+	public static boolean temporalProjectionTest = true;
+	
+	public static boolean transactionalTest = true;
+	
+	public static boolean saveOperationTypeTest = true;
+	
+	public static boolean updateNullsTest = true;
+	
 }

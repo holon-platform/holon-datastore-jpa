@@ -13,30 +13,39 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.datastore.jpa.jpql.expression;
+package com.holonplatform.datastore.jpa.test.model.oentity;
 
-import com.holonplatform.datastore.jpa.jpql.JPQLResultConverter;
+import java.io.Serializable;
 
-/**
- * JPQL query expression.
- * 
- * @param <Q> Query result type
- * @param <R> Conversion result type
- *
- * @since 5.1.0
- */
-public interface JPQLQuery<Q, R> extends JPQLStatement {
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-	/**
-	 * Get the query result type.
-	 * @return The query result type
-	 */
-	Class<? extends Q> getQueryResultType();
+@Entity
+@Table(name = "test3")
+public class Test3 implements Serializable {
 
-	/**
-	 * Get the JPQL result converter to be used with this query.
-	 * @return The query result converter
-	 */
-	JPQLResultConverter<? super Q, R> getResultConverter();
+	private static final long serialVersionUID = 1L;
+
+	@EmbeddedId
+	private Test3Pk pk;
+
+	private String text;
+
+	public Test3Pk getPk() {
+		return pk;
+	}
+
+	public void setPk(Test3Pk pk) {
+		this.pk = pk;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
 
 }

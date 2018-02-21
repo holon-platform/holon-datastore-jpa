@@ -1,0 +1,33 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+
+	<persistence-unit name="test_openjpa"
+		transaction-type="RESOURCE_LOCAL">
+		<!-- Persistence provider -->
+		<provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+		<!-- Entity classes -->
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.Test1</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.Test2</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.Test3</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.TestRec</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.TestTx</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.Test3Pk</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.TestNested</class>
+		<class>com.holonplatform.datastore.jpa.test.model.oentity.SubNested</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- Configuration properties -->
+		<properties>
+			<property name="openjpa.jdbc.DBDictionary" value="h2" />
+			<property name="openjpa.ConnectionURL"
+				value="jdbc:h2:mem:datastore3;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+			<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
+			<property name="openjpa.ConnectionUserName" value="sa" />
+			<property name="openjpa.ConnectionPassword" value="" />
+			<property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

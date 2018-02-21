@@ -17,21 +17,20 @@ package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.CLOB_STR;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.CLOB_SET_STR;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
 import com.holonplatform.core.property.PropertyBox;
-import com.holonplatform.core.property.PropertySet;
 
 public class ClobTest extends AbstractJpaDatastoreSuiteTest {
 
-	private static final PropertySet<?> CLOB_SET_STR = PropertySet.of(PROPERTIES, CLOB_STR);
+	
 
 	@Test
 	public void testClobString() {

@@ -15,12 +15,12 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TEST3;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_CODE;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_SET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_TEXT;

@@ -15,24 +15,23 @@
  */
 package com.holonplatform.datastore.jpa.dialect;
 
-import java.lang.reflect.Method;
-import java.util.Optional;
+import java.lang.reflect.Field;
 
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ClassUtils;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 
 /**
- * Hibernate {@link ORMDialect}.
+ * OpenJPA {@link ORMDialect}.
  *
  * @since 5.1.0
  */
-public class HibernateDialect implements ORMDialect {
+public class OpenJPADialect implements ORMDialect {
 
 	private static final Logger LOGGER = JpaDatastoreLogger.create();
 
 	private int supportedJPAMajorVersion = 2;
-	private int supportedJPAMinorVersion = 1;
+	private int supportedJPAMinorVersion = 0;
 
 	/*
 	 * (non-Javadoc)
@@ -41,60 +40,26 @@ public class HibernateDialect implements ORMDialect {
 	 */
 	@Override
 	public void init(ORMDialectContext context) {
-		try {
-			String version = context.withEntityManager(em -> {
-				try {
-					Class<?> versionCls = ClassUtils.forName("org.hibernate.Version", em.getDelegate().getClass().getClassLoader());
-					Method m = versionCls.getDeclaredMethod("getVersionString");
-					return (String) m.invoke(null);
-				} catch (Exception e) {
-					LOGGER.warn("Failed to detect Hibernate version", e);
-					return null;
-				}
-			});
-			
-			int majorVersion = -1;
-			int minorVersion = -1;
 
-			int dix = version.indexOf('.');
-			if (dix > -1) {
-				majorVersion = Integer.parseInt(version.substring(0, dix));
-				String minor = version.substring(dix + 1);
-				minorVersion = Integer.parseInt(minor.substring(0, minor.indexOf('.')));
+		int majorRelease = context.withEntityManager(em -> {
+			try {
+				Class<?> versionCls = ClassUtils.forName("org.apache.openjpa.conf.OpenJPAVersion",
+						em.getDelegate().getClass().getClassLoader());
+				Field f = versionCls.getDeclaredField("MAJOR_RELEASE");
+				return f.getInt(null);
+			} catch (Exception e) {
+				LOGGER.warn("Failed to detect OpenJPA version", e);
+				return -1;
 			}
+		});
 
-			if (majorVersion > -1 && minorVersion > -1) {
-				if (majorVersion <= 3) {
-					if (minorVersion >= 5) {
-						supportedJPAMajorVersion = 2;
-						supportedJPAMinorVersion = 0;
-					} else {
-						supportedJPAMajorVersion = 1;
-						supportedJPAMinorVersion = 0;
-					}
-				} else if (majorVersion == 4) {
-					if (minorVersion < 3) {
-						supportedJPAMajorVersion = 2;
-						supportedJPAMinorVersion = 0;
-					} else {
-						supportedJPAMajorVersion = 2;
-						supportedJPAMinorVersion = 1;
-					}
-				} else if (majorVersion > 4) {
-					if (minorVersion < 3) {
-						supportedJPAMajorVersion = 2;
-						supportedJPAMinorVersion = 1;
-					} else {
-						supportedJPAMajorVersion = 2;
-						supportedJPAMinorVersion = 2;
-					}
-				}
+		if (majorRelease > -1) {
+			if (majorRelease < 2) {
+				supportedJPAMajorVersion = 1;
+			} else {
+				supportedJPAMajorVersion = 2;
 			}
-
-		} catch (Exception e) {
-			LOGGER.warn("Failed to detect Hibernate version", e);
 		}
-
 	}
 
 	/*
@@ -117,20 +82,29 @@ public class HibernateDialect implements ORMDialect {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#isTupleSupported()
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#temporalTypeParametersSupported()
 	 */
 	@Override
-	public boolean isTupleSupported() {
-		return true;
+	public boolean temporalTypeParametersSupported() {
+		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getBatchSizeConfigurationProperty()
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#temporalTypeProjectionSupported()
 	 */
 	@Override
-	public Optional<String> getBatchSizeConfigurationProperty() {
-		return Optional.of("hibernate.jdbc.batch_size");
+	public boolean temporalTypeProjectionSupported() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#isTupleSupported()
+	 */
+	@Override
+	public boolean isTupleSupported() {
+		return false;
 	}
 
 	/*

@@ -15,6 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.dialect;
 
+import java.time.temporal.Temporal;
 import java.util.Optional;
 
 import javax.persistence.Tuple;
@@ -37,6 +38,18 @@ public interface ORMDialect {
 	void init(ORMDialectContext context);
 
 	/**
+	 * Get the supported JPA major version.
+	 * @return the supported JPA major version
+	 */
+	int getSupportedJPAMajorVersion();
+
+	/**
+	 * Get the supported JPA minor version.
+	 * @return the supported JPA minor version
+	 */
+	int getSupportedJPAMinorVersion();
+
+	/**
 	 * Returns whether the {@link Tuple} query result type is supported.
 	 * @return Whether the {@link Tuple} query result type is supported
 	 */
@@ -48,6 +61,22 @@ public interface ORMDialect {
 	 */
 	default Optional<String> getBatchSizeConfigurationProperty() {
 		return Optional.empty();
+	}
+
+	/**
+	 * Get whether {@link Temporal} type query parameters are supported.
+	 * @return Whether {@link Temporal} type query parameters are supported
+	 */
+	default boolean temporalTypeParametersSupported() {
+		return getSupportedJPAMajorVersion() >= 2 && getSupportedJPAMinorVersion() >= 1;
+	}
+
+	/**
+	 * Get whether {@link Temporal} type query result is supported.
+	 * @return Whether {@link Temporal} type query result is supported
+	 */
+	default boolean temporalTypeProjectionSupported() {
+		return getSupportedJPAMajorVersion() >= 2 && getSupportedJPAMinorVersion() >= 1;
 	}
 
 	/**
@@ -97,7 +126,7 @@ public interface ORMDialect {
 			case ECLIPSELINK:
 				return Optional.of(new EclipselinkDialect());
 			case OPENJPA:
-				return Optional.of(new DefaultDialect());
+				return Optional.of(new OpenJPADialect());
 			case DATANUCLEUS:
 				return Optional.of(new DefaultDialect());
 			default:

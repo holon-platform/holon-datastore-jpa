@@ -135,8 +135,8 @@ public enum DefaultJPQLValueDeserializer implements JPQLValueDeserializer {
 		if (TypeUtils.isAssignable(deserializedValue.getClass(), expression.getType())) {
 			return (T) deserializedValue;
 		} else {
-			throw new DataAccessException(
-					"Failed to deserialize value [" + value + "] for required type [" + expression.getType() + "]");
+			throw new DataAccessException("Failed to deserialize value [" + value + "] of type [" + value.getClass()
+					+ "] for required type [" + expression.getType() + "]");
 		}
 
 	}
@@ -170,6 +170,17 @@ public enum DefaultJPQLValueDeserializer implements JPQLValueDeserializer {
 			}
 			if (LocalTime.class.isAssignableFrom(targetType)) {
 				return ConversionUtils.toLocalTime((Date) value);
+			}
+		}
+		if (java.util.Date.class.isAssignableFrom(value.getClass())) {
+			if (LocalDate.class.isAssignableFrom(targetType)) {
+				return ConversionUtils.toLocalDate((java.util.Date) value);
+			}
+			if (LocalDateTime.class.isAssignableFrom(targetType)) {
+				return ConversionUtils.toLocalDateTime((java.util.Date) value);
+			}
+			if (LocalTime.class.isAssignableFrom(targetType)) {
+				return ConversionUtils.toLocalTime((java.util.Date) value);
 			}
 		}
 

@@ -17,10 +17,10 @@ package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.BLOB_BYS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -38,41 +38,46 @@ public class BlobTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testBlobBytes() {
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.blobArrayProjectionTest) {
 
-			// query
+			inTransaction(() -> {
 
-			byte[] bval = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(BLOB_BYS).orElse(null);
-			assertNotNull(bval);
-			assertTrue(Arrays.equals(TestDataModel.DEFAULT_BLOB_VALUE, bval));
+				// query
 
-			PropertyBox value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(BLOB_SET_BYT)
-					.orElse(null);
-			assertNotNull(value);
-			assertTrue(Arrays.equals(TestDataModel.DEFAULT_BLOB_VALUE, value.getValue(BLOB_BYS)));
+				byte[] bval = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(BLOB_BYS)
+						.orElse(null);
+				assertNotNull(bval);
+				assertTrue(Arrays.equals(TestDataModel.DEFAULT_BLOB_VALUE, bval));
 
-			// update
+				PropertyBox value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(BLOB_SET_BYT)
+						.orElse(null);
+				assertNotNull(value);
+				assertTrue(Arrays.equals(TestDataModel.DEFAULT_BLOB_VALUE, value.getValue(BLOB_BYS)));
 
-			final byte[] bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+				// update
 
-			value.setValue(BLOB_BYS, bytes);
-			getDatastore().update(JPA_TARGET, value);
+				final byte[] bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(BLOB_SET_BYT).orElse(null);
-			assertNotNull(value);
-			assertTrue(Arrays.equals(bytes, value.getValue(BLOB_BYS)));
+				value.setValue(BLOB_BYS, bytes);
+				getDatastore().update(JPA_TARGET, value);
 
-			// insert
+				value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(BLOB_SET_BYT).orElse(null);
+				assertNotNull(value);
+				assertTrue(Arrays.equals(bytes, value.getValue(BLOB_BYS)));
 
-			value = PropertyBox.builder(BLOB_SET_BYT).set(KEY, 77L).set(STR, "Test clob").set(NBOOL, false)
-					.set(BLOB_BYS, bytes).build();
-			getDatastore().insert(JPA_TARGET, value);
+				// insert
 
-			bval = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(77L)).findOne(BLOB_BYS).orElse(null);
-			assertNotNull(bval);
-			assertTrue(Arrays.equals(bytes, bval));
+				value = PropertyBox.builder(BLOB_SET_BYT).set(KEY, 77L).set(STR, "Test clob").set(NBOOL, false)
+						.set(BLOB_BYS, bytes).build();
+				getDatastore().insert(JPA_TARGET, value);
 
-		});
+				bval = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(77L)).findOne(BLOB_BYS).orElse(null);
+				assertNotNull(bval);
+				assertTrue(Arrays.equals(bytes, bval));
+
+			});
+
+		}
 	}
 
 }

@@ -18,8 +18,6 @@ package com.holonplatform.datastore.jpa.test.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.holonplatform.datastore.jpa.test.model.entity.TestNested;
-
 public interface TestData extends Serializable {
 
 	Long getKey();
@@ -33,7 +31,5 @@ public interface TestData extends Serializable {
 	TestEnum getEnumValue();
 
 	public int getNumericBooleanValue();
-
-	TestNested getNested();
 
 }

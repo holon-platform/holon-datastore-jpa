@@ -16,19 +16,18 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES_NOID;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES_V;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES_NOID;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES_V;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
 import com.holonplatform.core.datastore.Datastore.OperationResult;
-import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.property.PropertyBox;
 
 public class RefreshTest extends AbstractJpaDatastoreSuiteTest {
@@ -89,13 +88,6 @@ public class RefreshTest extends AbstractJpaDatastoreSuiteTest {
 		PropertyBox refreshed = getDatastore().refresh(JPA_TARGET, value);
 		assertNotNull(refreshed);
 		assertEquals(Long.valueOf(1), refreshed.getValue(KEY));
-	}
-
-	@Test(expected = DataAccessException.class)
-	public void testRefreshMissingKey() {
-		PropertyBox value = PropertyBox.builder(PROPERTIES).set(STR, "test").build();
-
-		getDatastore().refresh(JPA_TARGET, value);
 	}
 
 }

@@ -15,6 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.internal.resolvers.projection;
 
+import java.util.Date;
 import java.util.Optional;
 
 import javax.annotation.Priority;
@@ -66,6 +67,10 @@ public enum TypedExpressionProjectionResolver
 
 		// query result type
 		Class<?> queryResultType = TypeUtils.box((converter != null) ? converter.getModelType() : expression.getType());
+		
+		if (TypeUtils.isTemporal(queryResultType) && !context.getDialect().temporalTypeProjectionSupported()) {
+			queryResultType = Date.class;
+		}
 		
 		final DefaultJPQLProjection<?, ?> projection = new DefaultJPQLProjection<>(context, queryResultType,
 				expression.getType());

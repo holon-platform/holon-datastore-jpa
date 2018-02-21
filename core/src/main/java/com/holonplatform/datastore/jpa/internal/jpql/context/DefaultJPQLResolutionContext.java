@@ -15,6 +15,9 @@
  */
 package com.holonplatform.datastore.jpa.internal.jpql.context;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -272,6 +275,25 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 				LOGGER.debug(
 						() -> "Setted parameter with name [" + n + "] using Calendar value [" + p.getValue() + "]");
 
+			} else if (TypeUtils.isLocalTemporal(p.getType()) && !getDialect().temporalTypeParametersSupported()) {
+				final Date date;
+				javax.persistence.TemporalType tt = null;
+				if (LocalDate.class.isAssignableFrom(p.getType())) {
+					date = java.sql.Date.valueOf((LocalDate)p.getValue());
+					tt = javax.persistence.TemporalType.DATE;
+				} else if (LocalDateTime.class.isAssignableFrom(p.getType())) {
+					date = java.sql.Timestamp.valueOf((LocalDateTime)p.getValue());
+					tt = javax.persistence.TemporalType.TIMESTAMP;
+				} else if (LocalTime.class.isAssignableFrom(p.getType())) {
+					date = java.sql.Time.valueOf((LocalTime)p.getValue());
+					tt = javax.persistence.TemporalType.TIME;
+				} else {
+					date = null;
+				}
+				
+				query.setParameter(n, date, tt);
+				
+				LOGGER.debug(() -> "Setted Temporal type parameter with name [" + n + "] using Date  value [" + date + "]");
 			} else {
 				// default
 				query.setParameter(n, p.getValue());

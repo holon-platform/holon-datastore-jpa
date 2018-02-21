@@ -15,17 +15,15 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY_P;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.R_NAME;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.R_PARENT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.R_TARGET;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR_P;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TEST3;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_CODE;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_CODE_P;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TEST3_CODE_P;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_TEXT;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_TEXT_P;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TEST3_TEXT_P;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -35,44 +33,60 @@ import java.util.List;
 import org.junit.Test;
 
 import com.holonplatform.core.datastore.relational.RelationalTarget;
+import com.holonplatform.core.property.PathProperty;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.query.QueryFilter;
+import com.holonplatform.datastore.jpa.test.config.DatastoreConfigCommodity;
+import com.holonplatform.datastore.jpa.test.model.TestDataModel;
 
 public class QueryJoinsTest extends AbstractJpaDatastoreSuiteTest {
+
+	// with parent
+	public final static PathProperty<Long> KEY_P = JPA_TARGET.property(TestDataModel.KEY);
+	public final static PathProperty<String> STR_P = JPA_TARGET.property(TestDataModel.STR);
 
 	@Test
 	public void testJoins() {
 
-		long key = getDatastore().query().target(TEST3).filter(TEST3_CODE.eq(2L)).findOne(TEST3_CODE).orElse(null);
-		assertEquals(2, key);
+		int jpaMayVer = getDatastore().create(DatastoreConfigCommodity.class).getDialect()
+				.getSupportedJPAMajorVersion();
+		int jpaMinVer = getDatastore().create(DatastoreConfigCommodity.class).getDialect()
+				.getSupportedJPAMinorVersion();
 
-		List<PropertyBox> results = getDatastore().query()
-				.target(RelationalTarget.of(TEST3).innerJoin(JPA_TARGET).on(KEY_P.eq(TEST3_CODE)).add())
-				.list(TEST3_TEXT, STR_P);
-		assertNotNull(results);
-		assertEquals(1, results.size());
-		assertEquals("Two", results.get(0).getValue(STR_P));
-		assertEquals("TestJoin", results.get(0).getValue(TEST3_TEXT));
+		if (jpaMayVer > 2 || (jpaMayVer == 2 && jpaMinVer > 0)) {
 
-		results = getDatastore().query()
-				.target(RelationalTarget.of(TEST3).innerJoin(JPA_TARGET).on(KEY_P.eq(TEST3_CODE_P)).add())
-				.list(TEST3_TEXT_P, STR_P);
-		assertNotNull(results);
-		assertEquals(1, results.size());
-		assertEquals("Two", results.get(0).getValue(STR_P));
-		assertEquals("TestJoin", results.get(0).getValue(TEST3_TEXT_P));
+			long key = getDatastore().query().target(TEST3).filter(TEST3_CODE.eq(2L)).findOne(TEST3_CODE).orElse(null);
+			assertEquals(2, key);
 
-		results = getDatastore().query()
-				.target(RelationalTarget.of(TEST3).innerJoin(JPA_TARGET).on(KEY_P.eq(TEST3_CODE_P)).add())
-				.list(TEST3_TEXT_P, STR_P);
-		assertNotNull(results);
-		assertEquals(1, results.size());
+			List<PropertyBox> results = getDatastore().query()
+					.target(RelationalTarget.of(TEST3).innerJoin(JPA_TARGET).on(KEY_P.eq(TEST3_CODE)).add())
+					.list(TEST3_TEXT, STR_P);
+			assertNotNull(results);
+			assertEquals(1, results.size());
+			assertEquals("Two", results.get(0).getValue(STR_P));
+			assertEquals("TestJoin", results.get(0).getValue(TEST3_TEXT));
 
-		results = getDatastore().query()
-				.target(RelationalTarget.of(JPA_TARGET).leftJoin(TEST3).on(KEY_P.eq(TEST3_CODE_P)).add())
-				.list(TEST3_TEXT_P, STR_P);
-		assertNotNull(results);
-		assertEquals(2, results.size());
+			results = getDatastore().query()
+					.target(RelationalTarget.of(TEST3).innerJoin(JPA_TARGET).on(KEY_P.eq(TEST3_CODE_P)).add())
+					.list(TEST3_TEXT_P, STR_P);
+			assertNotNull(results);
+			assertEquals(1, results.size());
+			assertEquals("Two", results.get(0).getValue(STR_P));
+			assertEquals("TestJoin", results.get(0).getValue(TEST3_TEXT_P));
+
+			results = getDatastore().query()
+					.target(RelationalTarget.of(TEST3).innerJoin(JPA_TARGET).on(KEY_P.eq(TEST3_CODE_P)).add())
+					.list(TEST3_TEXT_P, STR_P);
+			assertNotNull(results);
+			assertEquals(1, results.size());
+
+			results = getDatastore().query()
+					.target(RelationalTarget.of(JPA_TARGET).leftJoin(TEST3).on(KEY_P.eq(TEST3_CODE_P)).add())
+					.list(TEST3_TEXT_P, STR_P);
+			assertNotNull(results);
+			assertEquals(2, results.size());
+
+		}
 
 	}
 
@@ -100,10 +114,19 @@ public class QueryJoinsTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testRecur() {
 
-		List<String> parents = new ArrayList<>();
-		findParents(parents, "test3");
+		int jpaMayVer = getDatastore().create(DatastoreConfigCommodity.class).getDialect()
+				.getSupportedJPAMajorVersion();
+		int jpaMinVer = getDatastore().create(DatastoreConfigCommodity.class).getDialect()
+				.getSupportedJPAMinorVersion();
 
-		assertEquals(2, parents.size());
+		if (jpaMayVer > 2 || (jpaMayVer == 2 && jpaMinVer > 0)) {
+
+			List<String> parents = new ArrayList<>();
+			findParents(parents, "test3");
+
+			assertEquals(2, parents.size());
+
+		}
 
 	}
 

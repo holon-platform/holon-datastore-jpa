@@ -37,115 +37,127 @@ public class TransactionTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testTransactional() {
 
-		long count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(1L, count);
+		if (AbstractJpaDatastoreTestSuite.transactionalTest) {
 
-		getDatastore().requireTransactional().withTransaction(tx -> {
-			PropertyBox box = PropertyBox.builder(TEST_TX).set(TX_CODE, 2L).set(TX_TEXT, "Two").build();
-			getDatastore().insert(TX_TARGET, box);
+			long count = getDatastore().query().target(TX_TARGET).count();
+			Assert.assertEquals(1L, count);
 
-			long cnt = getDatastore().query().target(TX_TARGET).count();
-			Assert.assertEquals(2L, cnt);
+			getDatastore().requireTransactional().withTransaction(tx -> {
+				PropertyBox box = PropertyBox.builder(TEST_TX).set(TX_CODE, 2L).set(TX_TEXT, "Two").build();
+				getDatastore().insert(TX_TARGET, box);
 
-			tx.rollback();
-		});
+				long cnt = getDatastore().query().target(TX_TARGET).count();
+				Assert.assertEquals(2L, cnt);
 
-		count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(1L, count);
-
-		getDatastore().requireTransactional().withTransaction(tx -> {
-			PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 2L).set(TX_TEXT, "Two").build();
-			getDatastore().insert(TX_TARGET, box);
-
-			long cnt = getDatastore().query().target(TX_TARGET).count();
-			Assert.assertEquals(2L, cnt);
-
-			tx.commit();
-		});
-
-		count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(2L, count);
-
-		// test auto commit
-
-		getDatastore().requireTransactional().withTransaction(tx -> {
-			PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 3L).set(TX_TEXT, "Three").build();
-			getDatastore().insert(TX_TARGET, box);
-		}, TransactionConfiguration.withAutoCommit());
-
-		count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(3L, count);
-
-		// rollback
-
-		getDatastore().requireTransactional().withTransaction(tx -> {
-			PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 4L).set(TX_TEXT, "ToRollback").build();
-			getDatastore().insert(TX_TARGET, box);
-
-			tx.rollback();
-		});
-
-		count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(3L, count);
-
-		// rollback on error
-
-		TestUtils.expectedException(DataAccessException.class,
-				() -> getDatastore().requireTransactional().withTransaction(tx -> {
-					PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_TEXT, "ToRollback").build();
-					getDatastore().insert(TX_TARGET, box);
-
-					tx.commit();
-				}));
-
-		count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(3L, count);
-
-		// test nested
-
-		getDatastore().requireTransactional().withTransaction(tx -> {
-			String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT).orElse(null);
-			Assert.assertEquals("Two", txt);
-
-			OperationResult res = getDatastore().bulkUpdate(TX_TARGET).set(TX_TEXT, "Two*").filter(TX_CODE.eq(2L))
-					.execute();
-			Assert.assertEquals(1, res.getAffectedCount());
-
-			String val = ((EntityManagerHandler) getDatastore()).withEntityManager(em -> {
-				List<String> rs = em.createQuery("SELECT t.text FROM TestTx t WHERE t.code=2", String.class).getResultList();
-				return (rs.size() > 0) ? rs.get(0) : null;
+				tx.rollback();
 			});
-			Assert.assertEquals("Two*", val);
 
-			tx.rollback();
-		});
+			count = getDatastore().query().target(TX_TARGET).count();
+			Assert.assertEquals(1L, count);
 
-		String txtv = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT).orElse(null);
-		Assert.assertEquals("Two", txtv);
+			getDatastore().requireTransactional().withTransaction(tx -> {
+				PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 2L).set(TX_TEXT, "Two").build();
+				getDatastore().insert(TX_TARGET, box);
 
-		getDatastore().requireTransactional().withTransaction(tx -> {
+				long cnt = getDatastore().query().target(TX_TARGET).count();
+				Assert.assertEquals(2L, cnt);
 
-			OperationResult res = getDatastore().bulkUpdate(TX_TARGET).set(TX_TEXT, "Two_tx1").filter(TX_CODE.eq(2L))
-					.execute();
-			Assert.assertEquals(1, res.getAffectedCount());
+				tx.commit();
+			});
 
-			getDatastore().requireTransactional().withTransaction(tx2 -> {
+			count = getDatastore().query().target(TX_TARGET).count();
+			Assert.assertEquals(2L, count);
 
+			// test auto commit
+
+			getDatastore().requireTransactional().withTransaction(tx -> {
+				PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 3L).set(TX_TEXT, "Three").build();
+				getDatastore().insert(TX_TARGET, box);
+			}, TransactionConfiguration.withAutoCommit());
+
+			count = getDatastore().query().target(TX_TARGET).count();
+			Assert.assertEquals(3L, count);
+
+			// rollback
+
+			getDatastore().requireTransactional().withTransaction(tx -> {
+				PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 4L).set(TX_TEXT, "ToRollback")
+						.build();
+				getDatastore().insert(TX_TARGET, box);
+
+				tx.rollback();
+			});
+
+			count = getDatastore().query().target(TX_TARGET).count();
+			Assert.assertEquals(3L, count);
+
+			// rollback on error
+
+			if (AbstractJpaDatastoreTestSuite.txExpectedErrorTest) {
+
+				TestUtils.expectedException(DataAccessException.class,
+						() -> getDatastore().requireTransactional().withTransaction(tx -> {
+							PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_TEXT, "ToRollback").build();
+							getDatastore().insert(TX_TARGET, box);
+
+							tx.commit();
+						}));
+
+				count = getDatastore().query().target(TX_TARGET).count();
+				Assert.assertEquals(3L, count);
+
+			}
+
+			// test nested
+
+			getDatastore().requireTransactional().withTransaction(tx -> {
 				String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT)
 						.orElse(null);
 				Assert.assertEquals("Two", txt);
 
-				tx2.commit();
+				OperationResult res = getDatastore().bulkUpdate(TX_TARGET).set(TX_TEXT, "Two*").filter(TX_CODE.eq(2L))
+						.execute();
+				Assert.assertEquals(1, res.getAffectedCount());
+
+				String val = ((EntityManagerHandler) getDatastore()).withEntityManager(em -> {
+					List<String> rs = em.createQuery("SELECT t.text FROM TestTx t WHERE t.code=2", String.class)
+							.getResultList();
+					return (rs.size() > 0) ? rs.get(0) : null;
+				});
+				Assert.assertEquals("Two*", val);
+
+				tx.rollback();
 			});
 
-			String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT).orElse(null);
-			Assert.assertEquals("Two_tx1", txt);
+			String txtv = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT).orElse(null);
+			Assert.assertEquals("Two", txtv);
 
-			tx.rollback();
-		});
+			getDatastore().requireTransactional().withTransaction(tx -> {
 
-		txtv = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT).orElse(null);
-		Assert.assertEquals("Two", txtv);
+				OperationResult res = getDatastore().bulkUpdate(TX_TARGET).set(TX_TEXT, "Two_tx1")
+						.filter(TX_CODE.eq(2L)).execute();
+				Assert.assertEquals(1, res.getAffectedCount());
+
+				getDatastore().requireTransactional().withTransaction(tx2 -> {
+
+					String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT)
+							.orElse(null);
+					Assert.assertEquals("Two", txt);
+
+					tx2.commit();
+				});
+
+				String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT)
+						.orElse(null);
+				Assert.assertEquals("Two_tx1", txt);
+
+				tx.rollback();
+			});
+
+			txtv = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT).orElse(null);
+			Assert.assertEquals("Two", txtv);
+
+		}
 
 	}
 

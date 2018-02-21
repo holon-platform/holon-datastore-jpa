@@ -19,18 +19,15 @@ import java.util.Optional;
 
 import javax.annotation.Priority;
 
-import org.hibernate.dialect.function.SQLFunction;
-
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.query.QueryFunction;
+import com.holonplatform.datastore.jpa.dialect.ORMDialect;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
 
-import ch.qos.logback.core.db.dialect.SQLDialect;
-
 /**
- * {@link QueryFunction} to {@link SQLFunction} resolver which uses the {@link SQLDialect} to resolve the function.
+ * {@link QueryFunction} to {@link JPQLFunction} resolver which uses the {@link ORMDialect} to resolve the function.
  *
  * @since 5.1.0
  */

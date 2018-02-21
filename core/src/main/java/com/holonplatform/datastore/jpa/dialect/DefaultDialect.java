@@ -31,6 +31,22 @@ public class DefaultDialect implements ORMDialect {
 	public void init(ORMDialectContext context) {
 	}
 
+	/* (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getSupportedJPAMajorVersion()
+	 */
+	@Override
+	public int getSupportedJPAMajorVersion() {
+		return 2;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getSupportedJPAMinorVersion()
+	 */
+	@Override
+	public int getSupportedJPAMinorVersion() {
+		return 1;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#isTupleSupported()

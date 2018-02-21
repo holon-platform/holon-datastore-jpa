@@ -15,8 +15,8 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

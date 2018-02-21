@@ -65,9 +65,10 @@
 		<!-- JPA -->
 		<hibernate.jpa.api.version>1.0.0.Final</hibernate.jpa.api.version>
 
-		<!-- ORM -->
+		<!-- ORMs -->
 		<hibernate.version>5.2.12.Final</hibernate.version>
 		<eclipselink.version>2.7.0</eclipselink.version>
+		<openjpa.version>2.4.2</openjpa.version>
 
 		<!-- Hibernate validator -->
 		<hibernate.validator.version>6.0.2.Final</hibernate.validator.version>

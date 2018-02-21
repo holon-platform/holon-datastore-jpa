@@ -15,13 +15,17 @@
  */
 package com.holonplatform.datastore.jpa.dialect;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
+import com.holonplatform.core.internal.Logger;
+import com.holonplatform.core.internal.utils.ClassUtils;
 import com.holonplatform.core.query.QueryFunction;
 import com.holonplatform.core.query.TemporalFunction.Day;
 import com.holonplatform.core.query.TemporalFunction.Hour;
 import com.holonplatform.core.query.TemporalFunction.Month;
 import com.holonplatform.core.query.TemporalFunction.Year;
+import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.datastore.jpa.internal.dialect.DialectFunctionsRegistry;
 import com.holonplatform.datastore.jpa.internal.jpql.expression.ExtractJPQLFunction;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
@@ -33,6 +37,11 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
  */
 public class EclipselinkDialect implements ORMDialect {
 
+	private static final Logger LOGGER = JpaDatastoreLogger.create();
+
+	private int supportedJPAMajorVersion = 2;
+	private int supportedJPAMinorVersion = 1;
+
 	private final DialectFunctionsRegistry functions = new DialectFunctionsRegistry();
 
 	/*
@@ -42,10 +51,63 @@ public class EclipselinkDialect implements ORMDialect {
 	 */
 	@Override
 	public void init(ORMDialectContext context) {
+
+		try {
+
+			String version = context.withEntityManager(em -> {
+				try {
+					Class<?> versionCls = ClassUtils.forName("org.eclipse.persistence.Version",
+							em.getDelegate().getClass().getClassLoader());
+					Method m = versionCls.getDeclaredMethod("getVersion");
+					return (String) m.invoke(null);
+				} catch (Exception e) {
+					LOGGER.warn("Failed to detect Eclipselink version", e);
+					return null;
+				}
+			});
+
+			int majorVersion = -1;
+			int minorVersion = -1;
+
+			int dix = version.indexOf('.');
+			if (dix > -1) {
+				majorVersion = Integer.parseInt(version.substring(0, dix));
+				String minor = version.substring(dix + 1);
+				minorVersion = Integer.parseInt(minor.substring(0, minor.indexOf('.')));
+			}
+
+			if (majorVersion > -1 && minorVersion > -1) {
+				if (majorVersion == 2 && minorVersion < 5) {
+					supportedJPAMinorVersion = 0;
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.warn("Failed to detect Eclipselink version", e);
+		}
+
 		this.functions.registerFunction(Year.class, new ExtractJPQLFunction("YEAR"));
 		this.functions.registerFunction(Month.class, new ExtractJPQLFunction("MONTH"));
 		this.functions.registerFunction(Day.class, new ExtractJPQLFunction("DAY"));
 		this.functions.registerFunction(Hour.class, new ExtractJPQLFunction("HOUR"));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getSupportedJPAMajorVersion()
+	 */
+	@Override
+	public int getSupportedJPAMajorVersion() {
+		return supportedJPAMajorVersion;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getSupportedJPAMinorVersion()
+	 */
+	@Override
+	public int getSupportedJPAMinorVersion() {
+		return supportedJPAMinorVersion;
 	}
 
 	/*

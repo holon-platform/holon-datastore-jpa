@@ -16,10 +16,10 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_CODE;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_TEXT;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TEST3;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -27,8 +27,6 @@ import org.junit.Test;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.datastore.relational.SubQuery;
 import com.holonplatform.core.property.PathProperty;
-import com.holonplatform.datastore.jpa.test.model.entity.Test1;
-import com.holonplatform.datastore.jpa.test.model.entity.Test3;
 
 public class SubQueryTest extends AbstractJpaDatastoreSuiteTest {
 
@@ -61,14 +59,14 @@ public class SubQueryTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testSubQueryExplicitAlias() {
 
-		final RelationalTarget<Test1> AT = RelationalTarget.of(JPA_TARGET).alias("parent");
+		final RelationalTarget<?> AT = RelationalTarget.of(JPA_TARGET).alias("parent");
 		final PathProperty<Long> A_KEY = AT.property(KEY);
 
 		long count = getDatastore().query().target(AT)
 				.filter(SubQuery.create().target(TEST3).filter(TEST3_CODE.eq(A_KEY)).notExists()).count();
 		assertEquals(1, count);
 
-		final RelationalTarget<Test3> AT2 = RelationalTarget.of(TEST3).alias("sub");
+		final RelationalTarget<?> AT2 = RelationalTarget.of(TEST3).alias("sub");
 		final PathProperty<Long> A2_KEY = AT2.property(TEST3_CODE);
 
 		count = getDatastore().query().target(AT)

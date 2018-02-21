@@ -21,6 +21,8 @@ import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.query.QueryOperation;
+import com.holonplatform.datastore.jpa.internal.jpql.expression.DefaultJPQLQuery;
+import com.holonplatform.datastore.jpa.jpql.JPQLResultConverter;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
@@ -64,7 +66,7 @@ public enum QueryResolver implements JPQLContextExpressionResolver<QueryOperatio
 	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
 	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "cast" })
 	@Override
 	public Optional<JPQLQuery> resolve(QueryOperation expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
@@ -76,8 +78,8 @@ public enum QueryResolver implements JPQLContextExpressionResolver<QueryOperatio
 		String jpql = context.resolveOrFail(clauses, JPQLExpression.class).getValue();
 
 		// build SQLQuery
-		return Optional.of(JPQLQuery.create(jpql, (Class) clauses.getQueryResultType(),
-				clauses.getResultConverter()
+		return Optional.of(new DefaultJPQLQuery(jpql, (Class) clauses.getQueryResultType(),
+				(JPQLResultConverter)clauses.getResultConverter()
 						.orElseThrow(() -> new InvalidExpressionException("Missing query results converter")),
 				context.getNamedParametersHandler().getNamedParameters()));
 	}

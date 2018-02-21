@@ -15,15 +15,15 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.LDAT;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.LTMS;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LTMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TIME;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TIME;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
