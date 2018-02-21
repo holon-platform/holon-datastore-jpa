@@ -27,15 +27,15 @@ import com.holonplatform.core.datastore.Datastore;
 		BulkUpdateTest.class, BulkDeleteTest.class, BulkUpdateAliasTest.class, BulkDeleteAliasTest.class,
 		AggregationFunctionsTest.class, StringFunctionsTest.class, TemporalFunctionsTest.class,
 		DataTargetResolverTest.class, CustomExpressionsTest.class, EntityProjectionTest.class, InsertedKeysTest.class,
-		TransactionTest.class })
+		TransactionTest.class, QueryHintTest.class, LockModeTest.class })
 public abstract class AbstractJpaDatastoreTestSuite {
 
 	public static Datastore datastore;
 
 	public static boolean updateAliasTest = true;
-	
+
 	public static boolean rightJoinTest = true;
-	
+
 	public static boolean avgProjectionTest = true;
 
 }

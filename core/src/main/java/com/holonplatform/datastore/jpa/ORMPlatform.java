@@ -36,9 +36,7 @@ public enum ORMPlatform {
 	OPENJPA("org.apache.openjpa.persistence.OpenJPAEntityManager"),
 
 	DATANUCLEUS("org.datanucleus.jpa.EntityManagerImpl", "org.datanucleus.ObjectManager",
-			"org.datanucleus.ObjectManagerImpl"),
-
-	BATOO("org.batoo.jpa.core.impl.manager.EntityManagerImpl");
+			"org.datanucleus.ObjectManagerImpl");
 
 	/*
 	 * EntitManager delegates class names

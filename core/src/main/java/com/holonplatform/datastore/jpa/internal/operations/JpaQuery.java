@@ -17,7 +17,6 @@ package com.holonplatform.datastore.jpa.internal.operations;
 
 import java.util.stream.Stream;
 
-import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
@@ -115,9 +114,9 @@ public class JpaQuery implements QueryAdapter<QueryConfiguration> {
 			queryOperation.getConfiguration().getOffset().ifPresent((o) -> q.setFirstResult(o));
 
 			// query hints and lock mode
-			queryOperation.getConfiguration().getParameter(JpaQueryHint.QUERY_PARAMETER_HINT, JpaQueryHint.class)
+			queryOperation.getConfiguration().getParameter(JpaQueryHint.QUERY_PARAMETER_HINT)
 					.ifPresent(p -> q.setHint(p.getName(), p.getValue()));
-			queryOperation.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE, LockModeType.class)
+			queryOperation.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE)
 					.ifPresent(p -> q.setLockMode(p));
 
 			// execute and convert results

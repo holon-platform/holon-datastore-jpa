@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
 
+import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.datastore.DatastoreCommodity;
 import com.holonplatform.core.datastore.DatastoreCommodityRegistrar;
@@ -38,12 +39,10 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		DatastoreCommodityRegistrar<JpaDatastoreCommodityContext> {
 
 	/**
-	 * {@link Query} parameter to set lock mode (use {@link Query#parameter(String, Object)} to set query parameters).
-	 * <p>
-	 * Value must be {@link LockModeType} enum value.
-	 * </p>
+	 * A {@link Query} parameter to set the {@link LockModeType}, using {@link Query#parameter(ConfigProperty, Object)}.
 	 */
-	public static final String QUERY_PARAMETER_LOCK_MODE = "jpaQueryLockMode";
+	public static final ConfigProperty<LockModeType> QUERY_PARAMETER_LOCK_MODE = ConfigProperty
+			.create("jpaQueryLockMode", LockModeType.class);
 
 	// Builder
 

@@ -100,8 +100,6 @@ public interface ORMDialect {
 				return Optional.of(new DefaultDialect());
 			case DATANUCLEUS:
 				return Optional.of(new DefaultDialect());
-			case BATOO:
-				return Optional.of(new DefaultDialect());
 			default:
 				break;
 			}
