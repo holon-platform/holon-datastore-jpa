@@ -15,8 +15,8 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -61,9 +61,11 @@ public class AggregationFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testAvg() {
-		Optional<Double> avg = getDatastore().query().target(JPA_TARGET).findOne(KEY.avg());
-		assertTrue(avg.isPresent());
-		assertEquals(new Double(1.5), avg.get());
+		if (AbstractJpaDatastoreTestSuite.avgProjectionTest) {
+			Optional<Double> avg = getDatastore().query().target(JPA_TARGET).findOne(KEY.avg());
+			assertTrue(avg.isPresent());
+			assertEquals(new Double(1.5), avg.get());
+		}
 	}
 
 }

@@ -17,8 +17,8 @@ package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static org.junit.Assert.assertEquals;
@@ -75,14 +75,6 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 	@SuppressWarnings("serial")
 	@Test
 	public void testQueryFilterExpression() {
-		final ExpressionResolver<KeyIsFilter, JPQLExpression> SQL_RESOLVER = ExpressionResolver.create(
-				KeyIsFilter.class, JPQLExpression.class,
-				(kis, ctx) -> Optional.of(JPQLExpression.create("key > " + kis.getValue())));
-
-		Optional<String> str = getDatastore().query().withExpressionResolver(SQL_RESOLVER).target(JPA_TARGET)
-				.filter(new KeyIsFilter(1)).findOne(STR);
-		assertEquals("Two", str.get());
-
 		final ExpressionResolver<KeyIsFilter, JPQLExpression> SQL_RESOLVER_ALIAS = new JPQLContextExpressionResolver<KeyIsFilter, JPQLExpression>() {
 
 			@Override
@@ -104,7 +96,7 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 			}
 		};
 
-		str = getDatastore().query().withExpressionResolver(SQL_RESOLVER_ALIAS).target(JPA_TARGET)
+		Optional<String> str = getDatastore().query().withExpressionResolver(SQL_RESOLVER_ALIAS).target(JPA_TARGET)
 				.filter(new KeyIsFilter(1)).findOne(STR);
 		assertEquals("Two", str.get());
 	}
@@ -112,14 +104,6 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testQuerySort() {
 		List<Long> res = getDatastore().query().withExpressionResolver(StrKeySort.RESOLVER).target(JPA_TARGET)
-				.sort(new StrKeySort()).list(KEY);
-		assertEquals(2, res.size());
-		assertEquals(Long.valueOf(2), res.get(0));
-	}
-
-	@Test
-	public void testQuerySortExpression() {
-		List<Long> res = getDatastore().query().withExpressionResolver(StrKeySort.SQL_RESOLVER).target(JPA_TARGET)
 				.sort(new StrKeySort()).list(KEY);
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));

@@ -37,10 +37,8 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 	public static void initDatastore() {
 
 		// init db
-		DataSourceBuilder.builder()
-		//.type(DataSourceType.BASIC)
-		.url("jdbc:h2:mem:datastore;DB_CLOSE_ON_EXIT=FALSE")
-				.username("sa").withInitScriptResource("h2/init.sql").build();
+		DataSourceBuilder.builder().url("jdbc:h2:mem:datastore;DB_CLOSE_ON_EXIT=FALSE").username("sa")
+				.withInitScriptResource("h2/init.sql").build();
 
 		final EntityManagerFactory emf = Persistence.createEntityManagerFactory("test_eclipselink");
 
@@ -48,6 +46,7 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 				.withCommodity(DatastoreConfigCommodity.FACTORY).withExpressionResolver(KeyIsFilter.RESOLVER).build();
 
 		rightJoinTest = false;
+		avgProjectionTest = false;
 	}
 
 	@Test

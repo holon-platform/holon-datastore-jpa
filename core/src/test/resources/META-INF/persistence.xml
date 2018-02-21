@@ -21,7 +21,7 @@
 				value="jdbc:h2:mem:datastore;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
-			<property name="hibernate.show_sql" value="true" />
+			<!-- <property name="hibernate.show_sql" value="true" /> -->
 			<property name="hibernate.hbm2ddl.auto" value="none" />
 		</properties>
 	</persistence-unit>
@@ -44,8 +44,8 @@
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="eclipselink.weaving" value="false" />
-			<property name="eclipselink.logging.level.sql" value="FINE" />
-			<property name="eclipselink.logging.parameters" value="true" />
+			<!-- <property name="eclipselink.logging.level.sql" value="FINE" /> -->
+			<!-- <property name="eclipselink.logging.parameters" value="true" /> -->
 		</properties>
 	</persistence-unit>
 

@@ -101,19 +101,6 @@ public class TransactionTest extends AbstractJpaDatastoreSuiteTest {
 		count = getDatastore().query().target(TX_TARGET).count();
 		Assert.assertEquals(3L, count);
 
-		TestUtils.expectedException(DataAccessException.class,
-				() -> getDatastore().requireTransactional().withTransaction(tx -> {
-					PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_CODE, 4L).set(TX_TEXT, "ToRollback")
-							.build();
-					getDatastore().insert(TX_TARGET, box);
-
-					throw new RuntimeException("Should rollback");
-
-				}, TransactionConfiguration.withAutoCommit()));
-
-		count = getDatastore().query().target(TX_TARGET).count();
-		Assert.assertEquals(3L, count);
-
 		// test nested
 
 		getDatastore().requireTransactional().withTransaction(tx -> {
@@ -125,7 +112,7 @@ public class TransactionTest extends AbstractJpaDatastoreSuiteTest {
 			Assert.assertEquals(1, res.getAffectedCount());
 
 			String val = ((EntityManagerHandler) getDatastore()).withEntityManager(em -> {
-				List<String> rs = em.createQuery("SELECT text FROM TestTx WHERE code=2", String.class).getResultList();
+				List<String> rs = em.createQuery("SELECT t.text FROM TestTx t WHERE t.code=2", String.class).getResultList();
 				return (rs.size() > 0) ? rs.get(0) : null;
 			});
 			Assert.assertEquals("Two*", val);

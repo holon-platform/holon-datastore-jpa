@@ -35,5 +35,7 @@ public abstract class AbstractJpaDatastoreTestSuite {
 	public static boolean updateAliasTest = true;
 	
 	public static boolean rightJoinTest = true;
+	
+	public static boolean avgProjectionTest = true;
 
 }

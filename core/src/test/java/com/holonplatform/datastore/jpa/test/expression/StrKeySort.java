@@ -19,7 +19,6 @@ import java.util.Optional;
 
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.query.QuerySort;
-import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 import com.holonplatform.datastore.jpa.test.model.TestDataModel;
 
 @SuppressWarnings("serial")
@@ -31,9 +30,5 @@ public class StrKeySort implements QuerySort {
 
 	public static final ExpressionResolver<QuerySort, QuerySort> RESOLVER = ExpressionResolver.create(StrKeySort.class,
 			QuerySort.class, (sort, ctx) -> Optional.of(TestDataModel.STR.desc().and(TestDataModel.KEY.asc())));
-
-	public static final ExpressionResolver<QuerySort, JPQLExpression> SQL_RESOLVER = ExpressionResolver.create(
-			StrKeySort.class, JPQLExpression.class,
-			(sort, ctx) -> Optional.of(JPQLExpression.create("stringValue desc, key asc")));
 
 }

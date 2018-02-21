@@ -18,10 +18,10 @@ package com.holonplatform.datastore.jpa.test.suite;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.LDAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.LTMS;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
@@ -40,7 +40,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import com.holonplatform.core.datastore.Datastore.OperationResult;
-import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.datastore.jpa.test.model.TestEnum;
 import com.holonplatform.datastore.jpa.test.model.TestSampleData;
@@ -144,16 +143,6 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
 			assertNotNull(value);
 			assertEquals("uxs", value.getValue(STR));
-
-		});
-	}
-
-	@Test(expected = DataAccessException.class)
-	public void testUpdateMissingKey() {
-		inTransaction(() -> {
-
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(STR, "test").build();
-			getDatastore().update(JPA_TARGET, value);
 
 		});
 	}

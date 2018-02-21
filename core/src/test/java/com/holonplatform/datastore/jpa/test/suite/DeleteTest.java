@@ -15,11 +15,10 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.PROPERTIES_NOID;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +26,6 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import com.holonplatform.core.datastore.Datastore.OperationResult;
-import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.property.PropertyBox;
 
 public class DeleteTest extends AbstractJpaDatastoreSuiteTest {
@@ -73,16 +71,6 @@ public class DeleteTest extends AbstractJpaDatastoreSuiteTest {
 
 			assertFalse(getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES_NOID)
 					.isPresent());
-
-		});
-	}
-
-	@Test(expected = DataAccessException.class)
-	public void testDeleteMissingKey() {
-		inTransaction(() -> {
-
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(STR, "test").build();
-			getDatastore().delete(JPA_TARGET, value);
 
 		});
 	}

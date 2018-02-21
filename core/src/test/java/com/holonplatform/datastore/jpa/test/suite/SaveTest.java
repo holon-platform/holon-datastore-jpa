@@ -45,6 +45,7 @@ import org.junit.Test;
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.property.PropertyBox;
+import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.test.model.TestEnum;
 import com.holonplatform.datastore.jpa.test.model.TestSampleData;
 
@@ -57,7 +58,7 @@ public class SaveTest extends AbstractJpaDatastoreSuiteTest {
 			PropertyBox value = PropertyBox.builder(TEST2_PROPERTIES).set(TEST2_TEXT, "test_ins")
 					.build();
 
-			OperationResult result = getDatastore().save(TEST2, value);
+			OperationResult result = getDatastore().save(TEST2, value, JpaWriteOption.FLUSH);
 			assertEquals(1, result.getAffectedCount());
 			assertEquals(OperationType.INSERT, result.getOperationType().orElse(null));
 			
