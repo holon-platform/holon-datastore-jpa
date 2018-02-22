@@ -140,7 +140,7 @@ public interface ORMDialect {
 
 	/**
 	 * Detect a suitable {@link ORMDialect} to use with given ORM platform, if available.
-	 * @param database ORM platform
+	 * @param platform ORM platform
 	 * @return Optional {@link ORMDialect} for given platform
 	 */
 	static Optional<ORMDialect> detect(ORMPlatform platform) {

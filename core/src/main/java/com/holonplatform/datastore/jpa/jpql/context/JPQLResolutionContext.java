@@ -36,7 +36,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLParameter;
  * </p>
  * <p>
  * Supports named parameters definitions, which can be added using {@link #addNamedParameter(JPQLParameter)}. The named
- * parameters can be normalized as JPQL statement parameters through the {@link #prepareStatement(String)} method.
+ * parameters can provided to a query definition using {@link #setupQueryParameters(Query)}.
  * </p>
  * <p>
  * JPQL compostion contexts are hierarchical and provides methods to get the parent context and to create children using
