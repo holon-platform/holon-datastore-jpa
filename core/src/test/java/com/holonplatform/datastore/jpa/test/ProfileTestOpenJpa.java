@@ -52,7 +52,7 @@ import com.holonplatform.datastore.jpa.test.expression.KeyIsFilter;
 import com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite;
 import com.holonplatform.jdbc.DataSourceBuilder;
 
-public class TestOpenJpa extends AbstractJpaDatastoreTestSuite {
+public class ProfileTestOpenJpa extends AbstractJpaDatastoreTestSuite {
 
 	private static EntityManagerFactory entityManagerFactory;
 

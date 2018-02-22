@@ -29,33 +29,6 @@
 					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
-			<!-- OpenJPA entity enhancement -->
-			<plugin>
-				<groupId>org.apache.openjpa</groupId>
-				<artifactId>openjpa-maven-plugin</artifactId>
-				<version>${openjpa.version}</version>
-				<configuration>
-					<includes>**/test/model/oentity/*.class</includes>
-					<addDefaultConstructor>true</addDefaultConstructor>
-					<persistenceXmlFile>src/test/resources/META-INF/persistence-openjpa.xml</persistenceXmlFile>
-				</configuration>
-				<executions>
-					<execution>
-						<id>enhancer</id>
-						<phase>process-test-classes</phase>
-						<goals>
-							<goal>test-enhance</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.openjpa</groupId>
-						<artifactId>openjpa</artifactId>
-						<version>${openjpa.version}</version>
-					</dependency>
-				</dependencies>
-			</plugin>
 			<!-- Danucleus entity enhancer -->
 			<plugin>
 				<groupId>org.datanucleus</groupId>
@@ -212,5 +185,53 @@
 		</dependency>
 
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>openjpa</id>
+			<build>
+				<plugins>
+					<!-- Unit test -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>com/holonplatform/datastore/jpa/test/ProfileTestOpenJpa.java</include>
+							</includes>
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</plugin>
+					<!-- OpenJPA entity enhancement -->
+					<plugin>
+						<groupId>org.apache.openjpa</groupId>
+						<artifactId>openjpa-maven-plugin</artifactId>
+						<version>${openjpa.version}</version>
+						<configuration>
+							<includes>**/test/model/oentity/*.class</includes>
+							<addDefaultConstructor>true</addDefaultConstructor>
+							<persistenceXmlFile>src/test/resources/META-INF/persistence-openjpa.xml</persistenceXmlFile>
+						</configuration>
+						<executions>
+							<execution>
+								<id>enhancer</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>test-enhance</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.openjpa</groupId>
+								<artifactId>openjpa</artifactId>
+								<version>${openjpa.version}</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
