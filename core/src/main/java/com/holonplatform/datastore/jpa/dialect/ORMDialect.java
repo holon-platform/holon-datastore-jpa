@@ -104,6 +104,31 @@ public interface ORMDialect {
 	}
 
 	/**
+	 * Get whether the ESCAPE clause in LIKE predicate is supported.
+	 * @return Whether the ESCAPE clause in LIKE predicate is supported.
+	 */
+	default boolean likeEscapeSupported() {
+		return true;
+	}
+
+	/**
+	 * Get the character to use for ESCAPE in LIKE predicate.
+	 * @return the character to use for ESCAPE in LIKE predicate.
+	 */
+	default char getLikeEscapeCharacter() {
+		return '!';
+	}
+
+	/**
+	 * Serialize LIKE ESCAPE character as JPQL.
+	 * @param escapeCharacter The LIKE ESCAPE character to use
+	 * @return JPQL expression
+	 */
+	default String getLikeEscapeJPQL(char escapeCharacter) {
+		return "'" + escapeCharacter + "'";
+	}
+
+	/**
 	 * Resolve given <code>function</code> into a dialect-specific {@link JPQLFunction}.
 	 * @param function The function to resolve (not null)
 	 * @return A dialect-specific function resolution, or empty to fallback to the default function resolution, if
@@ -128,7 +153,7 @@ public interface ORMDialect {
 			case OPENJPA:
 				return Optional.of(new OpenJPADialect());
 			case DATANUCLEUS:
-				return Optional.of(new DefaultDialect());
+				return Optional.of(new DatanucleusDialect());
 			default:
 				break;
 			}

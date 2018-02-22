@@ -15,9 +15,9 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -37,17 +37,21 @@ public class StringFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 		assertNotNull(key);
 		assertEquals(Long.valueOf(1L), key);
 
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateWithFunctionTest) {
 
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, STR.lower()).filter(KEY.eq(1L))
-					.execute();
-			assertEquals(1, result.getAffectedCount());
+			inTransaction(() -> {
 
-			String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
-			assertNotNull(v);
-			assertEquals("one", v);
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, STR.lower()).filter(KEY.eq(1L))
+						.execute();
+				assertEquals(1, result.getAffectedCount());
 
-		});
+				String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
+				assertNotNull(v);
+				assertEquals("one", v);
+
+			});
+
+		}
 	}
 
 	@Test
@@ -60,17 +64,21 @@ public class StringFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 		assertNotNull(key);
 		assertEquals(Long.valueOf(1L), key);
 
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateWithFunctionTest) {
 
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, STR.upper()).filter(KEY.eq(1L))
-					.execute();
-			assertEquals(1, result.getAffectedCount());
+			inTransaction(() -> {
 
-			String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
-			assertNotNull(v);
-			assertEquals("ONE", v);
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, STR.upper()).filter(KEY.eq(1L))
+						.execute();
+				assertEquals(1, result.getAffectedCount());
 
-		});
+				String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
+				assertNotNull(v);
+				assertEquals("ONE", v);
+
+			});
+
+		}
 	}
 
 }

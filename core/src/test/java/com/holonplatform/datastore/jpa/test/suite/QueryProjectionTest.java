@@ -15,20 +15,20 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LTMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TIME;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LTMS;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -61,7 +61,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testPropertySet() {
-		
+
 		PropertyBox result = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES)
 				.orElse(null);
 		checkKey1Value(result);
@@ -88,8 +88,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 
 		assertFalse(result.contains(DBL));
 
-		List<PropertyBox> results = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).list(KEY, STR,
-				NBOOL);
+		List<PropertyBox> results = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).list(KEY, STR, NBOOL);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		assertEquals(Long.valueOf(1), results.get(0).getValue(KEY));
@@ -111,9 +110,11 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 		assertNotNull(dbl);
 		assertEquals(Double.valueOf(7.4), dbl);
 
-		TestEnum enm = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(ENM).orElse(null);
-		assertNotNull(enm);
-		assertEquals(TestEnum.FIRST, enm);
+		if (AbstractJpaDatastoreTestSuite.enumProjectionTest) {
+			TestEnum enm = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(ENM).orElse(null);
+			assertNotNull(enm);
+			assertEquals(TestEnum.FIRST, enm);
+		}
 
 		Boolean nb = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(NBOOL).orElse(null);
 		assertNotNull(nb);
@@ -170,10 +171,10 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testLiteral() {
-		Integer value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L))
-				.findOne(ConstantExpressionProjection.create(1)).orElse(null);
+		Long value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L))
+				.findOne(ConstantExpressionProjection.create(1L)).orElse(null);
 		assertNotNull(value);
-		assertEquals(Integer.valueOf(1), value);
+		assertEquals(Long.valueOf(1L), value);
 	}
 
 	@Test

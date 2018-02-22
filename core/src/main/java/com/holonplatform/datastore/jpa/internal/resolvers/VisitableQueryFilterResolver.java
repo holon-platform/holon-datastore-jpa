@@ -232,6 +232,10 @@ public enum VisitableQueryFilterResolver implements JPQLContextExpressionResolve
 	@Override
 	public JPQLExpression visit(StringMatchFilter filter, JPQLResolutionContext context) {
 
+		// escape char
+		final boolean escapeSupported = context.getDialect().likeEscapeSupported();
+		final char escapeChar = context.getDialect().getLikeEscapeCharacter();
+
 		// check value
 		String value = filter.getValue();
 		if (value == null) {
@@ -239,7 +243,12 @@ public enum VisitableQueryFilterResolver implements JPQLContextExpressionResolve
 		}
 
 		// escape
-		value = value.replace("!", "!!").replace("%", "!%").replace("_", "!_").replace("[", "![");
+		if (escapeSupported) {
+			final String escapeString = String.valueOf(escapeChar);
+
+			value = value.replace(escapeString, escapeString + escapeChar).replace("%", escapeString + "%")
+					.replace("_", escapeString + "_").replace("[", escapeString + "[");
+		}
 
 		// add wildcards
 		switch (filter.getMatchMode()) {
@@ -274,7 +283,10 @@ public enum VisitableQueryFilterResolver implements JPQLContextExpressionResolve
 						JPQLExpression.class)
 				.getValue());
 
-		sb.append(" ESCAPE '!'");
+		if (escapeSupported) {
+			sb.append(" ESCAPE ");
+			sb.append(context.getDialect().getLikeEscapeJPQL(escapeChar));
+		}
 
 		return JPQLExpression.create(sb.toString());
 	}

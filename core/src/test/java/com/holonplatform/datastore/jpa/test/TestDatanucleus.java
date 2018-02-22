@@ -41,12 +41,12 @@ import com.holonplatform.datastore.jpa.JpaTarget;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.test.config.DatastoreConfigCommodity;
 import com.holonplatform.datastore.jpa.test.expression.KeyIsFilter;
-import com.holonplatform.datastore.jpa.test.model.entity.Test1;
-import com.holonplatform.datastore.jpa.test.model.entity.Test3;
+import com.holonplatform.datastore.jpa.test.model.dentity.Test1;
+import com.holonplatform.datastore.jpa.test.model.dentity.Test3;
 import com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite;
 import com.holonplatform.jdbc.DataSourceBuilder;
 
-public class TestHibernate extends AbstractJpaDatastoreTestSuite {
+public class TestDatanucleus extends AbstractJpaDatastoreTestSuite {
 
 	private static EntityManagerFactory entityManagerFactory;
 
@@ -54,15 +54,15 @@ public class TestHibernate extends AbstractJpaDatastoreTestSuite {
 	public static void initDatastore() {
 
 		// init db
-		DataSourceBuilder.builder().url("jdbc:h2:mem:datastore1;DB_CLOSE_ON_EXIT=FALSE").username("sa")
+		DataSourceBuilder.builder().url("jdbc:h2:mem:datastore4;DB_CLOSE_ON_EXIT=FALSE").username("sa")
 				.withInitScriptResource("h2/init.sql").build();
 
-		entityManagerFactory = Persistence.createEntityManagerFactory("test_hibernate");
+		entityManagerFactory = Persistence.createEntityManagerFactory("test_datanucleus");
 
 		datastore = JpaDatastore.builder().entityManagerFactory(entityManagerFactory).traceEnabled(true)
 				.withCommodity(DatastoreConfigCommodity.FACTORY).withExpressionResolver(KeyIsFilter.RESOLVER).build();
 
-		platform = ORMPlatform.HIBERNATE;
+		platform = ORMPlatform.DATANUCLEUS;
 
 		JPA_TARGET = JpaTarget.of(Test1.class);
 
@@ -83,6 +83,13 @@ public class TestHibernate extends AbstractJpaDatastoreTestSuite {
 
 		TEST3_CODE_P = PathProperty.create("pk.code", long.class).parent(TEST3);
 		TEST3_TEXT_P = PathProperty.create("text", String.class).parent(TEST3);
+
+		enumProjectionTest = false;
+		transactionalTest = false;
+		blobArrayProjectionTest = false;
+		updateWithFunctionTest = false;
+		updateNestedTest = false;
+		saveOperationTest = false;
 	}
 
 	@AfterClass

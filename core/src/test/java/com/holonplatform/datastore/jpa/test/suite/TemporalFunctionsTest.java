@@ -59,22 +59,26 @@ public class TemporalFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 		long cnt = getDatastore().query().target(JPA_TARGET).filter(DAT.lt(QueryFunction.currentDate())).count();
 		assertEquals(2L, cnt);
 
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateWithFunctionTest) {
 
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(DAT, QueryFunction.currentDate())
-					.filter(KEY.eq(1L)).execute();
-			assertEquals(1, result.getAffectedCount());
+			inTransaction(() -> {
 
-			Date date = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(DAT).orElse(null);
-			assertNotNull(date);
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(DAT, QueryFunction.currentDate())
+						.filter(KEY.eq(1L)).execute();
+				assertEquals(1, result.getAffectedCount());
 
-			Calendar c = Calendar.getInstance();
-			c.setTime(date);
-			assertEquals(now.get(Calendar.YEAR), c.get(Calendar.YEAR));
-			assertEquals(now.get(Calendar.MONTH), c.get(Calendar.MONTH));
-			assertEquals(now.get(Calendar.DAY_OF_MONTH), c.get(Calendar.DAY_OF_MONTH));
+				Date date = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(DAT).orElse(null);
+				assertNotNull(date);
 
-		});
+				Calendar c = Calendar.getInstance();
+				c.setTime(date);
+				assertEquals(now.get(Calendar.YEAR), c.get(Calendar.YEAR));
+				assertEquals(now.get(Calendar.MONTH), c.get(Calendar.MONTH));
+				assertEquals(now.get(Calendar.DAY_OF_MONTH), c.get(Calendar.DAY_OF_MONTH));
+
+			});
+
+		}
 	}
 
 	@Test
@@ -94,18 +98,23 @@ public class TemporalFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 		long cnt = getDatastore().query().target(JPA_TARGET).filter(LDAT.loe(QueryFunction.currentLocalDate())).count();
 		assertEquals(2L, cnt);
 
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateWithFunctionTest) {
 
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(LDAT, QueryFunction.currentLocalDate())
-					.filter(KEY.eq(1L)).execute();
-			assertEquals(1, result.getAffectedCount());
+			inTransaction(() -> {
 
-			LocalDate date = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(LDAT).orElse(null);
-			assertNotNull(date);
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET)
+						.set(LDAT, QueryFunction.currentLocalDate()).filter(KEY.eq(1L)).execute();
+				assertEquals(1, result.getAffectedCount());
 
-			assertEquals(lnow, date);
+				LocalDate date = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(LDAT)
+						.orElse(null);
+				assertNotNull(date);
 
-		});
+				assertEquals(lnow, date);
+
+			});
+
+		}
 	}
 
 	@Test
@@ -130,22 +139,26 @@ public class TemporalFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 				.filter(TMS.isNotNull().and(TMS.lt(QueryFunction.currentTimestamp()))).count();
 		assertEquals(1L, cnt);
 
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateWithFunctionTest) {
 
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(TMS, QueryFunction.currentTimestamp())
-					.filter(KEY.eq(2L)).execute();
-			assertEquals(1, result.getAffectedCount());
+			inTransaction(() -> {
 
-			Date date = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(2L)).findOne(TMS).orElse(null);
-			assertNotNull(date);
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET)
+						.set(TMS, QueryFunction.currentTimestamp()).filter(KEY.eq(2L)).execute();
+				assertEquals(1, result.getAffectedCount());
 
-			Calendar c = Calendar.getInstance();
-			c.setTime(date);
-			assertEquals(now.get(Calendar.YEAR), c.get(Calendar.YEAR));
-			assertEquals(now.get(Calendar.MONTH), c.get(Calendar.MONTH));
-			assertEquals(now.get(Calendar.DAY_OF_MONTH), c.get(Calendar.DAY_OF_MONTH));
+				Date date = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(2L)).findOne(TMS).orElse(null);
+				assertNotNull(date);
 
-		});
+				Calendar c = Calendar.getInstance();
+				c.setTime(date);
+				assertEquals(now.get(Calendar.YEAR), c.get(Calendar.YEAR));
+				assertEquals(now.get(Calendar.MONTH), c.get(Calendar.MONTH));
+				assertEquals(now.get(Calendar.DAY_OF_MONTH), c.get(Calendar.DAY_OF_MONTH));
+
+			});
+
+		}
 
 	}
 
@@ -167,19 +180,23 @@ public class TemporalFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 				.filter(LTMS.isNotNull().and(LTMS.loe(QueryFunction.currentLocalDateTime()))).count();
 		assertEquals(1L, cnt);
 
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.updateWithFunctionTest) {
 
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET)
-					.set(LTMS, QueryFunction.currentLocalDateTime()).filter(KEY.eq(1L)).execute();
-			assertEquals(1, result.getAffectedCount());
+			inTransaction(() -> {
 
-			LocalDateTime ldate = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(LTMS)
-					.orElse(null);
-			assertNotNull(ldate);
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET)
+						.set(LTMS, QueryFunction.currentLocalDateTime()).filter(KEY.eq(1L)).execute();
+				assertEquals(1, result.getAffectedCount());
 
-			assertEquals(lnow.toLocalDate(), ldate.withSecond(0).withNano(0).toLocalDate());
+				LocalDateTime ldate = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(LTMS)
+						.orElse(null);
+				assertNotNull(ldate);
 
-		});
+				assertEquals(lnow.toLocalDate(), ldate.withSecond(0).withNano(0).toLocalDate());
+
+			});
+
+		}
 	}
 
 	@Test

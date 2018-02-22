@@ -53,14 +53,17 @@ public class SaveTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testSaveAsInsert() {
-		if (AbstractJpaDatastoreTestSuite.saveOperationTypeTest) {
+		if (AbstractJpaDatastoreTestSuite.saveOperationTest) {
 			inTransaction(() -> {
 
 				PropertyBox value = PropertyBox.builder(TEST2_PROPERTIES).set(TEST2_TEXT, "test_ins").build();
 
 				OperationResult result = getDatastore().save(TEST2, value, JpaWriteOption.FLUSH);
 				assertEquals(1, result.getAffectedCount());
-				assertEquals(OperationType.INSERT, result.getOperationType().orElse(null));
+
+				if (AbstractJpaDatastoreTestSuite.saveOperationTypeTest) {
+					assertEquals(OperationType.INSERT, result.getOperationType().orElse(null));
+				}
 
 				Optional<Long> insertedKey = result.getInsertedKey(TEST2_CODE);
 				assertTrue(insertedKey.isPresent());
@@ -79,7 +82,7 @@ public class SaveTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testSaveAsUpdate() {
-		if (AbstractJpaDatastoreTestSuite.saveOperationTypeTest) {
+		if (AbstractJpaDatastoreTestSuite.saveOperationTest) {
 			inTransaction(() -> {
 
 				PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 1L).set(STR, "k401").set(DBL, 7.45)
@@ -90,7 +93,10 @@ public class SaveTest extends AbstractJpaDatastoreSuiteTest {
 
 				OperationResult result = getDatastore().save(JPA_TARGET, value);
 				assertEquals(1, result.getAffectedCount());
-				assertEquals(OperationType.UPDATE, result.getOperationType().orElse(null));
+
+				if (AbstractJpaDatastoreTestSuite.saveOperationTypeTest) {
+					assertEquals(OperationType.UPDATE, result.getOperationType().orElse(null));
+				}
 
 				value = getDatastore().query(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
 				assertNotNull(value);

@@ -26,7 +26,6 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Properties;
 
@@ -34,8 +33,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.holonplatform.core.property.PathProperty;
 import com.holonplatform.core.property.PropertySet;
@@ -43,7 +42,6 @@ import com.holonplatform.core.property.TemporalProperty;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.JpaTarget;
 import com.holonplatform.datastore.jpa.ORMPlatform;
-import com.holonplatform.datastore.jpa.dialect.EclipselinkDialect;
 import com.holonplatform.datastore.jpa.test.config.DatastoreConfigCommodity;
 import com.holonplatform.datastore.jpa.test.expression.KeyIsFilter;
 import com.holonplatform.datastore.jpa.test.model.entity.Test1;
@@ -52,6 +50,8 @@ import com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite;
 import com.holonplatform.jdbc.DataSourceBuilder;
 
 public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
+
+	private static EntityManagerFactory entityManagerFactory;
 
 	@BeforeClass
 	public static void initDatastore() {
@@ -64,11 +64,13 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 		props.setProperty(PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML,
 				"META-INF/persistence-eclipselink.xml");
 
-		final EntityManagerFactory emf = Persistence.createEntityManagerFactory("test_eclipselink", props);
+		entityManagerFactory = Persistence.createEntityManagerFactory("test_eclipselink", props);
 
-		datastore = JpaDatastore.builder().entityManagerFactory(emf).traceEnabled(true)
+		datastore = JpaDatastore.builder().entityManagerFactory(entityManagerFactory).traceEnabled(true)
 				.withCommodity(DatastoreConfigCommodity.FACTORY).withExpressionResolver(KeyIsFilter.RESOLVER).build();
 
+		platform = ORMPlatform.ECLIPSELINK;
+		
 		rightJoinTest = false;
 		avgProjectionTest = false;
 		txExpectedErrorTest = false;
@@ -85,7 +87,7 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 		PROPERTIES_V = PropertySet
 				.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
 				.identifier(KEY).build();
-		
+
 		CLOB_SET_STR = PropertySet.of(PROPERTIES, CLOB_STR);
 
 		TEST3 = JpaTarget.of(Test3.class);
@@ -94,11 +96,9 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 		TEST3_TEXT_P = PathProperty.create("text", String.class).parent(TEST3);
 	}
 
-	@Test
-	public void testConfig() {
-		DatastoreConfigCommodity c = datastore.create(DatastoreConfigCommodity.class);
-		assertEquals(ORMPlatform.ECLIPSELINK, c.getPlatform());
-		assertEquals(EclipselinkDialect.class, c.getDialect().getClass());
+	@AfterClass
+	public static void closeEmf() {
+		entityManagerFactory.close();
 	}
 
 }

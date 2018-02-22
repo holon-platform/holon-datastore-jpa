@@ -15,16 +15,18 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LTMS;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
-import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TIME;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LTMS;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.TIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -40,6 +42,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.holonplatform.core.internal.query.filter.NotFilter;
+import com.holonplatform.core.property.PropertyBox;
 
 public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 
@@ -106,6 +109,32 @@ public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 		count = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L).and(STR.eq("One"))).count();
 		assertEquals(1, count);
 
+	}
+	
+	@Test
+	public void testEscape() {
+		inTransaction(() -> {
+			
+			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 1001L).set(STR, "50%").set(NBOOL, false).build();
+			getDatastore().insert(JPA_TARGET, value);
+			value = PropertyBox.builder(PROPERTIES).set(KEY, 1002L).set(STR, "100%").set(NBOOL, false).build();
+			getDatastore().insert(JPA_TARGET, value);
+			value = PropertyBox.builder(PROPERTIES).set(KEY, 1003L).set(STR, "_3").set(NBOOL, false).build();
+			getDatastore().insert(JPA_TARGET, value);
+			
+			long count = getDatastore().query().target(JPA_TARGET).filter(STR.endsWith("%")).count();
+			assertEquals(2, count);
+			
+			count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("0%")).count();
+			assertEquals(2, count);
+			
+			count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("100%")).count();
+			assertEquals(1, count);
+			
+			count = getDatastore().query().target(JPA_TARGET).filter(STR.startsWith("_")).count();
+			assertEquals(1, count);
+			
+		});
 	}
 
 	@Test

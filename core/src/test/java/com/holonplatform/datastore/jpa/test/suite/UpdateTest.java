@@ -67,7 +67,7 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 			value.setValue(LTMS, TestSampleData.LDATETIME1);
 			value.setValue(TIME, TestSampleData.LTIME1);
 
-			OperationResult result = getDatastore().update(JPA_TARGET, value);
+			OperationResult result = getDatastore().update(JPA_TARGET, value, JpaWriteOption.FLUSH);
 			assertEquals(1, result.getAffectedCount());
 
 			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
@@ -78,8 +78,12 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 			assertEquals(TestSampleData.DATE1, value.getValue(DAT));
 			assertEquals(TestSampleData.LDATE1, value.getValue(LDAT));
 			assertEquals(TestEnum.THIRD, value.getValue(ENM));
-			assertEquals("Unstr", value.getValue(NST_STR));
-			assertEquals(TestSampleData.BD1, value.getValue(NST_DEC));
+
+			if (AbstractJpaDatastoreTestSuite.updateNestedTest) {
+				assertEquals("Unstr", value.getValue(NST_STR));
+				assertEquals(TestSampleData.BD1, value.getValue(NST_DEC));
+			}
+			
 			assertFalse(value.getValue(NBOOL));
 			assertEquals(TestSampleData.DATETIME1, value.getValue(TMS));
 			assertEquals(TestSampleData.LDATETIME1, value.getValue(LTMS));

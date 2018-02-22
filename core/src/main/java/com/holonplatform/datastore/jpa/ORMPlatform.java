@@ -36,7 +36,7 @@ public enum ORMPlatform {
 	OPENJPA("org.apache.openjpa.persistence.OpenJPAEntityManager"),
 
 	DATANUCLEUS("org.datanucleus.jpa.EntityManagerImpl", "org.datanucleus.ObjectManager",
-			"org.datanucleus.ObjectManagerImpl");
+			"org.datanucleus.ExecutionContext");
 
 	/*
 	 * EntitManager delegates class names
@@ -93,7 +93,6 @@ public enum ORMPlatform {
 		}
 		for (ORMPlatform platform : values()) {
 			for (String entityManagerClassName : platform.getDelegates()) {
-
 				if (isEntityManagerOfType(em, entityManagerClassName)) {
 					return platform;
 				}
@@ -119,5 +118,5 @@ public enum ORMPlatform {
 		}
 		return false;
 	}
-	
+
 }
