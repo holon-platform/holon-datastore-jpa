@@ -21,16 +21,17 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 
 import com.holonplatform.core.datastore.Datastore;
+import com.holonplatform.jpa.spring.JpaDatastoreConfigProperties;
 import com.holonplatform.jpa.spring.internal.JpaDatastoreRegistrar;
-import com.holonplatform.spring.internal.PrimaryMode;
+import com.holonplatform.spring.internal.BeanRegistryUtils;
 
 /**
  * Registrar for JPA {@link Datastore} beans registration.
@@ -38,11 +39,13 @@ import com.holonplatform.spring.internal.PrimaryMode;
  * @since 5.0.0
  */
 public class JpaDatastoreAutoConfigurationRegistrar
-		implements ImportBeanDefinitionRegistrar, BeanFactoryAware, BeanClassLoaderAware {
+		implements ImportBeanDefinitionRegistrar, BeanFactoryAware, BeanClassLoaderAware, EnvironmentAware {
 
 	private BeanFactory beanFactory;
 
 	private ClassLoader beanClassLoader;
+
+	private Environment environment;
 
 	/*
 	 * (non-Javadoc)
@@ -65,25 +68,27 @@ public class JpaDatastoreAutoConfigurationRegistrar
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.springframework.context.EnvironmentAware#setEnvironment(org.springframework.core.env.Environment)
+	 */
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see
 	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.springframework.
 	 * core.type.AnnotationMetadata, org.springframework.beans.factory.support.BeanDefinitionRegistry)
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
-		// Register JPA Datastore (transactional)
-		if (beanFactory instanceof ListableBeanFactory) {
-			String[] emfBeanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
-					(ListableBeanFactory) beanFactory, EntityManagerFactory.class, true, false);
-			if (emfBeanNames == null || emfBeanNames.length == 0) {
-				emfBeanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ListableBeanFactory) beanFactory,
-						AbstractEntityManagerFactoryBean.class, true, false);
-			}
-			if (emfBeanNames != null && emfBeanNames.length == 1) {
-				String emfBeanName = (emfBeanNames[0].startsWith("&")) ? emfBeanNames[0].substring(1) : emfBeanNames[0];
-				JpaDatastoreRegistrar.registerDatastore(registry, null, PrimaryMode.AUTO, emfBeanName, true, false,
-						beanClassLoader);
-			}
+		for (String[] emfDefinition : BeanRegistryUtils.getBeanNamesWithDataContextId(registry, beanFactory,
+				EntityManagerFactory.class, AbstractEntityManagerFactoryBean.class)) {
+			// register JPA Datastore
+			final String dataContextId = emfDefinition[1];
+			JpaDatastoreRegistrar.registerDatastore(registry, environment, dataContextId, emfDefinition[0],
+					JpaDatastoreConfigProperties.builder(dataContextId).build(), beanClassLoader);
 		}
 	}
 

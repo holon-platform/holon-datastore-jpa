@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
-import com.holonplatform.jpa.spring.SpringJpaDatastore;
 import com.holonplatform.spring.internal.datastore.DatastoreInitializer;
 
 /**
@@ -42,7 +41,7 @@ import com.holonplatform.spring.internal.datastore.DatastoreInitializer;
  * @since 5.0.0
  */
 public class DefaultSpringJpaDatastore extends DefaultJpaDatastore
-		implements SpringJpaDatastore, InitializingBean, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
+		implements InitializingBean, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
 
 	private static final long serialVersionUID = 6656514093021783034L;
 
@@ -115,27 +114,8 @@ public class DefaultSpringJpaDatastore extends DefaultJpaDatastore
 
 		// configure
 		DatastoreInitializer.configureDatastore(this, beanName, beanFactory);
-	}
 
-	public static class Builder
-			extends DefaultJpaDatastore.AbstractBuilder<SpringJpaDatastore, DefaultSpringJpaDatastore> {
-
-		public Builder() {
-			super(new DefaultSpringJpaDatastore());
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.holonplatform.core.datastore.Datastore.Builder#build()
-		 */
-		@Override
-		public SpringJpaDatastore build() {
-			if (datastore.getEntityManagerFactory() == null) {
-				throw new IllegalStateException("Missing EntityManagerFactory");
-			}
-			return datastore;
-		}
-
+		LOGGER.info("JPA Datastore initialized");
 	}
 
 }

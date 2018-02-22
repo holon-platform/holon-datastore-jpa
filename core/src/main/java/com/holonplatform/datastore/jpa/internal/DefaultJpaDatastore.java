@@ -109,7 +109,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	/**
 	 * Logger
 	 */
-	private final static Logger LOGGER = JpaDatastoreLogger.create();
+	protected final static Logger LOGGER = JpaDatastoreLogger.create();
 
 	/**
 	 * Current local {@link JpaTransaction} stack

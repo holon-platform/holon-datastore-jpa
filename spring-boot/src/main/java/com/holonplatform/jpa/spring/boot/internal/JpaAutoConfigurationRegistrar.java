@@ -38,14 +38,15 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.datastore.jpa.JpaDatastore;
+import com.holonplatform.jdbc.spring.internal.DataSourceFactoryBean;
 import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.EnableJpaDatastore;
+import com.holonplatform.jpa.spring.JpaDatastoreConfigProperties;
 import com.holonplatform.jpa.spring.boot.JpaEntityScan;
 import com.holonplatform.jpa.spring.internal.JpaDatastoreRegistrar;
 import com.holonplatform.jpa.spring.internal.JpaRegistrar;
 import com.holonplatform.spring.internal.BeanRegistryUtils;
 import com.holonplatform.spring.internal.DataContextBoundBeanDefinition;
-import com.holonplatform.spring.internal.PrimaryMode;
 
 /**
  * Registrar for JPA stack and {@link Datastore} beans registration, using Spring boot {@link EntityScan} annotation.
@@ -97,47 +98,39 @@ public class JpaAutoConfigurationRegistrar
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
-
-		// Register JPA beans for every Data context bound DataSource
 		if (beanFactory instanceof ListableBeanFactory) {
-			ListableBeanFactory listableBeanFactory = (ListableBeanFactory) beanFactory;
+			for (String[] dataSourceDefinition : BeanRegistryUtils.getBeanNamesWithDataContextId(registry, beanFactory,
+					DataSource.class, DataSourceFactoryBean.class)) {
+				final String dataSourceBeanName = dataSourceDefinition[0];
+				final String dataContextId = dataSourceDefinition[1];
+				// check EntityManagerFactory bean
+				String emfBeanName = isBeanRegistered((ListableBeanFactory) beanFactory, registry,
+						EntityManagerFactory.class, dataContextId, BeanRegistryUtils.buildBeanName(dataContextId,
+								EnableJpa.DEFAULT_ENTITYMANAGERFACTORY_BEAN_NAME));
 
-			String[] dataSourceBeanNames = listableBeanFactory.getBeanNamesForType(DataSource.class, false, true);
-			if (dataSourceBeanNames != null) {
-				for (String dataSourceBeanName : dataSourceBeanNames) {
-					BeanDefinition bd = registry.getBeanDefinition(dataSourceBeanName);
-					if (bd instanceof DataContextBoundBeanDefinition) {
-						String dataContextId = ((DataContextBoundBeanDefinition) bd).getDataContextId().orElse(null);
+				if (emfBeanName == null) {
+					// register JPA stack
+					Map<String, Object> attributes = new HashMap<>();
+					attributes.put("dataContextId", dataContextId);
+					attributes.put("dataSourceReference", dataSourceBeanName);
+					attributes.put("entityPackages", getPackagesToScan(dataContextId));
+					attributes.put("enableDatastore", Boolean.FALSE);
+					emfBeanName = JpaRegistrar.registerJpaBeans(registry, beanFactory, environment, attributes,
+							beanClassLoader);
 
-						String emfBeanName = isBeanRegistered(listableBeanFactory, registry, EntityManagerFactory.class,
-								dataContextId, BeanRegistryUtils.buildBeanName(dataContextId,
-										EnableJpa.DEFAULT_ENTITYMANAGERFACTORY_BEAN_NAME));
-						if (emfBeanName == null) {
-
-							Map<String, Object> attributes = new HashMap<>();
-							attributes.put("dataContextId", dataContextId);
-							attributes.put("dataSourceReference", dataSourceBeanName);
-							attributes.put("entityPackages", getPackagesToScan(dataContextId));
-							attributes.put("enableDatastore", Boolean.FALSE);
-							emfBeanName = JpaRegistrar.registerJpaBeans(registry, beanFactory, environment, attributes,
-									beanClassLoader);
-
-						}
-
-						if (emfBeanName != null && isBeanRegistered(listableBeanFactory, registry, JpaDatastore.class,
-								dataContextId, BeanRegistryUtils.buildBeanName(dataContextId,
-										EnableJpaDatastore.DEFAULT_DATASTORE_BEAN_NAME)) == null) {
-							// Register JPA Datastore (transactional)
-							JpaDatastoreRegistrar.registerDatastore(registry, dataContextId, PrimaryMode.AUTO,
-									emfBeanName, true, false, beanClassLoader);
-						}
-
-					}
 				}
+
+				// check JpaDatastore bean
+				if (emfBeanName != null && isBeanRegistered((ListableBeanFactory) beanFactory, registry,
+						JpaDatastore.class, dataContextId, BeanRegistryUtils.buildBeanName(dataContextId,
+								EnableJpaDatastore.DEFAULT_DATASTORE_BEAN_NAME)) == null) {
+					// register JPA Datastore
+					JpaDatastoreRegistrar.registerDatastore(registry, environment, dataContextId, emfBeanName,
+							JpaDatastoreConfigProperties.builder(dataContextId).build(), beanClassLoader);
+				}
+
 			}
-
 		}
-
 	}
 
 	/**
