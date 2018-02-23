@@ -33,7 +33,6 @@ import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.query.BeanProjection;
 import com.holonplatform.core.query.QueryExpression;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.internal.converters.BeanResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.BeanTupleConverter;
