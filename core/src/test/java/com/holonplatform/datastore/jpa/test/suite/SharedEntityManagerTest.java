@@ -19,7 +19,6 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -33,22 +32,22 @@ public class SharedEntityManagerTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testSharedEntityManager() {
 		assertTrue(getDatastore() instanceof JpaDatastore);
-		
+
 		final JpaDatastore ds = (JpaDatastore) getDatastore();
-		
+
 		ds.withEntityManager(em -> {
-			
+
 			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 881L).set(STR, "TestSE").build();
-			
+
 			ds.insert(JPA_TARGET, value);
-			
+
 			Object found = em.find(JPA_TARGET.getEntityClass(), Long.valueOf(881L));
 			assertNotNull(found);
-			
+
 			ds.delete(JPA_TARGET, value);
-			
+
 		});
-		
+
 	}
-	
+
 }

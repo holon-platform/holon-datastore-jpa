@@ -118,6 +118,8 @@ public class JpaQuery implements QueryAdapter<QueryConfiguration> {
 					.ifPresent(p -> q.setHint(p.getName(), p.getValue()));
 			queryOperation.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE)
 					.ifPresent(p -> q.setLockMode(p));
+			queryOperation.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_FLUSH_MODE)
+					.ifPresent(p -> q.setFlushMode(p));
 
 			// execute and convert results
 			final JpaExecutionContext ctx = JpaExecutionContext.create(operationContext, entityManager);

@@ -17,6 +17,7 @@ package com.holonplatform.datastore.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 
 import com.holonplatform.core.config.ConfigProperty;
@@ -43,6 +44,13 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 	 */
 	public static final ConfigProperty<LockModeType> QUERY_PARAMETER_LOCK_MODE = ConfigProperty
 			.create("jpaQueryLockMode", LockModeType.class);
+
+	/**
+	 * A {@link Query} parameter to set the {@link FlushModeType}, using
+	 * {@link Query#parameter(ConfigProperty, Object)}.
+	 */
+	public static final ConfigProperty<FlushModeType> QUERY_PARAMETER_FLUSH_MODE = ConfigProperty
+			.create("jpaQueryFlushMode", FlushModeType.class);
 
 	// Builder
 
