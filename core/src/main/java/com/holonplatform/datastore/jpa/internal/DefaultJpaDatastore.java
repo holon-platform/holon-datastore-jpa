@@ -46,6 +46,7 @@ import com.holonplatform.datastore.jpa.dialect.ORMDialectContext;
 import com.holonplatform.datastore.jpa.internal.operations.JpaBulkDelete;
 import com.holonplatform.datastore.jpa.internal.operations.JpaBulkInsert;
 import com.holonplatform.datastore.jpa.internal.operations.JpaBulkUpdate;
+import com.holonplatform.datastore.jpa.internal.operations.JpaDelete;
 import com.holonplatform.datastore.jpa.internal.operations.JpaInsert;
 import com.holonplatform.datastore.jpa.internal.operations.JpaQuery;
 import com.holonplatform.datastore.jpa.internal.operations.JpaRefresh;

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.datastore.jpa.internal;
+package com.holonplatform.datastore.jpa.internal.operations;
 
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.Datastore.OperationType;
@@ -90,9 +90,13 @@ public class JpaDelete extends AbstractDeleteOperation {
 			// delete entity
 			entityManager.remove(instance);
 
+			operationContext.traceOperation("REMOVE entity [" + entity.getName() + "]");
+
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
+
+				operationContext.traceOperation("FLUSH EntityManager");
 			}
 
 			return OperationResult.builder().type(OperationType.DELETE).affectedCount(1).build();
