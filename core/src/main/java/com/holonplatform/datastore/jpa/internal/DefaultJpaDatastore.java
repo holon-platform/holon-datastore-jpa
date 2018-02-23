@@ -112,6 +112,12 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	protected final static Logger LOGGER = JpaDatastoreLogger.create();
 
 	/**
+	 * Current operation EntityManager
+	 * 
+	 */
+	private static final ThreadLocal<EntityManager> CURRENT_ENTITY_MANAGER = new ThreadLocal<>();
+
+	/**
 	 * Current local {@link JpaTransaction} stack
 	 */
 	private static final ThreadLocal<Stack<JpaTransaction>> CURRENT_TRANSACTION = ThreadLocal
@@ -389,6 +395,19 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.context.JpaContext#traceOperation(java.lang.String)
+	 */
+	@Override
+	public void traceOperation(String operation) {
+		if (isTraceEnabled()) {
+			LOGGER.info("(TRACE) [" + operation + "]");
+		} else {
+			LOGGER.debug(() -> "[" + operation + "]");
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.internal.ConfigurableJpaDatastore#getORMPlatform()
 	 */
 	@Override
@@ -410,7 +429,10 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 */
 	protected Optional<ORMPlatform> detectORMPlatform() {
 		try {
-			return Optional.ofNullable(withEntityManager(em -> ORMPlatform.resolve(em)));
+			final ORMPlatform platform = withEntityManager(em -> {
+				return ORMPlatform.resolve(em);
+			});
+			return Optional.ofNullable(platform);
 		} catch (Exception e) {
 			LOGGER.warn("Failed to detected ORM platform");
 			LOGGER.debug(() -> "Failed to detected ORM platform", e);
@@ -468,7 +490,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 					+ "] returned a null EntityManager");
 		}
 
-		LOGGER.debug(() -> "EntityManager initialized [" + entityManager + "]");
+		LOGGER.debug(() -> "EntityManager [" + entityManager.hashCode() + "] initialized: " + entityManager);
 
 		return entityManager;
 	}
@@ -481,7 +503,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		if (entityManager != null) {
 			getEntityManagerFinalizer().ifPresent(f -> f.finalizeEntityManager(entityManager));
 
-			LOGGER.debug(() -> "EntityManager finalized [" + entityManager + "]");
+			LOGGER.debug(() -> "EntityManager [" + entityManager.hashCode() + "] finalized");
 		}
 	}
 
@@ -498,14 +520,35 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		EntityManager entityManager = null;
 		try {
 
+			// check current
+			final EntityManager current = CURRENT_ENTITY_MANAGER.get();
+			if (current != null) {
+
+				LOGGER.debug(() -> "Execute operation using current EntityManager [" + current.hashCode() + "]");
+
+				return operation.execute(current);
+			}
+
 			// if a transaction is active, use current transaction EntityManager
-			JpaTransaction tx = getCurrentTransaction().orElse(null);
+			final JpaTransaction tx = getCurrentTransaction().orElse(null);
 			if (tx != null) {
+
+				LOGGER.debug(() -> "Execute operation using current transaction EntityManager ["
+						+ tx.getEntityManager().hashCode() + "]");
+
 				return operation.execute(tx.getEntityManager());
 			}
 
+			// obtain EntityManager
+			entityManager = obtainEntityManager();
+			CURRENT_ENTITY_MANAGER.set(entityManager);
+
 			// execute operation
-			return operation.execute(entityManager = obtainEntityManager());
+
+			LOGGER.debug(
+					() -> "Execute operation using EntityManager [" + CURRENT_ENTITY_MANAGER.get().hashCode() + "]");
+
+			return operation.execute(entityManager);
 
 		} catch (DataAccessException e) {
 			throw e;
@@ -514,8 +557,14 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		} finally {
 			// check active transaction: avoid EntityManager finalization if present
 			if (entityManager != null) {
+				final EntityManager em = entityManager;
+
 				// finalize EntityManager
 				finalizeEntityManager(entityManager);
+				// remove current
+				CURRENT_ENTITY_MANAGER.remove();
+
+				LOGGER.debug(() -> "Current EntityManager finalized and removed [" + em.hashCode() + "]");
 			}
 		}
 	}

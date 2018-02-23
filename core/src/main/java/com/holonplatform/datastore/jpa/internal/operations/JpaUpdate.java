@@ -84,9 +84,13 @@ public class JpaUpdate extends AbstractUpdateOperation {
 			// merge entity
 			entityManager.merge(operationContext.getBeanIntrospector().write(getConfiguration().getValue(), instance));
 
+			operationContext.traceOperation("MERGE entity [" + entity.getName() + "]");
+
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
+
+				operationContext.traceOperation("FLUSH EntityManager");
 			}
 
 			return OperationResult.builder().type(OperationType.UPDATE).affectedCount(1).build();

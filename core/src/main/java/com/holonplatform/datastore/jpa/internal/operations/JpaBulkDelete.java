@@ -108,6 +108,8 @@ public class JpaBulkDelete extends AbstractBulkDeleteOperation<BulkDelete> imple
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
+
+				operationContext.traceOperation("FLUSH EntityManager");
 			}
 
 			return OperationResult.builder().type(OperationType.DELETE).affectedCount(results).build();

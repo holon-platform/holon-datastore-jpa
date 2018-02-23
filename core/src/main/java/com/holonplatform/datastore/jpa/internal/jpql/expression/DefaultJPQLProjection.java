@@ -23,7 +23,7 @@ import java.util.Optional;
 
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ObjectUtils;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.JPQLResultConverter;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLProjection;
@@ -38,7 +38,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLProjection;
  */
 public class DefaultJPQLProjection<Q, R> implements JPQLProjection<Q, R> {
 
-	private final static Logger LOGGER = JpaDatastoreLogger.create();
+	private final static Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/**
 	 * Allowed alias characters

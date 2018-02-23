@@ -16,7 +16,6 @@
 package com.holonplatform.datastore.jpa.context;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.exceptions.DataAccessException;
 
@@ -40,9 +39,23 @@ public interface EntityManagerHandler {
 	 * @param <R> Operation result type
 	 * @param operation The operation to execute (not null)
 	 * @return Operation result
-	 * @throws IllegalStateException If a {@link EntityManagerFactory} is not available
 	 * @throws DataAccessException If an error occurred during {@link EntityManager} management or operation execution
 	 */
 	<R> R withEntityManager(EntityManagerOperation<R> operation);
+
+	/**
+	 * Execute given <code>operation</code> using an {@link EntityManager} instance provided by the Datastore.
+	 * <p>
+	 * The {@link EntityManager} lifecycle is managed by the JPA Datastore, including creation and closing.
+	 * </p>
+	 * @param operation The operation to execute (not null)
+	 * @throws DataAccessException If an error occurred during {@link EntityManager} management or operation execution
+	 */
+	default void withEntityManager(EntityManagerRunnable operation) {
+		withEntityManager(em -> {
+			operation.execute(em);
+			return null;
+		});
+	}
 
 }

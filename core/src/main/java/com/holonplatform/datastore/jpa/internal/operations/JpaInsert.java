@@ -108,10 +108,14 @@ public class JpaInsert extends AbstractInsertOperation {
 			final BeanPropertySet<Object> set = operationContext.getBeanIntrospector().getPropertySet(entity);
 			// persist entity
 			entityManager.persist(set.write(getConfiguration().getValue(), instance));
+			
+			operationContext.traceOperation("PERSIST entity [" + entity.getName() + "]");
 
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
+				
+				operationContext.traceOperation("FLUSH EntityManager");
 			}
 
 			OperationResult.Builder result = OperationResult.builder().type(OperationType.INSERT).affectedCount(1);

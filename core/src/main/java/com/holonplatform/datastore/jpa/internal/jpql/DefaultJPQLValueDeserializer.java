@@ -39,7 +39,7 @@ import com.holonplatform.core.internal.utils.ConversionUtils;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.core.internal.utils.TypeUtils;
 import com.holonplatform.datastore.jpa.context.JpaExecutionContext;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.JPQLValueDeserializer;
 
 /**
@@ -57,7 +57,7 @@ public enum DefaultJPQLValueDeserializer implements JPQLValueDeserializer {
 	/**
 	 * Logger
 	 */
-	private static final Logger LOGGER = JpaDatastoreLogger.create();
+	private static final Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/**
 	 * Additional value processors

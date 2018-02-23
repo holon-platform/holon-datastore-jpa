@@ -138,7 +138,6 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 			int i = 0;
 			for (Map<Path<?>, ConstantExpression<?>> value : getConfiguration().getValues()) {
 
-				// TODO
 				PropertyBox box = PropertyBox.builder(propertySet).invalidAllowed(true).build();
 				PathPropertyBoxAdapter adapter = PathPropertyBoxAdapter.create(box);
 				value.forEach((p, e) -> {
@@ -147,6 +146,9 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 
 				// persist entity
 				entityManager.persist(set.write(box, entity.newInstance()));
+
+				operationContext.traceOperation("Bulk PERSIST entity [" + entity.getName() + "]");
+
 				// check flush
 				if (batchSize > 0 && i % batchSize == 0) {
 					entityManager.flush();
@@ -157,6 +159,8 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
+
+				operationContext.traceOperation("FLUSH EntityManager");
 			}
 
 			return OperationResult.builder().type(OperationType.INSERT)

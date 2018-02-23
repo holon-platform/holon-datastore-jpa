@@ -26,7 +26,7 @@ import com.holonplatform.core.datastore.relational.RelationalTarget;
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.context.JpaContext;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLStatementResolutionContext;
 
@@ -38,7 +38,7 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLStatementResolutionConte
 public class DefaultJPQLStatementResolutionContext extends DefaultJPQLResolutionContext
 		implements JPQLStatementResolutionContext {
 
-	private final static Logger LOGGER = JpaDatastoreLogger.create();
+	private final static Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/**
 	 * Legal alias characters

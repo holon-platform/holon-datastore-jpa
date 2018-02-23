@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.internal.converters;
 
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.JPQLResultConverter;
 
 /**
@@ -34,7 +34,7 @@ public abstract class AbstractResultConverter<Q, R> implements JPQLResultConvert
 	/**
 	 * Logger
 	 */
-	protected static final Logger LOGGER = JpaDatastoreLogger.create();
+	protected static final Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/**
 	 * Get the result value which corresponds to given alias or index.

@@ -29,7 +29,7 @@ import com.holonplatform.core.TypedExpression;
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.property.Property;
 import com.holonplatform.core.query.PropertySetProjection;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.internal.converters.PropertyBoxResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.PropertyBoxTupleConverter;
 import com.holonplatform.datastore.jpa.internal.jpql.expression.DefaultJPQLProjection;
@@ -56,7 +56,7 @@ public enum PropertySetProjectionResolver
 	/**
 	 * Logger
 	 */
-	private static final Logger LOGGER = JpaDatastoreLogger.create();
+	private static final Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/*
 	 * (non-Javadoc)

@@ -108,6 +108,8 @@ public class JpaBulkUpdate extends AbstractBulkUpdateOperation<BulkUpdate> imple
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
+				
+				operationContext.traceOperation("FLUSH EntityManager");
 			}
 
 			return OperationResult.builder().type(OperationType.UPDATE).affectedCount(results).build();

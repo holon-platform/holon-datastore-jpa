@@ -75,6 +75,14 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 	}
 
 	/* (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.context.JpaContext#traceOperation(java.lang.String)
+	 */
+	@Override
+	public void traceOperation(String operation) {
+		context.traceOperation(operation);
+	}
+
+	/* (non-Javadoc)
 	 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverProvider#getExpressionResolvers()
 	 */
 	@SuppressWarnings("rawtypes")

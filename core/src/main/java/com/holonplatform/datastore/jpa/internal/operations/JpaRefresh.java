@@ -85,6 +85,8 @@ public class JpaRefresh extends AbstractRefreshOperation {
 			// refresh
 			entityManager.refresh(managed);
 
+			operationContext.traceOperation("REFRESH entity [" + entity.getName() + "]");
+
 			// return refreshed entity property values
 			return operationContext.getBeanIntrospector()
 					.read(PropertyBox.builder(getConfiguration().getValue()).invalidAllowed(true).build(), managed);

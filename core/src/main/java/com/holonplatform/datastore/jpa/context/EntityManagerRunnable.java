@@ -20,24 +20,21 @@ import javax.persistence.EntityManager;
 /**
  * Represents an operation to be executed using a Datastore managed {@link EntityManager}.
  * <p>
- * If returning a result is not required, the {@link EntityManagerRunnable} can be used.
+ * Differently from {@link EntityManagerOperation}, the operation execution does not return any result.
  * </p>
- * 
- * @param <R> Operation result type
  * 
  * @since 5.1.0
  * 
- * @see EntityManagerRunnable
+ * @see EntityManagerOperation
  */
 @FunctionalInterface
-public interface EntityManagerOperation<R> {
+public interface EntityManagerRunnable {
 
 	/**
-	 * Execute an operation and returns a result.
+	 * Execute an operation.
 	 * @param entityManager EntityManager to use
-	 * @return Operation result
 	 * @throws Exception If an operation execution error occurred
 	 */
-	R execute(EntityManager entityManager) throws Exception;
-
+	void execute(EntityManager entityManager) throws Exception;
+	
 }

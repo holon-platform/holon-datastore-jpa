@@ -34,6 +34,7 @@ import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.query.BeanProjection;
 import com.holonplatform.core.query.QueryExpression;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.internal.converters.BeanResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.BeanTupleConverter;
 import com.holonplatform.datastore.jpa.internal.jpql.expression.DefaultJPQLProjection;
@@ -59,7 +60,7 @@ public enum BeanProjectionResolver implements JPQLContextExpressionResolver<Bean
 	/**
 	 * Logger
 	 */
-	private static final Logger LOGGER = JpaDatastoreLogger.create();
+	private static final Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/*
 	 * (non-Javadoc)
@@ -101,9 +102,11 @@ public enum BeanProjectionResolver implements JPQLContextExpressionResolver<Bean
 		}
 
 		if (context.getDialect().isTupleSupported()) {
-			projection.setConverter(new BeanTupleConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
+			projection
+					.setConverter(new BeanTupleConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
 		} else {
-			projection.setConverter(new BeanResultArrayConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
+			projection.setConverter(
+					new BeanResultArrayConverter(bps, selectionPaths.toArray(new Path<?>[0]), selectionAlias));
 		}
 
 		return Optional.of(projection);

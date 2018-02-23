@@ -24,7 +24,6 @@ import com.holonplatform.core.datastore.operation.PropertyBoxOperationConfigurat
 import com.holonplatform.core.datastore.operation.SaveOperation;
 import com.holonplatform.core.datastore.operation.UpdateOperation;
 import com.holonplatform.core.internal.datastore.operation.AbstractSaveOperation;
-import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
@@ -94,11 +93,6 @@ public class JpaSave extends AbstractSaveOperation {
 				result = insert(getConfiguration());
 			} else {
 				result = update(getConfiguration());
-			}
-
-			// check auto-flush
-			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
-				entityManager.flush();
 			}
 
 			return result;

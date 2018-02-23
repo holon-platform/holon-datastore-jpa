@@ -11,8 +11,14 @@
 		<appender-ref ref="stdout" />
 	</root>
 
-	<!--  
+	
 	<logger name="com.holonplatform.datastore.jpa" level="DEBUG"
+		additivity="false">
+		<appender-ref ref="stdout" />
+	</logger>
+	
+	<!-- 
+	<logger name="com.holonplatform.datastore.jpa.jpql" level="DEBUG"
 		additivity="false">
 		<appender-ref ref="stdout" />
 	</logger>

@@ -37,7 +37,7 @@ import com.holonplatform.core.temporal.TemporalType;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.context.JpaContext;
 import com.holonplatform.datastore.jpa.dialect.ORMDialect;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
+import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.JPQLValueDeserializer;
 import com.holonplatform.datastore.jpa.jpql.JPQLValueSerializer;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLContextParametersHandler;
@@ -50,7 +50,7 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
  */
 public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 
-	private final static Logger LOGGER = JpaDatastoreLogger.create();
+	private final static Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/**
 	 * Expression resolvers
@@ -195,6 +195,15 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.context.JpaContext#traceOperation(java.lang.String)
+	 */
+	@Override
+	public void traceOperation(String operation) {
+		getContext().traceOperation(operation);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JPQLCompositionContext#getNamedParametersHandler()
 	 */
 	@Override
@@ -279,21 +288,22 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 				final Date date;
 				javax.persistence.TemporalType tt = null;
 				if (LocalDate.class.isAssignableFrom(p.getType())) {
-					date = java.sql.Date.valueOf((LocalDate)p.getValue());
+					date = java.sql.Date.valueOf((LocalDate) p.getValue());
 					tt = javax.persistence.TemporalType.DATE;
 				} else if (LocalDateTime.class.isAssignableFrom(p.getType())) {
-					date = java.sql.Timestamp.valueOf((LocalDateTime)p.getValue());
+					date = java.sql.Timestamp.valueOf((LocalDateTime) p.getValue());
 					tt = javax.persistence.TemporalType.TIMESTAMP;
 				} else if (LocalTime.class.isAssignableFrom(p.getType())) {
-					date = java.sql.Time.valueOf((LocalTime)p.getValue());
+					date = java.sql.Time.valueOf((LocalTime) p.getValue());
 					tt = javax.persistence.TemporalType.TIME;
 				} else {
 					date = null;
 				}
-				
+
 				query.setParameter(n, date, tt);
-				
-				LOGGER.debug(() -> "Setted Temporal type parameter with name [" + n + "] using Date  value [" + date + "]");
+
+				LOGGER.debug(
+						() -> "Setted Temporal type parameter with name [" + n + "] using Date  value [" + date + "]");
 			} else {
 				// default
 				query.setParameter(n, p.getValue());
