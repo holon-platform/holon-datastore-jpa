@@ -37,7 +37,7 @@ public final class EntityTargetCache implements Serializable {
 	private static final long serialVersionUID = 1780346234469898465L;
 
 	/**
-	 * Query target name - entity class mappings cache
+	 * Data target name - entity class mappings cache
 	 */
 	private final static WeakHashMap<EntityManagerFactory, Map<String, Class<?>>> ENTITY_TARGETS = new WeakHashMap<>();
 

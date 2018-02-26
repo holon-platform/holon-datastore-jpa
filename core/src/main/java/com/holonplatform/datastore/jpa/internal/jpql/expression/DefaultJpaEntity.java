@@ -15,6 +15,24 @@
  */
 package com.holonplatform.datastore.jpa.internal.jpql.expression;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.IdClass;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
+import javax.persistence.metamodel.EmbeddableType;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.ManagedType;
+import javax.persistence.metamodel.Metamodel;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.Type;
+
+import com.holonplatform.core.beans.BeanPropertySet;
+import com.holonplatform.core.internal.utils.AnnotationUtils;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
@@ -32,7 +50,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	/**
 	 * Entity class
 	 */
-	private final Class<? extends T> entityClass;
+	private final Class<T> entityClass;
 
 	/**
 	 * Entity name
@@ -40,16 +58,53 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	private final String entityName;
 
 	/**
+	 * Identifier metadata
+	 */
+	private final IdMetadata<T> idMetadata;
+
+	/**
+	 * Optional version attribute
+	 */
+	private final Optional<SingularAttribute<? super T, ?>> versionAttribute;
+
+	/**
+	 * Entity class property set
+	 */
+	private final BeanPropertySet<T> beanPropertySet;
+
+	/**
 	 * Constructor.
+	 * @param metamodel JPA Metamodel (not null)
 	 * @param entityClass Entity class (not null)
 	 * @param entityName Entity name (not null)
 	 */
-	public DefaultJpaEntity(Class<? extends T> entityClass, String entityName) {
+	public DefaultJpaEntity(Metamodel metamodel, Class<T> entityClass) {
 		super();
+		ObjectUtils.argumentNotNull(metamodel, "Metamodel must be not null");
 		ObjectUtils.argumentNotNull(entityClass, "Entity class must be not null");
-		ObjectUtils.argumentNotNull(entityName, "Entity name must be not null");
 		this.entityClass = entityClass;
-		this.entityName = entityName;
+
+		this.beanPropertySet = BeanPropertySet.create(entityClass);
+
+		// inspect entity metadata
+		ManagedType<T> type = metamodel.managedType(entityClass);
+		if (type == null) {
+			throw new IllegalArgumentException("Entity class [" + entityClass.getName() + "] not found in Metamodel");
+		}
+
+		if (type instanceof EntityType) {
+			this.entityName = ((EntityType<?>) type).getName();
+		} else {
+			this.entityName = getEntityNameFromAnnotation(entityClass).orElse(entityClass.getSimpleName());
+		}
+
+		if (type instanceof IdentifiableType) {
+			this.idMetadata = new IdMetadata<>((IdentifiableType<T>) type, metamodel);
+			this.versionAttribute = lookupVersionAttribute(metamodel, (IdentifiableType<T>) type);
+		} else {
+			this.idMetadata = null;
+			this.versionAttribute = null;
+		}
 	}
 
 	/*
@@ -57,7 +112,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	 * @see com.holonplatform.datastore.jpa.internal.JpaEntity#getEntityClass()
 	 */
 	@Override
-	public Class<? extends T> getEntityClass() {
+	public Class<T> getEntityClass() {
 		return entityClass;
 	}
 
@@ -83,4 +138,240 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 			throw new InvalidExpressionException("Null entity name");
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getIdType()
+	 */
+	@Override
+	public Optional<Class<?>> getIdType() {
+		return (idMetadata == null) ? Optional.empty() : Optional.ofNullable(idMetadata.getType());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#hasCompositeId()
+	 */
+	@Override
+	public boolean hasCompositeId() {
+		return (idMetadata == null) ? !idMetadata.hasSimpleId() : false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getId(java.lang.Object)
+	 */
+	@Override
+	public Optional<Object> getId(T entity) {
+		ObjectUtils.argumentNotNull(entity, "Entity instance must be not null");
+		if (idMetadata != null) {
+			if (idMetadata.hasSimpleId()) {
+				return Optional
+						.ofNullable(beanPropertySet.read(idMetadata.getSimpleIdAttribute().get().getName(), entity));
+			}
+			// idclass
+			Set<SingularAttribute<? super T, ?>> idClassAttributes = idMetadata.getIdClassAttributes();
+			if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
+				final BeanPropertySet<Object> idClassPropertySet = idMetadata.getIdClassPropertySet();
+				try {
+					Object id = idMetadata.getType().newInstance();
+					for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
+						final Object value = beanPropertySet.read(ica.getName(), entity);
+						if (value != null) {
+							idClassPropertySet.write(ica.getName(), value, id);
+						}
+					}
+					return Optional.of(id);
+				} catch (InstantiationException | IllegalAccessException e) {
+					throw new RuntimeException("Failed to istantiate id class [" + idMetadata.getType() + "]", e);
+				}
+			}
+		}
+		return Optional.empty();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#isNew(java.lang.Object)
+	 */
+	@Override
+	public boolean isNew(T entity) {
+		ObjectUtils.argumentNotNull(entity, "Entity instance must be not null");
+		if (!versionAttribute.isPresent()
+				|| versionAttribute.map(Attribute::getJavaType).map(Class::isPrimitive).orElse(false)) {
+			// use id
+			final Class<?> idType = getIdType().orElse(Object.class);
+			if (idMetadata != null) {
+				if (idMetadata.hasSimpleId()) {
+					final SingularAttribute<? super T, ?> singleId = idMetadata.getSimpleIdAttribute().get();
+					final Object idValue = beanPropertySet.read(singleId.getName(), entity);
+					boolean isNull = isNullIdValue(idValue, idType);
+					if (!isNull && idMetadata.getEmbeddedIdAttributes() != null
+							&& !idMetadata.getEmbeddedIdAttributes().isEmpty()) {
+						// embedded id
+						for (SingularAttribute<?, ?> eia : idMetadata.getEmbeddedIdAttributes()) {
+							boolean isNullAttribute = isNullIdValue(
+									idMetadata.getIdClassPropertySet().read(eia.getName(), idValue), eia.getJavaType());
+							if (isNullAttribute) {
+								return true;
+							}
+						}
+						return false;
+					}
+					return isNull;
+				} else {
+					// check multiple id using IdClass
+					Set<SingularAttribute<? super T, ?>> idClassAttributes = idMetadata.getIdClassAttributes();
+					if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
+						for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
+							final Object value = beanPropertySet.read(ica.getName(), entity);
+							boolean isNullAttribute = isNullIdValue(value, ica.getJavaType());
+							if (isNullAttribute) {
+								return true;
+							}
+						}
+						return false;
+					}
+				}
+			}
+
+			return isNullIdValue(getId(entity).orElse(null), idType);
+		}
+		// use version
+		return versionAttribute.map(it -> beanPropertySet.read(it.getName(), entity) == null).orElse(true);
+	}
+
+	private static boolean isNullIdValue(Object id, Class<?> type) {
+		if (type.isPrimitive() && (id instanceof Number)) {
+			return ((Number) id).longValue() == 0L;
+		}
+		return id == null;
+	}
+
+	/**
+	 * Get the entity name using {@link Entity#name()} annotation attribute, if available.
+	 * @param entityClass Entity class (not null)
+	 * @return The entity name as specified using {@link Entity#name()} annotation attribute, or an empty Optional if
+	 *         the {@link Entity} annotation is not present or the <code>name</code> attribute has no value
+	 */
+	private static Optional<String> getEntityNameFromAnnotation(Class<?> entityClass) {
+		if (entityClass.isAnnotationPresent(Entity.class)) {
+			String name = entityClass.getAnnotation(Entity.class).name();
+			if (name != null && !name.trim().equals("")) {
+				return Optional.of(name);
+			}
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Try to obtain the <em>version</em> attribute of the entity type, if available.
+	 * @param metamodel JPA Metamodel
+	 * @param type Entity type
+	 * @return Optional version attribute
+	 */
+	@SuppressWarnings("unchecked")
+	private static <T> Optional<SingularAttribute<? super T, ?>> lookupVersionAttribute(Metamodel metamodel,
+			IdentifiableType<T> type) {
+		try {
+			return Optional.ofNullable(type.getVersion(Object.class));
+		} catch (@SuppressWarnings("unused") IllegalArgumentException e) {
+			// ignore
+		}
+		for (SingularAttribute<? super T, ?> attribute : type.getSingularAttributes()) {
+			if (attribute.isVersion()) {
+				return Optional.of(attribute);
+			}
+		}
+		// check super type
+		try {
+			ManagedType<?> managedSuperType = metamodel.managedType(type.getJavaType().getSuperclass());
+			if (!(managedSuperType instanceof IdentifiableType)) {
+				return Optional.empty();
+			}
+			return lookupVersionAttribute(metamodel, (IdentifiableType<T>) managedSuperType);
+		} catch (@SuppressWarnings("unused") IllegalArgumentException e) {
+			return Optional.empty();
+		}
+	}
+
+	private static class IdMetadata<T> {
+
+		private final IdentifiableType<T> identifiableType;
+		private final SingularAttribute<? super T, ?> simpleIdAttribute;
+		private final Set<SingularAttribute<?, ?>> embeddedIdAttributes;
+		private final Set<SingularAttribute<? super T, ?>> idClassAttributes;
+		private final BeanPropertySet<Object> idClassPropertySet;
+		private Class<?> idType;
+
+		public IdMetadata(IdentifiableType<T> identifiableType, Metamodel metamodel) {
+			this.identifiableType = identifiableType;
+			if (identifiableType.hasSingleIdAttribute()) {
+				this.simpleIdAttribute = identifiableType.getDeclaredId(identifiableType.getIdType().getJavaType());
+				this.idClassAttributes = null;
+				if (this.simpleIdAttribute != null
+						&& PersistentAttributeType.EMBEDDED == this.simpleIdAttribute.getPersistentAttributeType()) {
+					this.idClassPropertySet = BeanPropertySet.create(identifiableType.getIdType().getJavaType());
+					this.embeddedIdAttributes = new HashSet<>();
+					try {
+						EmbeddableType<?> et = metamodel.embeddable(identifiableType.getIdType().getJavaType());
+						this.embeddedIdAttributes.addAll(et.getSingularAttributes());
+					} catch (@SuppressWarnings("unused") IllegalArgumentException e) {
+						// ignore
+					}
+				} else {
+					this.embeddedIdAttributes = null;
+					this.idClassPropertySet = null;
+				}
+			} else {
+				this.simpleIdAttribute = null;
+				this.idClassAttributes = identifiableType.getIdClassAttributes();
+				this.embeddedIdAttributes = null;
+				this.idClassPropertySet = BeanPropertySet.create(getType());
+			}
+		}
+
+		public boolean hasSimpleId() {
+			return simpleIdAttribute != null;
+		}
+
+		public Class<?> getType() {
+			if (idType == null) {
+				idType = getIdType().orElseThrow(
+						() -> new IllegalStateException("Failed to resolve ID type of [" + identifiableType + "]"));
+			}
+			return idType;
+		}
+
+		private Optional<Class<?>> getIdType() {
+			Type<?> idType = null;
+			try {
+				idType = identifiableType.getIdType();
+			} catch (@SuppressWarnings("unused") IllegalStateException e) {
+				// ignore
+			}
+			if (idType != null) {
+				return Optional.of(idType.getJavaType());
+			}
+			// Try to get id using IdClass annotation
+			return AnnotationUtils.getAnnotation(identifiableType.getJavaType(), IdClass.class).map(a -> a.value());
+		}
+
+		public Optional<SingularAttribute<? super T, ?>> getSimpleIdAttribute() {
+			return Optional.of(simpleIdAttribute);
+		}
+
+		public BeanPropertySet<Object> getIdClassPropertySet() {
+			return idClassPropertySet;
+		}
+
+		public Set<SingularAttribute<?, ?>> getEmbeddedIdAttributes() {
+			return embeddedIdAttributes;
+		}
+
+		public Set<SingularAttribute<? super T, ?>> getIdClassAttributes() {
+			return idClassAttributes;
+		}
+	}
+
 }

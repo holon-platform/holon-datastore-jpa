@@ -90,6 +90,7 @@ public class TestDatanucleus extends AbstractJpaDatastoreTestSuite {
 		updateWithFunctionTest = false;
 		updateNestedTest = false;
 		saveOperationTest = false;
+		entityProjectionTest = false;
 	}
 
 	@AfterClass

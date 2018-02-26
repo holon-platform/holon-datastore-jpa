@@ -76,20 +76,22 @@ public class JpaSave extends AbstractSaveOperation {
 		context.addExpressionResolvers(getConfiguration().getExpressionResolvers());
 
 		// get entity class
-		final Class<?> entity = context.resolveOrFail(getConfiguration().getTarget(), JpaEntity.class).getEntityClass();
+		@SuppressWarnings("unchecked")
+		final JpaEntity<Object> entity = context.resolveOrFail(getConfiguration().getTarget(), JpaEntity.class);
 
 		return operationContext.withEntityManager(entityManager -> {
 
 			// Bean property set
-			final BeanPropertySet<Object> set = operationContext.getBeanIntrospector().getPropertySet(entity);
+			final BeanPropertySet<Object> set = operationContext.getBeanIntrospector()
+					.getPropertySet(entity.getEntityClass());
 
 			// create instance and write values
-			Object instance = set.write(getConfiguration().getValue(), entity.newInstance());
+			Object instance = set.write(getConfiguration().getValue(), entity.getEntityClass().newInstance());
 
 			OperationResult result;
 
 			// check has identifier
-			if (entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(instance) == null) {
+			if (entity.isNew(instance)) {
 				result = insert(getConfiguration());
 			} else {
 				result = update(getConfiguration());

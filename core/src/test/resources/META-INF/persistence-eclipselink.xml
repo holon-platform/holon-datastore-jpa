@@ -28,5 +28,29 @@
 			<!-- <property name="eclipselink.logging.parameters" value="true" /> -->
 		</properties>
 	</persistence-unit>
+	
+	<persistence-unit name="test_metamodel"
+		transaction-type="RESOURCE_LOCAL">
+		<!-- Persistence provider -->
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<!-- Entity classes -->
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.SingleIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.SinglePrimitiveIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.EmbeddedIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.EmbeddedEntityId</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.MultiEmbeddedIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.MultiEmbeddedId</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.IdClassEntity</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- Configuration properties -->
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:h2:mem:metamodel;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="eclipselink.weaving" value="false" />
+		</properties>
+	</persistence-unit>
 
 </persistence>

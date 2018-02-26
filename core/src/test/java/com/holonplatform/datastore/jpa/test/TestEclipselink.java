@@ -27,10 +27,12 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
 
+import java.util.List;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.spi.PersistenceProviderResolverHolder;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.AfterClass;
@@ -64,13 +66,14 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 		props.setProperty(PersistenceUnitProperties.ECLIPSELINK_PERSISTENCE_XML,
 				"META-INF/persistence-eclipselink.xml");
 
-		entityManagerFactory = Persistence.createEntityManagerFactory("test_eclipselink", props);
+		entityManagerFactory = getEclipselinkPersistenceProvider().createEntityManagerFactory("test_eclipselink",
+				props);
 
 		datastore = JpaDatastore.builder().entityManagerFactory(entityManagerFactory).traceEnabled(true)
 				.withCommodity(DatastoreConfigCommodity.FACTORY).withExpressionResolver(KeyIsFilter.RESOLVER).build();
 
 		platform = ORMPlatform.ECLIPSELINK;
-		
+
 		rightJoinTest = false;
 		avgProjectionTest = false;
 		txExpectedErrorTest = false;
@@ -99,6 +102,19 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 	@AfterClass
 	public static void closeEmf() {
 		entityManagerFactory.close();
+	}
+
+	public static PersistenceProvider getEclipselinkPersistenceProvider() {
+		List<PersistenceProvider> providers = PersistenceProviderResolverHolder.getPersistenceProviderResolver()
+				.getPersistenceProviders();
+
+		for (PersistenceProvider provider : providers) {
+			if (provider instanceof org.eclipse.persistence.jpa.PersistenceProvider) {
+				return provider;
+			}
+		}
+
+		return null;
 	}
 
 }
