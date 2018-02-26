@@ -85,7 +85,9 @@ public class JpaDelete extends AbstractDeleteOperation {
 			operationContext.getBeanIntrospector().write(getConfiguration().getValue(), instance);
 
 			// merge to ensure entity is not detached
-			instance = entityManager.merge(instance);
+			if (!entityManager.contains(instance)) {
+				instance = entityManager.merge(instance);
+			}
 
 			// delete entity
 			entityManager.remove(instance);
