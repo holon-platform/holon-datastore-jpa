@@ -21,7 +21,6 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.IdClass;
-import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.EntityType;
@@ -32,8 +31,10 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
 import com.holonplatform.core.beans.BeanPropertySet;
+import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.AnnotationUtils;
 import com.holonplatform.core.internal.utils.ObjectUtils;
+import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
@@ -48,6 +49,11 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	private static final long serialVersionUID = -2297497762504490622L;
 
 	/**
+	 * Logger
+	 */
+	private final static Logger LOGGER = JpaDatastoreLogger.create();
+
+	/**
 	 * Entity class
 	 */
 	private final Class<T> entityClass;
@@ -60,12 +66,12 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	/**
 	 * Identifier metadata
 	 */
-	private final IdMetadata<T> idMetadata;
+	private IdMetadata<T> idMetadata;
 
 	/**
-	 * Optional version attribute
+	 * Version attribute
 	 */
-	private final Optional<SingularAttribute<? super T, ?>> versionAttribute;
+	private SingularAttribute<? super T, ?> versionAttribute;
 
 	/**
 	 * Entity class property set
@@ -99,8 +105,16 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 		}
 
 		if (type instanceof IdentifiableType) {
-			this.idMetadata = new IdMetadata<>((IdentifiableType<T>) type, metamodel);
-			this.versionAttribute = lookupVersionAttribute(metamodel, (IdentifiableType<T>) type);
+			try {
+				this.idMetadata = new IdMetadata<>((IdentifiableType<T>) type, metamodel);
+				this.versionAttribute = lookupVersionAttribute(metamodel, (IdentifiableType<T>) type).orElse(null);
+			} catch (Exception e) {
+				LOGGER.warn("Failed to resolve identifier metadata for entity [" + entityClass.getName() + "]");
+				LOGGER.debug(() -> "Failed to resolve identifier metadata for entity [" + entityClass.getName() + "]",
+						e);
+				this.idMetadata = null;
+				this.versionAttribute = null;
+			}
 		} else {
 			this.idMetadata = null;
 			this.versionAttribute = null;
@@ -145,7 +159,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	 */
 	@Override
 	public Optional<Class<?>> getIdType() {
-		return (idMetadata == null) ? Optional.empty() : Optional.ofNullable(idMetadata.getType());
+		return Optional.of(getIdMetadata().getType());
 	}
 
 	/*
@@ -154,7 +168,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	 */
 	@Override
 	public boolean hasCompositeId() {
-		return (idMetadata == null) ? !idMetadata.hasSimpleId() : false;
+		return !getIdMetadata().hasSimpleId();
 	}
 
 	/*
@@ -164,29 +178,30 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	@Override
 	public Optional<Object> getId(T entity) {
 		ObjectUtils.argumentNotNull(entity, "Entity instance must be not null");
-		if (idMetadata != null) {
-			if (idMetadata.hasSimpleId()) {
-				return Optional
-						.ofNullable(beanPropertySet.read(idMetadata.getSimpleIdAttribute().get().getName(), entity));
-			}
-			// idclass
-			Set<SingularAttribute<? super T, ?>> idClassAttributes = idMetadata.getIdClassAttributes();
-			if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
-				final BeanPropertySet<Object> idClassPropertySet = idMetadata.getIdClassPropertySet();
-				try {
-					Object id = idMetadata.getType().newInstance();
-					for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
-						final Object value = beanPropertySet.read(ica.getName(), entity);
-						if (value != null) {
-							idClassPropertySet.write(ica.getName(), value, id);
-						}
+
+		final IdMetadata<T> idm = getIdMetadata();
+
+		if (idm.hasSimpleId()) {
+			return Optional.ofNullable(beanPropertySet.read(idm.getSimpleIdAttribute().get().getName(), entity));
+		}
+		// idclass
+		Set<SingularAttribute<? super T, ?>> idClassAttributes = idm.getIdClassAttributes();
+		if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
+			final BeanPropertySet<Object> idClassPropertySet = idm.getIdClassPropertySet();
+			try {
+				Object id = idm.getType().newInstance();
+				for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
+					final Object value = beanPropertySet.read(ica.getName(), entity);
+					if (value != null) {
+						idClassPropertySet.write(ica.getName(), value, id);
 					}
-					return Optional.of(id);
-				} catch (InstantiationException | IllegalAccessException e) {
-					throw new RuntimeException("Failed to istantiate id class [" + idMetadata.getType() + "]", e);
 				}
+				return Optional.of(id);
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new RuntimeException("Failed to istantiate id class [" + idm.getType() + "]", e);
 			}
 		}
+
 		return Optional.empty();
 	}
 
@@ -197,50 +212,74 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	@Override
 	public boolean isNew(T entity) {
 		ObjectUtils.argumentNotNull(entity, "Entity instance must be not null");
-		if (!versionAttribute.isPresent()
-				|| versionAttribute.map(Attribute::getJavaType).map(Class::isPrimitive).orElse(false)) {
+		if (versionAttribute == null || versionAttribute.getJavaType().isPrimitive()) {
 			// use id
+			final IdMetadata<T> idm = getIdMetadata();
+
 			final Class<?> idType = getIdType().orElse(Object.class);
-			if (idMetadata != null) {
-				if (idMetadata.hasSimpleId()) {
-					final SingularAttribute<? super T, ?> singleId = idMetadata.getSimpleIdAttribute().get();
-					final Object idValue = beanPropertySet.read(singleId.getName(), entity);
-					boolean isNull = isNullIdValue(idValue, idType);
-					if (!isNull && idMetadata.getEmbeddedIdAttributes() != null
-							&& !idMetadata.getEmbeddedIdAttributes().isEmpty()) {
-						// embedded id
-						for (SingularAttribute<?, ?> eia : idMetadata.getEmbeddedIdAttributes()) {
-							boolean isNullAttribute = isNullIdValue(
-									idMetadata.getIdClassPropertySet().read(eia.getName(), idValue), eia.getJavaType());
-							if (isNullAttribute) {
-								return true;
-							}
+
+			if (idm.hasSimpleId()) {
+				final SingularAttribute<? super T, ?> singleId = idm.getSimpleIdAttribute().get();
+				final Object idValue = beanPropertySet.read(singleId.getName(), entity);
+				boolean isNull = isNullIdValue(idValue, idType);
+				if (!isNull && idm.getEmbeddedIdAttributes() != null && !idm.getEmbeddedIdAttributes().isEmpty()) {
+					// embedded id
+					for (SingularAttribute<?, ?> eia : idm.getEmbeddedIdAttributes()) {
+						boolean isNullAttribute = isNullIdValue(
+								idm.getIdClassPropertySet().read(eia.getName(), idValue), eia.getJavaType());
+						if (isNullAttribute) {
+							return true;
 						}
-						return false;
 					}
-					return isNull;
-				} else {
-					// check multiple id using IdClass
-					Set<SingularAttribute<? super T, ?>> idClassAttributes = idMetadata.getIdClassAttributes();
-					if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
-						for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
-							final Object value = beanPropertySet.read(ica.getName(), entity);
-							boolean isNullAttribute = isNullIdValue(value, ica.getJavaType());
-							if (isNullAttribute) {
-								return true;
-							}
+					return false;
+				}
+				return isNull;
+			} else {
+				// check multiple id using IdClass
+				Set<SingularAttribute<? super T, ?>> idClassAttributes = idm.getIdClassAttributes();
+				if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
+					for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
+						final Object value = beanPropertySet.read(ica.getName(), entity);
+						boolean isNullAttribute = isNullIdValue(value, ica.getJavaType());
+						if (isNullAttribute) {
+							return true;
 						}
-						return false;
 					}
+					return false;
 				}
 			}
 
 			return isNullIdValue(getId(entity).orElse(null), idType);
 		}
+
 		// use version
-		return versionAttribute.map(it -> beanPropertySet.read(it.getName(), entity) == null).orElse(true);
+		if (versionAttribute != null) {
+			return beanPropertySet.read(versionAttribute.getName(), entity) == null;
+		}
+
+		// default
+		return true;
 	}
 
+	/**
+	 * Get the entity identifier metadata
+	 * @return The entity identifier metadata
+	 * @throws IllegalStateException if the entity identifier metadata is not available
+	 */
+	protected IdMetadata<T> getIdMetadata() {
+		if (idMetadata == null) {
+			throw new IllegalStateException(
+					"Entity identifier metadata not available for entity [" + getEntityClass() + "]");
+		}
+		return idMetadata;
+	}
+
+	/**
+	 * Checks whether given identifier value is to be considered <code>null</code>.
+	 * @param id Identifier value
+	 * @param type Identifier value type
+	 * @return <code>true</code> if it is to be considered <code>null</code>
+	 */
 	private static boolean isNullIdValue(Object id, Class<?> type) {
 		if (type.isPrimitive() && (id instanceof Number)) {
 			return ((Number) id).longValue() == 0L;

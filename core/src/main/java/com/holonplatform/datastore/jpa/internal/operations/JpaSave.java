@@ -23,9 +23,11 @@ import com.holonplatform.core.datastore.operation.InsertOperation;
 import com.holonplatform.core.datastore.operation.PropertyBoxOperationConfiguration;
 import com.holonplatform.core.datastore.operation.SaveOperation;
 import com.holonplatform.core.datastore.operation.UpdateOperation;
+import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.datastore.operation.AbstractSaveOperation;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
+import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
@@ -37,6 +39,8 @@ import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 public class JpaSave extends AbstractSaveOperation {
 
 	private static final long serialVersionUID = -823102485809986906L;
+
+	private final static Logger LOGGER = JpaDatastoreLogger.create();
 
 	// Commodity factory
 	@SuppressWarnings("serial")
@@ -91,7 +95,18 @@ public class JpaSave extends AbstractSaveOperation {
 			OperationResult result;
 
 			// check has identifier
-			if (entity.isNew(instance)) {
+			boolean isNew;
+			try {
+				isNew = entity.isNew(instance);
+			} catch (IllegalStateException e) {
+				LOGGER.debug(
+						() -> "New entity instance check not available from entity metadata, falling back to PersistenceUnitUtil.getIdentifier",
+						e);
+				isNew = operationContext.getEntityManagerFactory().getPersistenceUnitUtil()
+						.getIdentifier(instance) == null;
+			}
+
+			if (isNew) {
 				result = insert(getConfiguration());
 			} else {
 				result = update(getConfiguration());

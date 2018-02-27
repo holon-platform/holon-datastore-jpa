@@ -47,22 +47,25 @@ public interface JpaEntity<T> extends Expression, Serializable {
 	/**
 	 * Get the type of the entity id, if available.
 	 * @return the entity id type
+	 * @throws IllegalStateException If the entity identifier metadata are not available
 	 */
-	Optional<Class<?>> getIdType();
+	Optional<Class<?>> getIdType() throws IllegalStateException;
 
 	/**
 	 * Get whether the entity has a composite id.
 	 * @return <code>true</code> if the entity has a composite (multi attribute) id, <code>false</code> if the entity
 	 *         has a simple (single attribute) id or if the entity id is not available
+	 * @throws IllegalStateException If the entity identifier metadata are not available
 	 */
-	boolean hasCompositeId();
+	boolean hasCompositeId() throws IllegalStateException;
 
 	/**
 	 * Get the id value of given entity istance.
 	 * @param entity Entity istance (not null)
 	 * @return The id value, if available
+	 * @throws IllegalStateException If the entity identifier metadata are not available
 	 */
-	Optional<Object> getId(T entity);
+	Optional<Object> getId(T entity) throws IllegalStateException;
 
 	/**
 	 * Gets whether given entity instance has to be considered new according to entity id value.
@@ -71,8 +74,9 @@ public interface JpaEntity<T> extends Expression, Serializable {
 	 * </p>
 	 * @param entity Entity instance (not null)
 	 * @return <code>true</code> if entity instance has to be considered new, <code>false</code> otherwise
+	 * @throws IllegalStateException If the entity identifier metadata are not available
 	 */
-	boolean isNew(T entity);
+	boolean isNew(T entity) throws IllegalStateException;
 
 	/**
 	 * Create a new {@link JpaEntity} from given <code>entityClass</code>.
