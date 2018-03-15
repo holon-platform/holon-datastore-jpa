@@ -48,7 +48,6 @@ public final class EntityTargetCache implements Serializable {
 	 * Try to obtain JPA Entity mapping class from given path name using given ClassLoader
 	 * @param entityManagerFactory EntityManagerFactory to use
 	 * @param name Path name (not null)
-	 * @param metamodel JPA Metamodel (not null)
 	 * @return Entity class, or <code>null</code> target was null
 	 */
 	public synchronized static Optional<Class<?>> resolveEntityClass(EntityManagerFactory entityManagerFactory,

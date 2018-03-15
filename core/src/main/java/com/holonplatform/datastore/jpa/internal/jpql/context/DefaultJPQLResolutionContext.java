@@ -80,7 +80,6 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 	/**
 	 * Default constructor.
 	 * @param context JPA context (not null)
-	 * @param aliasMode Alias handling mode
 	 */
 	public DefaultJPQLResolutionContext(JpaContext context) {
 		super();

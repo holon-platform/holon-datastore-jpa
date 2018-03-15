@@ -82,7 +82,6 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	 * Constructor.
 	 * @param metamodel JPA Metamodel (not null)
 	 * @param entityClass Entity class (not null)
-	 * @param entityName Entity name (not null)
 	 */
 	public DefaultJpaEntity(Metamodel metamodel, Class<T> entityClass) {
 		super();

@@ -33,8 +33,8 @@ public class TestTx {
 
 	public final static BeanPropertySet<TestTx> TEST_TX = BeanPropertySet.create(TestTx.class);
 
-	public final static PathProperty<Long> TX_CODE = TEST_TX.requireProperty("code", Long.class);
-	public final static PathProperty<String> TX_TEXT = TEST_TX.requireProperty("text", String.class);
+	public final static PathProperty<Long> TX_CODE = TEST_TX.property("code", Long.class);
+	public final static PathProperty<String> TX_TEXT = TEST_TX.property("text", String.class);
 
 	@Id
 	@Column(name = "code")
