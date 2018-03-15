@@ -94,6 +94,13 @@
 			<artifactId>holon-jdbc</artifactId>
 			<version>${holon.jdbc.version}</version>
 		</dependency>
+		
+		<!-- Holon jpa -->
+		<dependency>
+			<groupId>com.holon-platform.jpa</groupId>
+			<artifactId>holon-jpa-bean-processors</artifactId>
+			<version>${holon.jpa.version}</version>
+		</dependency>
 
 		<!-- JPA 2.1 API -->
 		<dependency>

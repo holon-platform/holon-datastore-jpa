@@ -23,7 +23,6 @@ import org.junit.Test;
 import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.internal.property.EnumByOrdinalConverter;
 import com.holonplatform.core.temporal.TemporalType;
-import com.holonplatform.datastore.jpa.internal.JpaPropertyConfiguration;
 import com.holonplatform.datastore.jpa.test.model.entity.Test1;
 import com.holonplatform.datastore.jpa.test.model.entity.Test3;
 
@@ -41,11 +40,6 @@ public class TestBeanPostProcessors {
 		assertTrue(set.getProperty("enumValue").isPresent());
 		assertTrue(set.getProperty("enumValue").get().getConverter().isPresent());
 		assertEquals(EnumByOrdinalConverter.class, set.getProperty("enumValue").get().getConverter().get().getClass());
-
-		assertEquals("enmv", set.getProperty("enumValue").get().getConfiguration()
-				.getParameter(JpaPropertyConfiguration.COLUMN_NAME).orElse(null));
-		assertEquals("nested", set.getProperty("nested").get().getConfiguration()
-				.getParameter(JpaPropertyConfiguration.COLUMN_NAME).orElse(null));
 
 		// identifier
 
