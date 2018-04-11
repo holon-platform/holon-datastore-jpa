@@ -32,7 +32,7 @@ import com.holonplatform.core.datastore.DataContextBound;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.jpa.spring.internal.JpaDatastoreRegistrar;
-import com.holonplatform.spring.internal.PrimaryMode;
+import com.holonplatform.spring.PrimaryMode;
 
 /**
  * Annotation to be used on Spring Configuration classes to setup a JPA {@link Datastore}.

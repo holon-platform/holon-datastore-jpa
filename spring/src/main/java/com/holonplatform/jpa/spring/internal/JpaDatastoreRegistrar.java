@@ -39,10 +39,10 @@ import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.EnableJpaDatastore;
 import com.holonplatform.jpa.spring.JpaDatastoreConfigProperties;
 import com.holonplatform.spring.EnvironmentConfigPropertyProvider;
+import com.holonplatform.spring.PrimaryMode;
 import com.holonplatform.spring.internal.AbstractConfigPropertyRegistrar;
 import com.holonplatform.spring.internal.BeanRegistryUtils;
 import com.holonplatform.spring.internal.GenericDataContextBoundBeanDefinition;
-import com.holonplatform.spring.internal.PrimaryMode;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.TypeCache;

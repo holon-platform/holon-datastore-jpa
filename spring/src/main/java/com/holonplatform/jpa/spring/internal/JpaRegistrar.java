@@ -53,11 +53,11 @@ import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.JpaConfigProperties;
 import com.holonplatform.jpa.spring.JpaDatastoreConfigProperties;
 import com.holonplatform.spring.EnvironmentConfigPropertyProvider;
+import com.holonplatform.spring.PrimaryMode;
 import com.holonplatform.spring.internal.AbstractConfigPropertyRegistrar;
 import com.holonplatform.spring.internal.BeanRegistryUtils;
 import com.holonplatform.spring.internal.DefaultEnvironmentConfigPropertyProvider;
 import com.holonplatform.spring.internal.GenericDataContextBoundBeanDefinition;
-import com.holonplatform.spring.internal.PrimaryMode;
 
 /**
  * Registrar for JPA beans registration using {@link EnableJpa} annotation.

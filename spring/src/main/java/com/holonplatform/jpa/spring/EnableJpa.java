@@ -38,7 +38,7 @@ import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.jdbc.DataSourceConfigProperties;
 import com.holonplatform.jdbc.spring.SpringDataSourceConfigProperties;
 import com.holonplatform.jpa.spring.internal.JpaRegistrar;
-import com.holonplatform.spring.internal.PrimaryMode;
+import com.holonplatform.spring.PrimaryMode;
 
 /**
  * Annotation to be used on Spring Configuration classes to setup a full JPA enviroment bean stack: DataSource (if not

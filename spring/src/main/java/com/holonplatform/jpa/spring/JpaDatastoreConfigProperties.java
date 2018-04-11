@@ -27,7 +27,7 @@ import com.holonplatform.core.config.ConfigPropertySet;
 import com.holonplatform.core.datastore.DataContextBound;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.internal.config.DefaultConfigPropertySet;
-import com.holonplatform.spring.internal.PrimaryMode;
+import com.holonplatform.spring.PrimaryMode;
 
 /**
  * A {@link ConfigPropertySet} for JPA Datastore configuration, using {@link #DEFAULT_NAME} as property prefix.
