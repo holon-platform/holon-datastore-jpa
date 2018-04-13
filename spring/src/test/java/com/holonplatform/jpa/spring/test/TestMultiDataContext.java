@@ -15,6 +15,7 @@
  */
 package com.holonplatform.jpa.spring.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -103,6 +104,8 @@ public class TestMultiDataContext {
 		assertNotNull(transactionManager1);
 		assertNotNull(datastore1);
 
+		assertEquals("one", datastore1.getDataContextId().orElse(null));
+
 		datastore1.save(JpaTarget.of(TestJpaDomain1.class),
 				PropertyBox.builder(KEY, STR, DEC).set(KEY, 7L).set(STR, "Test ds").set(DEC, 7.7).build());
 
@@ -118,6 +121,8 @@ public class TestMultiDataContext {
 		assertNotNull(entityManagerFactory2);
 		assertNotNull(transactionManager2);
 		assertNotNull(datastore2);
+
+		assertEquals("two", datastore2.getDataContextId().orElse(null));
 
 		datastore2.save(JpaTarget.of(TestJpaDomain2.class),
 				PropertyBox.builder(KEY, STR, DEC).set(KEY, 7L).set(STR, "Test ds").set(DEC, 7.7).build());

@@ -196,6 +196,10 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 		MutablePropertyValues pvs = new MutablePropertyValues();
 		pvs.add("entityManagerFactory", new RuntimeBeanReference(entityManagerFactoryBeanName));
 		pvs.add("autoFlush", autoFlush);
+		
+		if (dataContextId != null) {
+			pvs.add("dataContextId", dataContextId);
+		}
 
 		if (datastoreConfig != null) {
 			if (datastoreConfig.isTrace()) {
