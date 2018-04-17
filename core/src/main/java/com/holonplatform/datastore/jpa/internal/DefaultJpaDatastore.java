@@ -812,6 +812,9 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		public JpaDatastore.Builder<D> configuration(DatastoreConfigProperties configuration) {
 			ObjectUtils.argumentNotNull(configuration, "Datastore configuration must be not null");
 			datastore.setTraceEnabled(configuration.isTrace());
+			if (configuration.getDialect() != null) {
+				dialect(configuration.getDialect());
+			}
 			return this;
 		}
 
