@@ -1,6 +1,7 @@
-== Datastore
+[[JPADatastore]]
+== JPA Datastore
 
-The `holon-datastore-jpa` artifact is the main entry point to use the JPA Datastore.
+The `holon-datastore-jpa` artifact is the main entry point to use the JPA `Datastore` API implementation.
 
 _Maven coordinates_:
 [source, xml, subs="attributes+"]
@@ -10,38 +11,190 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
-The link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.html[JpaDatastore^] interface represents the *JPA Datastore*, which extends the core *Datastore* interface.
+The link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.html[JpaDatastore^] interface represents the *JPA Datastore* API implementation, extending the core `Datastore` API.
 
-The `withEntityManager` method can be used to execute a JPA operation using a Datastore managed link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager], providing the operation execution code through the `EntityManagerOperation` functional interface. Any `EntityManager` initialization and finalization operation is executed by the JPA Datastore before and after the execution of the provided operation.
+The `JpaDatastore` API, besides the standard `Datastore` API operations, provides methods to:
 
-[source, java]
-----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=wem,indent=0]
-----
+* Create and configure a `JpaDatastore` API instance, using the provided _builder_.
+* Directly working with `JpaDatastore` managed _EntityManagers_, with a consistent and integrated `EntityManager` instance and related _persistence context_ lifecycle management. See <<JpaDatastoreAPI>>.
 
-IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core *Datastore* interface should be used as a reference for persistence operations, instead of the specific *JpaDatastore* interface. This way, the concrete Datastore implementation may be replaced by a different one at any time, without any change to the rest of the code.
+IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core `Datastore` API interface should be used instead of the specific `JpaDatastore` API by your application code. This way, the concrete `Datastore` API implementation may be replaced by a different one at any time, without any change to the codebase.
 
-=== Setup
+[[JPADatastoreSetup]]
+=== Setup and configuration
 
-The JPA Datastore supports the default Datastore configuration property:
+To create a *JPA Datastore* instance, the `builder()` static method of the `JpaDatastore` API can be used to obtain the JPA Datastore _builder_ API. 
 
-* `holon.datastore.trace`: To enable/disable Datastore operations tracing
-
-To create a *JpaDatastore* instance, the `builder()` static method of the interface can be used.
+The JPA Datastore builder provides a `JpaDatastore` instance:
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=setup,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=builder1,indent=0]
 ----
-<1> Set the `EntityManagerFactory` to use
-<2> Set the `autoFlush` mode to `true`, i.e. `EntityManager.flush()` is invoked after any Datastore data manipulation operation
-<3> Enable the `trace` mode to log the `JPQL` queries and operation performed by the Datastore
-<4> Set the `EntityManagerFactory` to use
-<5> Provide a custom `EntityManagerInitializer` to control how the `EntityManager` instances are obtained from the `EntityManagerFactory`
-<6> Provide a custom `EntityManagerFinalizer` to control how the `EntityManager` instances are finalized after Datastore operations executions
-<7> Set the `EntityManagerFactory` to use
-<8> Build a Datastore bound to a specific _data context id_ named `test`
-<9> Set a Datastore configuration property source using the `datastore.properties` file
+<1> Obtain the JPA `Datastore` builder to configure and create a new JPA Datastore instance
+
+But, as stated in the previous section, to reach the goal of a *complete abstraction* from the persistence store technology and the persistence model, the core `Datastore` API interface should be used by your application code, instead of the specific `JpaDatastore` API.
+
+So you can simply obtain the JPA Datastore implementation as a core `Datastore` API implementation:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=builder2,indent=0]
+----
+<1> Obtain the JPA Datastore builder to configure and create a new JPA Datastore instance and expose it as core `Datastore` API type 
+
+==== Common Datastore configuration options
+
+The JPA Datastore builder API extends the core `Datastore` builder API, which provides common Datastore configuration settings as listed below.
+
+|===
+|Builder method |Arguments |Description
+
+|`dataContextId`
+|The _data context id_ `String` value
+|Set the _data context id_ to which the Datastore is bound. Can be used, for example, to declare configuration properties for multiple Datastore instances. See the link:holon-core#DatastoreDataContextId[Multiple Datastores configuration^] documentation section.
+
+|`traceEnabled`
+|`true` or `false`
+|Whether to enable Datastore operations _tracing_. When enabled, the JPA Datastore will log any JPQL operation performed using the Datastore API.
+
+|`configuration`
+|A `DatastoreConfigProperties` instance
+|Set the `DatastoreConfigProperties` type configuration property set instance to use in order to read the Datastore configuration properties. See the link:holon-core#DatastoreConfiguration[Datastore configuration^] documentation section for details. This configuration properties can be used as an alternative for the programmatic configuration performed with the previous builder methods. 
+|===
+
+Example of base JPA Datastore configuration:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup1,indent=0]
+----
+<1> Set a _data context id_ for the Datastore
+<2> Activate operations _tracing_ in log
+
+The configuration properties can also be provided through an external configuration property source, using the properties provided by the link:{coreapidir}/com/holonplatform/core/datastore/DatastoreConfigProperties.html[DatastoreConfigProperties^] property set.
+
+For example, supposing to have a properties file named `datastore.properties` like this:
+
+[source, text]
+----
+holon.datastore.trace=true
+----
+
+We can use it as configuration property source to enable the Datastore _tracing_ mode:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup2,indent=0]
+----
+<1> Use the `datastore.properties` file as configuration property source
+
+==== `EntityManagerFactory` configuration
+
+The JPA Datastore implementation relies on the standard JPA `EntityManagerFactory` API to obtain and manage the `EntityManager` instances to be used to perform the Datastore operations.
+
+The `EntityManagerFactory` reference is the only *required* JPA Datastore configuration attribute and can be provided using the JPA `Datastore` _builder_ API.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup3,indent=0]
+----
+<1> Set the `EntityManagerFactory` instance to use
+
+
+[[ORMPlatform]]
+==== ORM platform configuration
+
+For some internal operations, the JPA Datastore needs to know the _ORM platform_ which manages the concrete `EntityManagerFactory` (and accorrdingly the `EntityManager`) instances (for example _Hibernate_, _Eclipselink_ and so on). The _ORM platform_ is used, for example, to auto-detect the <<Dialect,ORM dialect>> to use if not directly specified at JPA Datastore configuration time.
+
+The _ORM platform_ can be explicitly specified using the JPA Datastore `platform` builder method, using the link:{apidir}/com/holonplatform/jpa/ORMPlatform.html[ORMPlatform^] enumeration.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup5,indent=0]
+----
+<1> Set `Hibernate` as ORM platform
+
+*ORM platform auto detection:*
+
+When the _ORM platform_ is not explicitly specified, the JPA Datastore will *auto-detect* it using the configured `EntityManagerFactory`. 
+
+[[Dialect]]
+==== ORM Dialect configuration
+
+To ensure operations consistency and efficiency, the JPA Datastore uses the link:{apidir}/com/holonplatform/jpa/dialect/ORMDialect.html[ORMDialect^] API abstraction in order to resolve each ORM platform specificity and JPQL language difference.
+
+Normally, the `ORMDialect` implementation to use is *auto-detected* by the JPA Datastore, relying on the _ORM platform_ to which the `EntityManagerFactory` instance is bound, as described in the previous section.
+
+The `ORMDialect` implementation to use can be also explicitly configured using the JPA Datastore builder. This can be done in two ways:
+
+*1. `ORMDialect` configuration using the JPA Datastore builder:*
+
+The ORM dialect to use can be directly configured using the JPA Datastore builder, either using the `dialect(ORMDialect dialect)` or the `dialect(String dialectClassName)` method.
+
+The `ORMDialect` API provides a static methods to obtain the ORM dialect for a specific ORM platform or to directly obtain a specific dialect implementation within the available ones. 
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup6,indent=0]
+----
+<1> Configure the ORM dialect using a specific dialect implementation
+<2> Configure the ORM dialect using the dialect class name
+
+*1. `ORMDialect` configuration using a configuration property:*
+
+The ORM dialect to use can be also configured using the default `holon.datastore.dialect` Datastore configuration property, available from the link:{coreapidir}/com/holonplatform/core/datastore/DatastoreConfigProperties.html[DatastoreConfigProperties^] property set.
+
+The *fully qualified dialect class name* must be provided as property value.
+
+For example, supposing to have a properties file named `datastore.properties` like this:
+
+[source, text]
+----
+holon.datastore.dialect=com.holonplatform.datastore.jpa.dialect.HibernateDialect
+holon.datastore.trace=true
+----
+
+We can use it as configuration property source to configure the JPA Datastore dialect:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup7,indent=0]
+----
+<1> Use the `datastore.properties` file as configuration property source
+
+[[BuiltinORMDialects]]
+==== Builtin ORM dialects
+
+The Holon JPA Datastore module provides a set of builtin ORM dialects for the most common ORM platforms. The currently available ORM dialect implementations are:
+
+|===
+|ORM platform |Dialect class
+
+|Hibernate
+|link:{apidir}/com/holonplatform/datastore/jpa/dialect/HibernateDialect.html[HibernateDialect^]
+
+|Eclipselink
+|link:{apidir}/com/holonplatform/datastore/jpa/dialect/EclipselinkDialect.html[EclipselinkDialect^]
+
+|Apache OpenJPA
+|link:{apidir}/com/holonplatform/datastore/jpa/dialect/OpenJPADialect.html[OpenJPADialect^]
+
+|Datanucleus
+|link:{apidir}/com/holonplatform/datastore/jpa/dialect/DatanucleusDialect.html[DatanucleusDialect^]
+|===
+
+==== Auto-flush mode
+
+The JPA `Datastore` API can be configured to automatically _flush_ the persistence context into the concrete persistence source when a data management operation of the `Datastore` API (such as _save_ or _delete_) is performed.
+
+When the auto-flush mode is enabled, the `EntityManager.flush()` operation is invoked just after the `Datastore` API operation execution, forcing the persistence context synchronization to the underlying database.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup4,indent=0]
+----
+<1> Enable the auto-flush mode for the JPA `Datastore` API instance
 
 === Data targets and paths
 
