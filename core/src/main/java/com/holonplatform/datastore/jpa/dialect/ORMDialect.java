@@ -161,4 +161,36 @@ public interface ORMDialect {
 		return Optional.empty();
 	}
 
+	/**
+	 * Obtain the <em>Hibernate</em> ORM dialect implementation.
+	 * @return A new {@link ORMDialect} instance
+	 */
+	static ORMDialect hibernate() {
+		return new HibernateDialect();
+	}
+
+	/**
+	 * Obtain the <em>Eclipselink</em> ORM dialect implementation.
+	 * @return A new {@link ORMDialect} instance
+	 */
+	static ORMDialect eclipselink() {
+		return new EclipselinkDialect();
+	}
+
+	/**
+	 * Obtain the <em>OpenJPA</em> ORM dialect implementation.
+	 * @return A new {@link ORMDialect} instance
+	 */
+	static ORMDialect openJPA() {
+		return new OpenJPADialect();
+	}
+
+	/**
+	 * Obtain the <em>Datanucleus</em> ORM dialect implementation.
+	 * @return A new {@link ORMDialect} instance
+	 */
+	static ORMDialect datanucleus() {
+		return new DatanucleusDialect();
+	}
+
 }
