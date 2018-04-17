@@ -29,6 +29,7 @@ import com.holonplatform.core.query.Query;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory;
 import com.holonplatform.datastore.jpa.context.EntityManagerHandler;
+import com.holonplatform.datastore.jpa.dialect.ORMDialect;
 import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
 
 /**
@@ -87,6 +88,37 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		 * @return this
 		 */
 		Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer);
+
+		/**
+		 * Set the {@link ORMPlatform} to use.
+		 * <p>
+		 * By default, the ORM platform is auto-detected using the configured {@link EntityManagerFactory}.
+		 * </p>
+		 * @param platform The ORM platform to set
+		 * @return this
+		 */
+		Builder<D> platform(ORMPlatform platform);
+
+		/**
+		 * Set the ORM dialect to use.
+		 * <p>
+		 * By default, the ORM dialect is auto-detected using the configured {@link EntityManagerFactory}.
+		 * </p>
+		 * @param dialect The dialect to set (not null)
+		 * @return this
+		 */
+		Builder<D> dialect(ORMDialect dialect);
+
+		/**
+		 * Set the fully qualified dialect class name to use as ORM dialect.
+		 * <p>
+		 * <p>
+		 * By default, the ORM dialect is auto-detected using the configured {@link EntityManagerFactory}.
+		 * </p>
+		 * @param dialectClassName The dialect class name to set (not null)
+		 * @return this
+		 */
+		Builder<D> dialect(String dialectClassName);
 
 		/**
 		 * Set whether to auto-flush mode is enabled. When auto-flush mode is enabled, {@link EntityManager#flush()} is

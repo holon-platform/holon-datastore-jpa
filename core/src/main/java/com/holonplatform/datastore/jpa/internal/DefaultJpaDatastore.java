@@ -851,6 +851,43 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 
 		/*
 		 * (non-Javadoc)
+		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#platform(com.holonplatform.datastore.jpa.ORMPlatform)
+		 */
+		@Override
+		public JpaDatastore.Builder<D> platform(ORMPlatform platform) {
+			datastore.setORMPlatform(platform);
+			return this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#dialect(com.holonplatform.datastore.jpa.dialect.
+		 * ORMDialect)
+		 */
+		@Override
+		public JpaDatastore.Builder<D> dialect(ORMDialect dialect) {
+			datastore.setDialect(dialect);
+			return this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#dialect(java.lang.String)
+		 */
+		@Override
+		public JpaDatastore.Builder<D> dialect(String dialectClassName) {
+			ObjectUtils.argumentNotNull(dialectClassName, "Dialect class name must be not null");
+			try {
+				datastore.setDialect((ORMDialect) Class.forName(dialectClassName).newInstance());
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Failed to istantiate dialect class [" + dialectClassName + "]", e);
+			}
+			return this;
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#autoFlush(boolean)
 		 */
 		@Override
