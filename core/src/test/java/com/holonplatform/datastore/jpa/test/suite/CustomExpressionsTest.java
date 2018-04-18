@@ -18,9 +18,11 @@ package com.holonplatform.datastore.jpa.test.suite;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
+import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES_V;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -37,6 +39,8 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 import com.holonplatform.datastore.jpa.test.expression.KeyIsFilter;
 import com.holonplatform.datastore.jpa.test.expression.StrKeySort;
+import com.holonplatform.datastore.jpa.test.expression.TrimFunction;
+import com.holonplatform.datastore.jpa.test.expression.TrimFunctionResolver;
 import com.holonplatform.datastore.jpa.test.model.TestEnum;
 
 public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
@@ -107,6 +111,25 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 				.sort(new StrKeySort()).list(KEY);
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));
+	}
+
+	@Test
+	public void testFunctionExpression() {
+		inTransaction(() -> {
+
+			PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 50101L).set(STR, "  toTrim ")
+					.set(NBOOL, true).build();
+			OperationResult result = getDatastore().insert(JPA_TARGET, value);
+			assertEquals(1, result.getAffectedCount());
+
+			String trimmed = getDatastore().query().withExpressionResolver(new TrimFunctionResolver())
+					.target(JPA_TARGET).filter(KEY.eq(50101L)).findOne(new TrimFunction(STR)).orElse(null);
+
+			assertEquals("toTrim", trimmed);
+
+			getDatastore().delete(JPA_TARGET, value);
+
+		});
 	}
 
 }
