@@ -146,6 +146,19 @@ public interface JPQLResolutionContext extends JpaContext, ResolutionContext, Ex
 		return new DefaultJPQLResolutionContext(context);
 	}
 
+	/**
+	 * Checks if given {@link ResolutionContext} is a {@link JPQLResolutionContext}.
+	 * @param context The context to check
+	 * @return if given context is a {@link JPQLResolutionContext}, it is returned as a {@link JPQLResolutionContext}
+	 *         type. Otherwise, an empty Optional is returned.
+	 */
+	static Optional<JPQLResolutionContext> isJPQLResolutionContext(ResolutionContext context) {
+		if (context instanceof JPQLResolutionContext) {
+			return Optional.of((JPQLResolutionContext) context);
+		}
+		return Optional.empty();
+	}
+
 	// Utils
 
 	/**
