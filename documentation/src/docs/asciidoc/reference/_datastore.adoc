@@ -184,6 +184,7 @@ The Holon JPA Datastore module provides a set of builtin ORM dialects for the mo
 |link:{apidir}/com/holonplatform/datastore/jpa/dialect/DatanucleusDialect.html[DatanucleusDialect^]
 |===
 
+[[AutoFlush]]
 ==== Auto-flush mode
 
 The JPA `Datastore` API can be configured to automatically _flush_ the persistence context into the concrete persistence source when a data management operation of the `Datastore` API (such as _save_ or _delete_) is performed.

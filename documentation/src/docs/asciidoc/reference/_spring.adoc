@@ -1,6 +1,7 @@
-== Spring framework integration
+[[JPADatastoreSpring]]
+== Spring ecosystem integration
 
-The `holon-datastore-jpa-spring` artifact provides integration with the https://spring.io[Spring^] framework for the JPA Datastore.
+The `holon-datastore-jpa-spring` artifact provides integration with the https://spring.io[Spring^] framework for the JPA `Datastore` API.
 
 _Maven coordinates_:
 [source, xml, subs="attributes+"]
@@ -10,41 +11,198 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
-[[SpringJpaDatastore]]
-=== Datastore setup
+=== Integration with the Spring JPA infrastructure
 
-To create a JPA Datastore and register it as a Spring bean, the link:{apidir}/com/holonplatform/jpa/spring/SpringJpaDatastore.html[SpringJpaDatastore^] interface is provided, with the convenience `builder()` method.
+When a JPA `Datastore` API is configured as a Spring bean using the facilities described in this documentation section, a consistent integration with the Spring JPA infrastructure is automatically provided.
 
-This interface creates and represents a JPA Datastore implementation which supports Spring JPA and JTA transaction management architecture, using a Spring _transactional EntityManager proxy_ as Datastore `EntityManager`.
+In particular, the `EntityManager` instance used for the JPA `Datastore` API operations is obtained as a Spring *transactional `EntityManager` proxy*, using the `EntityManagerFactory` configured for the JPA `Datastore` implementation.
+
+This allows to seamlessy integrate with the Spring transaction synchronization architecture, since the _shared_ `EntityManager` proxy provides the following behavior: it will delegate all calls to the current transactional `EntityManager`, if any; otherwise it will fall back to a newly created `EntityManager` per operation. 
+
+This way, the JPA `Datastore` API can be seamlessly used along with the Spring transactions management conventions, for example when using a Spring `PlatformTransactionManager` or the `@Transactional` annotation.
 
 [[EnableJpaDatastore]]
-=== Datastore auto-configuration
+=== JPA Datastore configuration
 
 The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpaDatastore.html[EnableJpaDatastore^] 
-annotation can be used on Spring configuration classes to enable automatic JPA Datastore configuration. An available `EntityManagerFactory` type bean must be present in context to enable the JPA Datastore.
+annotation can be used on Spring configuration classes to enable automatic JPA `Datastore` beans configuration.
 
-The _data context id_ to which the JPA Datastore is bound can be configured using the `dataContextId` annotation attribute, useful when multiple JPA persistence units are available and it is required to configure multiple JPA Datastore instances.
+NOTE: By default, the JPA Datastore bean name configured with the `@EnableJpaDatastore` annotation will be `jpaDatastore`.
 
-When a _data context id_ is not specified, the JPA Datastore is bound to the unique `EntityManagerFactory` type bean registered in context. If the bean is not unique or is not present, a configuration error is thrown. The `entityManagerFactoryReference` annotation attribute can be used to specify the explicit `EntityManagerFactory` bean name to use for the JPA Datastore.
+==== EntityManagerFactory
 
-When a _data context id_ is specified, the registered Datastore is bound to the `EntityManagerFactory` with a matching
-_data context id_, if available. During registration phase, if a `entityManagerFactoryReference` is not specified, an `EntityManagerFactory` bean is searched in context using the bean name pattern: `entityManagerFactory_[datacontextid]` where `[datacontextid]` is equal to the 
-`dataContextId` annotation attribute.
+The `EntityManagerFactory` bean to be used to configure the JPA Datastore API is obtained as follows:
 
-The _auto-flush_ mode can be specified using the `autoFlush` annotation attribute.
-
-The `transactional` annotation attribute (`true` by default) can be used to control the Spring transactions architecture integration, i.e. if a `Transactional` behaviour must be configured for the JPA Datastore data manipulation methods, to automatically create or partecipate in a Spring transaction when these methods are invoked. 
+* If the `entityManagerFactoryReference` attribute of the `@EnableJpaDatastore` annotation is setted, the provided *bean definition name* will be used as the `EntityManagerFactory` bean definition name to use.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=spring,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring1.java[tag=config,indent=0]
+----
+<1> Provide the `EntityManagerFactory` bean definition name to use with the JPA Datastore
+<2> The JPA Datastore is configured and made available, for example, using dependency injection
+
+* Otherwise, the *default* `entityManagerFactory` bean definition name will be used to lookup for the `EntityManagerFactory` bean to use.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring2.java[tag=config,indent=0]
+----
+<1> The default `entityManagerFactory` bean definition name is used for the `EntityManagerFactory` bean definition
+<2> The JPA Datastore is configured and made available, for example, using dependency injection
+
+If a `EntityManagerFactory` bean definition whith the required name is not present in Spring context, an initialization error is thrown.
+
+NOTE: See the <<EnableJpa>> section to learn how to auto-configure a complete JPA bean stack in the Spring context. 
+
+==== Multiple JPA Datastores configuration
+
+When more than one JPA Datastore bean has to be configured using the `@EnableJpaDatastore` annotation, the `dataContextId` attribute can be used to assign a different *data context id* to each JPA Datastore bean definition, in order to:
+
+* Provide different sets of configuration properties using the same Spring environment.
+
+* Provide a default _name pattern matching strategy_ with the `EntityManagerFactory` bean definition to use for each JPA Datastore to configure: if not directly specified with the `entityManagerFactoryReference` attribute, the `EntityManagerFactory` bean definition to use for each JPA Datastore will be detected in Spring context using the bean name pattern: `entityManagerFactory_{datacontextid}` where `{datacontextid}` is equal to the `dataContextId` attribute of the `@EnableJpaDatastore` annotation.
+
+When a _data context id_ is defined, a Spring *qualifier* named the same as the _data context id_ will be associated to the generated JPA `Datastore` bean definitions, and such qualifier can be later used to obtain the right `Datastore` instance through dependency injection. 
+
+Furthermore, the JPA Datastore bean definitions will be named using the _data context id_ as suffix, according to the name pattern: `jpaDatastore_{datacontextid}`.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring3.java[tag=config,indent=0]
+----
+<1> Configure the first JPA Datastore using `one` as _data context id_: by default the bean named `entityManagerFactory_one` will be used as `EntityManagerFactory`
+<2> Configure the first JPA Datastore using `two` as _data context id_: by default the bean named `entityManagerFactory_two` will be used as `EntityManagerFactory`
+<3> A specific `Datastore` type bean reference can be obtained using the _data context id_ as *qualifier*
+
+==== Auto-flush mode
+
+The JPA `Datastore` <<AutoFlush>> can be configured using the `autoFlush` attribute of the `@EnableJpaDatastore` annotation.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring6.java[tag=config,indent=0]
+----
+<1> Enable the JPA `Datastore` auto-flush mode
+
+[[TransactionalJPADatastoreOperations]]
+==== Transactional JPA Datastore operations
+
+The `transactional` attribute of the `@EnableJpaDatastore` annotation can be used to control the _transactional_ configuration of a set of the `Datastore` API operations.
+
+When setted to `true`, the Spring `@Transactional` annotation behavior is automatically added to the following `Datastore` API operation methods:
+
+* `refresh`
+* `insert`
+* `update`
+* `save`
+* `delete`
+
+The default `REQUIRED` _propagation_ behavior is used, thus allowing the method calls to participate in an existing transaction or to be executed in a new one when the Spring transactions infrastructure is used.
+
+NOTE: The `transactional` attribute is *`true` by default*
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring7.java[tag=config,indent=0]
+----
+<1> Enables Spring's annotation-driven transaction management capability.
+<2> The `insert` method is _transactional_ by default, so the `@Transactional` annotation is not explicitly required here
+
+The `transactional` attribute can be used to disable this default behavior:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring8.java[tag=config2,indent=0]
 ----
 
-==== Commodity factories
+==== Primary mode
 
-To use the `DatastoreCommodityFactory` annotation on beans to automatically register them into the `Datastore`, the `JpaDatastoreCommodityFactory` base type must be used for such beans.
+The `@EnableJpaDatastore` annotation provides a `primary()` attribute which can be used to control the _primary mode_ of the JPA `Datastore` bean registration.
 
-See <<CommodityFactories>> for additional details about the `JpaDatastoreCommodityFactory` type.
+If the _primary mode_ is set to `PrimaryMode.TRUE`, the `Datastore` bean created with the corresponding annotation will be marked as *primary* in the Spring application context, meaning that will be the one provided by Spring in case of multiple available candidates, when no specific bean name or qualifier is specified in the dependency injection declaration.
+
+TIP: This behaviour is similar to the one obtained with the Spring `@Primary` annotation at bean definition time.
+
+By default, the _primary mode_ is set to `PrimaryMode.AUTO`, meaning that the registred JPA Datastore bean will be marked as *primary* only when the `EntityManagerFactory` bean to which is bound is registered as primary candidate bean.
+
+[[SpringJPADatastoreConfigurationProperties]]
+==== JPA Datastore configuration properties
+
+When a JPA Datastore bean is configured using the `@EnableJpaDatastore` annotation, the Spring environment is automatically used as configuration properties source.
+
+This way, many Datastore configuration settings can be provided using a configuration property with the proper name and value.
+
+The supported configuration properties are:
+
+*1. The standard Datastore configuration properties*, avaible from the link:{coreapidir}/com/holonplatform/core/datastore/DatastoreConfigProperties.html[DatastoreConfigProperties^] property set (See link:holon-core#DatastoreConfiguration[Datastore configuration^]).
+
+The configuration property prefix is `holon.datastore` and the following properties are available:
+
+.Datastore configuration properties
+|===
+|Name |Type |Meaning
+
+|_holon.datastore._ *trace*
+|Boolean (`true` / `false`)
+|Enable/disable Datastore operations _tracing_.
+
+|_holon.datastore._ *dialect*
+|String
+|The fully qualified class name of the _ORM Dialect_ to use. See <<Dialect>>.
+|===
+
+*2. An additional set of properties*, provided by the link:{apidir}/com/holonplatform/jpa/spring/JpaDatastoreConfigProperties.html[JpaDatastoreConfigProperties^] property set, which can be used as an alternative for the `@EnableJpaDatastore` annotation attributes described in the previous sections.
+
+.JPA Datastore configuration properties
+|===
+|Name |Type |Meaning
+
+|_holon.datastore.jpa._ *primary*
+|Boolean (`true` / `false`)
+|Mark the JPA Datastore bean as _primary_ candidate for dependency injection when more than one definition is available. IF not setted to `true`, the *AUTO* strategy will be used: the JPA Datastore bean will be marked as primary only when the `EntityManagerFactory` bean to which is bound is registered as primary candidate bean.
+
+|_holon.datastore.jpa._ *auto-flush*
+|Boolean (`true` / `false`)
+|Enable or disable the JPA Datastore auto-flush mode. See <<AutoFlush>>.
+
+|_holon.datastore.jpa._ *transactional*
+|Boolean (`true` / `false`)
+|Whether to add the Spring `@Transactional` behavior to the suitable Datastore API methods. See <<TransactionalJPADatastoreOperations>>.
+|===
+
+Example of Datastore configuration properties:
+
+[source, text]
+----
+holon.datastore.trace=true // <1>
+holon.datastore.dialect=my.dialect.class.Name // <2>
+
+holon.datastore.jpa.auto-flush=true // <3>
+holon.datastore.jpa.transactional=false // <4>
+----
+<1> Enable tracing
+<2> Set the ORM dialect class name
+<3> Enable the auto-flush mode
+<4> Disable the automatic _transactional_ behavior of the Datastore operations
+
+==== Datastore extension and configuration using the Spring context
+
+The JPA Datastore implementation supports the standard link:holon-core.html#SpringDatastoreConfiguration[Holon Platform Datastore Spring integration^] features for Datastore beans configuration and extension, which includes:
+
+* Datastore *configuration post processing* using  link:{coreapidir}/com/holonplatform/spring/DatastorePostProcessor.html[DatastorePostProcessor^] type beans.
+
+* Datastore *extension* through link:{coreapidir}/com/holonplatform/core/ExpressionResolver.html[ExpressionResolver^] registration using link:{coreapidir}/com/holonplatform/spring/DatastoreResolver.html[DatastoreResolver^] annotated beans.
+
+* Datastore *commodity factory* registration using link:{coreapidir}/com/holonplatform/spring/DatastoreCommodityFactory.html[DatastoreCommodityFactory^] annotated beans.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring9.java[tag=config,indent=0]
+----
+<1> Automatically register a Datastore expression resolver using the `@DatastoreResolver` annotation
+<2> Post process Datastore configuration using a `DatastorePostProcessor` type Spring bean
+<3> Automatically register a Datastore commodity factory using the `@DatastoreCommodityFactory` annotation
 
 [[EnableJpa]]
 === Full JPA auto-configuration
