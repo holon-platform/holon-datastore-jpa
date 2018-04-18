@@ -112,7 +112,6 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		/**
 		 * Set the fully qualified dialect class name to use as ORM dialect.
 		 * <p>
-		 * <p>
 		 * By default, the ORM dialect is auto-detected using the configured {@link EntityManagerFactory}.
 		 * </p>
 		 * @param dialectClassName The dialect class name to set (not null)
