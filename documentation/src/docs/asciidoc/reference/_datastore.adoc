@@ -493,7 +493,7 @@ So the `validate()` method can be used to implement custom expression validation
 
 ==== JPA Datastore expressions
 
-Besides the standard link:holon-core.html#DatastoreExpressionResolverExtension[Datastore API expressions], such as `DataTarget`, `QueryFilter` and `QuerySort`, which can be used to extend the `Datastore` API with new expression implementations and new resolution strategies, the JDBC `Datastore` API can be extended using a set of *specific JPQL resolution expressions*, used by the internal _JPQL composer engine_ to implement the resolution and composition strategy to obtain JPQL statements from the `Datastore` API meta-language expressions.
+Besides the standard link:holon-core.html#DatastoreExpressionResolverExtension[Datastore API expressions], such as `DataTarget`, `QueryFilter` and `QuerySort`, which can be used to extend the `Datastore` API with new expression implementations and new resolution strategies, the JPA `Datastore` API can be extended using a set of *specific JPQL resolution expressions*, used by the internal _JPQL composer engine_ to implement the resolution and composition strategy to obtain JPQL statements from the `Datastore` API meta-language expressions.
 
 These JPQL expression are available from the `com.holonplatform.datastore.jpa.jpql.expression` package of the `holon-datastore-jpa` artifact.
 
@@ -542,71 +542,96 @@ Some examples are:
 * link:{apidir}/com/holonplatform/datastore/jpa/jpql/expression/JPQLStatement.html[JPQLStatement^] to represent a full _JPQL statement_ with parameters support.
 * link:{apidir}/com/holonplatform/datastore/jpa/jpql/expression/JPQLQueryDefinition.html[JPQLQueryDefinition^] and link:{apidir}/com/holonplatform/datastore/jpa/jpql/expression/JPQLQuery.html[JPQLQuery^] to represent the definition of a _JPQL query_ and the query statement representation with the `JPQLResultConverter` to use to covert the query results in the expected type.
 
-For example, let's see how the `SQLFunction` expression can be used as an _intermediate_ SQL expression type to define a new SQL _function_.
+For example, let's see how the `JPQLFunction` expression can be used as an _intermediate_ JPQL expression type to define a new JPQL _function_.
 
-We want to define a *IfNull* function, which returns a _fallback_ value expression when a given _expression_ is _null_, following the syntax of the link:https://dev.mysql.com/doc/refman/5.7/en/control-flow-functions.html#function_ifnull[MySQL IFNULL function^].
+We want to define a *Trim* function to map the JPQL `TRIM(both from x)` function.
 
 We will use the `QueryFunction` expression type to represent the function, since it is the default _function_ expression representation of the `Datastore` API.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJdbcDatastoreFunction.java[tag=function1,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreFunction.java[tag=function1,indent=0]
 ----
-<1> The _nullable_ expression representation
-<2> The _fallback_ expression representation to be returned when the first expression value is _null_ 
-<3> Convenience constructor to accept a _constant_ expression value as fallback expression
-<4> Validate the arguments
-<5> The two function _arguments_ will be the _nullable_ expression and the _fallback_ expression
+<1> The expression to be _trimmed_
+<2> Validate the argument
+<3> The unique function _argument_ will be the expression to trim
 
-Now we create an expression resolver to resolve the `QueryFunction` expression into a *`SQLFunction` intermediate SQL expression type*:
+Now we create an expression resolver to resolve the `QueryFunction` expression into a *`JPQLFunction` intermediate JPQL expression type*:
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJdbcDatastoreFunction.java[tag=function2,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreFunction.java[tag=function2,indent=0]
 ----
-<1> Use the `SQLFunction` `create` method to provide the SQL function representation using the function arguments. The function arguments are already provided by the SQL composition engine as serialized SQL expression tokens, according to the actual arguments expression types
+<1> Use the `JPQLFunction` `create` method to provide the JPQL function representation using the function arguments. The function arguments are already provided by the JPQL composition engine as serialized JPQL expression tokens, according to the actual arguments expression types
 
 Now the function can be registered in the `Datastore` API and used the same way as any other `QueryFunction` expression implementation.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJdbcDatastoreFunction.java[tag=function3,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreFunction.java[tag=function3,indent=0]
 ----
-<1> Register the `IfNull` function expression resolver in Datastore
-<2> The `IfNull` function is used to provide a fallback `(fallback)` value in a query projection for the `STR` String property value
+<1> Register the `Trim` function expression resolver in Datastore
+<2> The `Trim` function is used to provide the _trimmed_ `STR` property value as query projection
 
 [[JPQLResolutionContext]]
-==== JDBC Expression resolution context
+==== JPA Expression resolution context
 
-The JDBC `Datastore` API makes available an extension of the standard expression `ResolutionContext`, to provide a set of configuration attributes and SQL resolution context specific operations. This resolution context extension is represented by the link:{apidir}/com/holonplatform/datastore/jdbc/composer/SQLCompositionContext.html[SQLCompositionContext^] API.
+The JPA `Datastore` API makes available an extension of the standard expression `ResolutionContext`, to provide a set of configuration attributes and JPQL resolution context specific operations. This resolution context extension is represented by the link:{apidir}/com/holonplatform/datastore/jpa/jpql/context/JPQLResolutionContext.html[JPQLResolutionContext^] API.
 
-When used within the JDBC `Datastore` API, the `ResolutionContext` provided to the registered expresion resolvers is `SQLCompositionContext` for any JDBC `Datastore` API standard operation. To obtain a `SQLCompositionContext`, the `isSQLCompositionContext` method can be used.
+When used within the JPA `Datastore` API, the `ResolutionContext` provided to the registered expression resolvers is a `JPQLResolutionContext` for any JPA `Datastore` API standard operation. To obtain a `JPQLResolutionContext`, the `isJPQLResolutionContext` method can be used.
 
-The link:{apidir}/com/holonplatform/datastore/jdbc/composer/SQLStatementCompositionContext.html[SQLStatementCompositionContext^] API is a further context extension which provides methods related to SQL _statements_ composition. It can be obtained from a `SQLCompositionContext` through the `isStatementCompositionContext()` method.
+The link:{apidir}/com/holonplatform/datastore/jpa/jpql/context/JPQLStatementResolutionContext.html[JPQLStatementResolutionContext^] API is a further context extension which provides methods related to JPQL _statements_ composition. It can be obtained from a `JPQLResolutionContext` through the `isStatementCompositionContext()` method.
+
+The _statement_ resolution context provides methods, for example, to obtain the *alias* for a property path used in a query.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJdbcDatastoreExtension.java[tag=context1,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreExtension.java[tag=context1,indent=0]
 ----
 <1> Let's suppose we are implementing an expression resolver resolution method
-<2> Check and obtain the current `ResolutionContext` as a `SQLCompositionContext`
-<3> As an example, the current `SQLDialect` is requested
-<4> If the context is a SQL _statement_ resolution context, it can be obtained as a `SQLStatementCompositionContext`
-<5> Add a _named_ parameter to the current SQL statement context
+<2> Check and obtain the current `ResolutionContext` as a `JPQLResolutionContext`
+<3> As an example, get the current `ORMPlatform` is requested
+<4> If the context is a JPQL _statement_ resolution context, it can be obtained as a `JPQLStatementResolutionContext`
+<5> Get the _alias_ assigned to the `A_PROPERTY` property in the current JPQL statement, if available
 
 [[CommodityFactories]]
 === Commodity factories
 
-The JPA Datastore supports `DatastoreCommodityFactory` automatic registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityFactory.html[JpaDatastoreCommodityFactory^] base type and default _Java service extensions_.
+The JPA `Datastore` API supports _Datastore commodities_ registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityFactory.html[JpaDatastoreCommodityFactory^] type.
 
-To automatically register an `DatastoreCommodityFactory` this way, a class implementing `JpaDatastoreCommodityFactory` has to be created and its qualified full name must be specified in a file named `com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory` placed in a `META-INF/services` folder in classpath.
+NOTE: See the link:holon-core.html#DatastoreCommodities[Datastore commodities definition and registration] documentation section to learn how the _Datastore commodity_ architecture can be used to provide extensions to the default `Datastore` API.
 
-The link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityContext.html[JpaDatastoreCommodityContext^] interface represents the JPA Datastore specific commodity context and it is provided at commodity creation time to the factories.
+The `JpaDatastoreCommodityFactory` type provides a specialized  link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityContext.html[JpaDatastoreCommodityContext^] API as Datastore commodity context, to make available a set of JPA `Datastore` specific configuration attributes and references, for example:
 
-The context extends the `JpaDatastore` interface itself and provides the following additional resources:
+* The `EntityManagerFactory` bound the JPA Datastore.
+* The configured (or auto-detected) <<ORMPlatform,ORM platform>>.
+* The available _expression resolvers_ 
+* A set of APIs and configuration methods available from the _JPQL composer engine_.
 
-* The `EntityManagerFactory` bound the JPA Datastore;
-* A `getEntityManager()` method to obtain a `EntityManager` instance;
-* The `ORMPlatform` used by the JPA Datastore, if available;
-* Whether the Datastore _auto-flush_ mode is enabled.
-* Whether the Datastore _trace_ mode is enabled.
+Furthermore, it makes available some API methods to invoke some JPA Datastore operations, such as the `withEntityManager(EntityManagerOperation<R> operation)` method to execute an operation using a Datastore managed `EntityManager` instance or methods to inspect and create other Datastore _commodities_.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreExtension.java[tag=commodity,indent=0]
+----
+<1> Datastore commodity API
+<2> Commodity implementation
+<3> Commodity factory implementation
+
+A Datastore commodity factory class which extends the `JpaDatastoreCommodityFactory` interface can be registered in a JPA `Datastore` in two ways:
+
+*1. Direct registration using the JPA `Datastore` API builder:*
+
+The JPA `Datastore` API supports `DatastoreCommodityFactory` automatic registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityFactory.html[JpaDatastoreCommodityFactory^] type using a _Java service extensions_ based registration method.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreExtension.java[tag=factoryreg,indent=0]
+----
+<1> Register the `MyCommodityFactory` commodity factory in given JPA `Datastore` implementation
+
+*2. Automatic registration using the  _Java service extensions_:*
+
+To automatically register an commodity factory using the standard _Java service extensions_ based method, a class implementing `JpaDatastoreCommodityFactory` has to be created and its qualified full name must be specified in a file named `com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory`,  placed in the `META-INF/services` folder of the classpath.
+
+When this registration method is used, the commodity factories defined this way will be registered for *any JPA `Datastore` API instance*.

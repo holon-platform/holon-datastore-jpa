@@ -35,7 +35,6 @@ import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
-import com.holonplatform.datastore.jpa.jpql.expression.JPQLParameter;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLToken;
 
 @SuppressWarnings({ "unused", "serial" })
@@ -173,6 +172,8 @@ public class ExampleJpaDatastoreExtension {
 		// end::expres3[]
 	}
 
+	final static NumericProperty<Long> A_PROPERTY = NumericProperty.create("aproperty", long.class);
+
 	class SomeExpressionResolver implements ExpressionResolver<JPQLExpression, JPQLExpression> {
 
 		// tag::context1[]
@@ -184,7 +185,7 @@ public class ExampleJpaDatastoreExtension {
 				ORMPlatform paltform = ctx.getORMPlatform().orElse(null); // <3>
 
 				ctx.isStatementCompositionContext().ifPresent(sctx -> { // <4>
-					sctx.addNamedParameter(JPQLParameter.create("test", String.class)); // <5>
+					Optional<String> alias = sctx.getAliasOrRoot(A_PROPERTY); // <5>
 				});
 			});
 
