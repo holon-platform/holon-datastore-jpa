@@ -116,6 +116,18 @@ public class ExampleJpaDatastoreConfiguration {
 		// end::setup7[]
 	}
 
+	public void setup8() {
+		// tag::setup8[]
+		EntityManagerFactory entityManagerFactory = createOrObtainEntityManagerFactory();
+
+		Datastore datastore = JpaDatastore.builder() //
+				.entityManagerFactory(entityManagerFactory) //
+				.entityManagerInitializer(emf -> emf.createEntityManager()) // <1>
+				.entityManagerFinalizer(em -> em.close()) // <2>
+				.build();
+		// end::setup8[]
+	}
+
 	private static EntityManagerFactory createOrObtainEntityManagerFactory() {
 		return null;
 	}

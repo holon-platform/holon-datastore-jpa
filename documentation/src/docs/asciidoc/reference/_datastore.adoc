@@ -196,70 +196,237 @@ include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatas
 ----
 <1> Enable the auto-flush mode for the JPA `Datastore` API instance
 
-=== Data targets and paths
+[[EntityManagerLifecyle]]
+==== EntityManager lifecyle
 
-The JPA `Datastore` relies on the following conventions regarding *DataTarget*s and *Path*s:
+The default JPA `Datastore` strategy to handle the `EntityManager` lifecycle is defined as follows:
 
-* The *DataTarget* _name_ is interpreted as the JPA _entity_ name (i.e. the simple Entity class name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation)
-* The *Path* _name_ is interpreted as a JPA _entity_ attribute name, supporting nested classes through the conventional _dot_ notation (e.g. `address.city`)
+* For each `Datastore` API operation, a new `EntityManager` instance is obtained from the configured `EntityManagerFactory`, using the `createEntityManager()` method, before the operation execution. The `EntityManager` instance is then _closed_, using the `EntityManager.close()` method, right after the operation execution.
+* If the `Datastore` API operation is executed within a Datastore managed _transaction_ (see <<Transactions>>), the `EntityManager` instance is created at transaction start, shared between any transaction operation and closed only at transaction end.
 
-TIP: See the core link:holon-core.html#Datastore[Datastore] documentation for more informations about *DataTarget*s and *Path*s, and about the use of extension hooks such as *DataTargetResolver* for target names resolution.
+To customize the `EntityManager` lifecycle, the link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.EntityManagerInitializer.html[EntityManagerInitializer^] and link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.EntityManagerFinalizer.html[EntityManagerFinalizer^] interfaces can be used to control the `EntityManager` instance creation and/or the `EntityManager` instance finalization for any JPA `Datastore` API operation.
 
-=== JpaTarget
-
-The link:{apidir}/com/holonplatform/datastore/jpa/JpaTarget.html[JpaTarget^] interface can be used to define a *DataTarget* using a JPA _entity_ class rather than an entity name. The entity name used in persistence operations will be the provided entity class simple name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation, if available.
+The `EntityManagerInitializer` and `EntityManagerFinalizer` to use can be configured using the JPA `Datastore` _builder_ API.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=jpatarget,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreConfiguration.java[tag=setup8,indent=0]
 ----
-<1> Create a `DataTarget` bound to given `Test` JPA entity class using the `JpaTarget` interface
+<1> Configure a custom `EntityManagerInitializer`
+<2> Configure a custom `EntityManagerFinalizer`
 
-=== JPA Write options
+[[NamingConventions]]
+=== Data model attributes naming conventions
 
-The additional `WriteOption` link:{apidir}/com/holonplatform/datastore/jpa/JpaWriteOption.html#FLUSH[JpaWriteOption.FLUSH^] is supported by the JPA Datastore, and can be used to synchronize the persistence context to the underlying database after a data manipulation operation, automatically calling the `EntityManager.flush()` method.
+Since the JPA `Datastore` implementation relies on the JPA architecture and APIs to manage the concrete data model and persistence source, the *JPA data model definition*, i.e. the relational schema mapping through Java objects using _entity_ beans representations, is used to resolve the `Datastore` API operations meta-language into valid JPA operation definitions, for example using the _JPQL_ language.
+
+IMPORTANT: This means that the JPA data model (the JPA _entity_ beans definitions) has to be defined and made available to the `EntityManagerFactory` used by the JPA `Datastore` to allow the `Datastore` API operations execution, for example using a `persistence.xml` file. This is the convention used by JPA, and it does not directly concern the JPA `Datastore` implementation. See the JPA reference documentation for details.
+
+For this reason, the JPA `Datastore` implementation relies on the following conventions regarding *DataTarget*s and *Path*s definitions:
+
+* The *DataTarget* _name_ is interpreted as the *JPA _entity_ name* (i.e. the simple _entity_ class name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation).
+* The *Path* _name_ is interpreted as a *JPA _entity_ attribute name*, supporting nested classes through the conventional _dot_ notation (e.g. `address.city`).
+
+For example, given a _table_ definition as follows:
+
+[source, sql]
+----
+create table test (
+  code numeric(20) primary key, 
+  text varchar(100)
+)
+----
+
+And the corresponding JPA _entity_ mapping definition:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreModel.java[tag=model1,indent=0]
+----
+
+According to the naming conventions described above, a _property model_ and a _DataTarget_ for the example JPA _entity_ can be defined as follows:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreModel.java[tag=model2,indent=0]
+----
+<1> Path property definition for the `id` JPA _entity_ attribute name
+<2> Path property definition for the `value` JPA _entity_ attribute name
+<3> DataTarget definition for the `Test` JPA _entity_ name
+
+If the JPA _entity_ name is specified using the `name` attribute of the `javax.persistence.Entity` annotation, that name has to be used as `DataTarget` name. 
+
+For example, if `myName` is specified as JPA _entity_ name:
+
+[source, java]
+----
+@Entity(name = "myName")
+----
+
+The `DataTarget` definition will be:
+
+[source, java]
+----
+DataTarget<?> TARGET = DataTarget.named("myName"); 
+----
+
+TIP: See <<JpaTarget>> to learn how to use the JPA _entity_ class definition rather than the JPA entity _name_ to declare a `DataTarget`.
+
+Now the _property model_ definition can be used with the `Datastore` API operations in an abstract and implementation-independent way. For example:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreModel.java[tag=model3,indent=0]
+----
+<1> Perform a query and obtain a stream of `ID` property values
+<2> Perform a query and obtain a stream of `PropertyBox` values using the `TEST` property set, which corresponds to the `Test` JPA entity attributes definitions
+<3> Insert or update a value (which corresponds to a JPA `Test`  instance) using the _save_ operation
+
+TIP: See <<JPABeanPropertyModel>> to learn how to create a _property model_ definition for a JPA _entity_ class using the Holon Platform Bean introspection APIs.
+
+[[JpaTarget]]
+=== JpaTarget
+
+The link:{apidir}/com/holonplatform/datastore/jpa/JpaTarget.html[JpaTarget^] interface can be used to define a `DataTarget` using a *JPA _entity_ class definition* rather than the entity _name_. 
+
+The entity name used in persistence operations will be the entity class simple name or the name specified using the `name` attribute of the `javax.persistence.Entity` annotation, if available.
+
+Fo example, for the `Test` JPA entity class defined in the example of the previous section, a `JpaTarget` can be created in the following way:
+
+[source, java]
+----
+JpaTarget<Test> TARGET = JpaTarget.of(Test.class); 
+----
+
+The `JpaTarget` path type will be the JPA _entity_ class. A `JpaTarget` definition can be used with `Datastore` API operations just like any other `DataTarget` definition.
+
+==== Using a JPA entity class as Query projection
+
+By default, the `Datastore` API relies on the `PropertyBox` type to represent and handle a set of data model attribute values. For this reason, the `PropertyBox` type is the default type used in _query projections_ to obtain a set of _property_ values.
+
+The `JpaTarget` definition can be also used as _query projection_, to obtain results as JPA _entity_ class instances, instead of `PropertyBox` type instances.
+
+IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the `PropertyBox` type should be used to represent a set of data model attributes values. This way, the concrete `Datastore` API implementation may be replaced by a different one at any time, without any change to the codebase.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreModel.java[tag=model4,indent=0]
+----
+<1> `JpaTarget` definition using the `Test` JPA _entity_ class
+<2> Perform a query and obtain the results as `Test` JPA _entity_ instances, using the `JpaTarget` as query projection
+
+[[JPABeanPropertyModel]]
+=== Using the Bean introspection APIs to obtain a JPA entity Property model
+
+The Holon Platform link:holon-core.html#BeanIntrospector[Bean introspection API^] can be used to obtain a _property model_ definition from any Java Bean class, including a JPA _entity_ class.
+
+The `BeanPropertySet` obtained using the bean introspection API can be used to refer to the JPA _entity_ attributes as _properties_ for `Datastore` API operations definition and execution.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreBean.java[tag=beans1,indent=0]
+----
+<1> Create a `BeanPropertySet` for the `Test` JPA _entity_ class
+<2> Create a `DataTarget` for the `Test` JPA _entity_ class
+<3> The `BeanPropertySet` can be used to obtain the _property_ definitions which corresponds to the JPA _entity_ class attributes
+<4> Perform a query using the property model provided by the `BeanPropertySet`
+
+The JPA `Datastore` API implementation automatically registers the *JPA bean post processors* provided by the link:holon-jpa.html#JPAPropertyPostProcessors[Holon Platform JPA Module^], used to inspect standard JPA entity annotations (for example `@Id`, `@EmbeddedId` and `@Transient`) and configure the bean properties accordingly.
+
+See the link:holon-jpa.html#JPAPropertyPostProcessors[Holon Platform JPA Module^] documentation for details.
+
+=== JPA _Write options_ 
+
+The link:holon-core.html#DataManipulationOperations[data manipulation^] `Datastore` API operations supports a set of *write options* to provide additional operation configuration attributes or behavior specifications.
+
+Besides the standard write options, the JPA `Datastore` API implementation supports an additional link:{apidir}/com/holonplatform/datastore/jpa/JpaWriteOption.html#FLUSH[FLUSH^], available from the link:{apidir}/com/holonplatform/datastore/jpa/JpaWriteOption.html[JpaWriteOption^] enumeration.
+
+This _write option_ can be provided a `Datastore` API data manipulation operation *to synchronize the persistence context to the underlying database* right after the operation execution, automatically invoking the `EntityManager.flush()` method on the current `EntityManager` instance.
 
 [source, java]
 ----
 include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=flush,indent=0]
 ----
+<1> The `FLUSH` write option is provided to synchronize the persistence context to the underlying database after the operation execution
 
 [[Relational-expressions]]
 === Relational expressions
 
-As a _relational_ Datastore, the JPA Datastore supports core relational expressions for data access and manipulation:
+As link:holon-core.html#RelationalDatastores[relational Datastore^], the JPA `Datastore` API supports core _relational expressions_ for data access and manipulation:
 
 *1. Sub-query:*
 
 The link:{apidir}/com/holonplatform/core/datastore/relational/SubQuery.html[SubQuery^] interface can be used to represent a _sub-query_,  which can be used in a query definition to express query restrictions (filters) that involve a sub-query as filter operand.
 
-See the link:holon-core.html#subquery[Sub query documentation] for further information and code examples.
+See the core link:holon-core.html#subquery[sub query expression documentation^] for further information on sub query expressions.
 
 *2. Alias and Joins:*
 
-The link:{apidir}/com/holonplatform/core/datastore/relational/RelationalTarget.html[RelationalTarget^] interface can be used to express *alias* and *joins* for a `DataTarget`.
+The link:{apidir}/com/holonplatform/core/datastore/relational/RelationalTarget.html[RelationalTarget^] interface can be used to declare *alias* and *joins* for a `DataTarget` expression.
 
-See the link:holon-core.html#joins[Alias and Joins documentation] for further information and code examples.
+See the core link:holon-core.html#joins[alias and joins documentation^] for further information on alias and join expressions.
 
+NOTE: The supported _join types_ are dependent from the JPA API specification version in use. For example, the *left* join type is only supported by the JPA specification version 2.1 or above. 
+
+[[AutoGeneratedIds]]
 === Auto-generated ids
 
-The JPA datastore supports the retrieving of auto-generated id column values, if supported by the underlying JDBC driver and ORM platform.
+The JPA Datastore API supports the retrieving of auto-generated id column values, if supported by the underlying JDBC driver and ORM platform.
 
-The auto-generated id values can be obtained from the `OperationResult` object, returned by Datastore data manipulation operations, through the `getInsertedKeys()` method.
-
-The default *BRING_BACK_GENERATED_IDS* `WriteOption` can be provided to Datastore data manipulation method to bring back any auto-generated id value into the `PropertyBox` which was subject of the operation, if a corresponding `Property` (using the property name) is available in the box property set.
+The auto-generated id values can be obtained from the `OperationResult` object, returned by Datastore data manipulation operations, through the `getInsertedKeys()` and related methods.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=ids,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=ids1,indent=0]
 ----
-<1> The `id` column is supposed to be auto-generated by the ORM/database
-<2> Create the `PropertyBox` to insert, not providing the `id` value
-<3> Execute the insert operation using the *BRING_BACK_GENERATED_IDS* write option and the *FLUSH* JPA write option to ensure the id auto-generation is triggered
-<4> The `ID` property of the inserted PropertyBox is updated with the auto-generated value
+<1> Perform an _insert_ operation, using the `FLUSH` write option to _flush_  the persistence context to the underlyng database after operation execution to ensure the key auto-generation is triggered
+<2> Get the auto-generated key value which corresponds to the `ID` property definition, if available
 
-=== Extensions
+The default *BRING_BACK_GENERATED_IDS* `WriteOption` can be provided to the `Datastore` API operation to bring back any auto-generated key value into the `PropertyBox` instance which was the subject of the operation, if a corresponding `PathProperty` (using the path name) is available in the `PropertyBox` property set.
 
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastore.java[tag=ids2,indent=0]
+----
+<1> Perform an  _insert_ operation using the *BRING_BACK_GENERATED_IDS* write option and the *FLUSH* write option to ensure the id auto-generation is triggered
+<2> The `ID` property value of the inserted `PropertyBox` value is updated with the auto-generated value, if available
+
+[[Transactions]]
+=== Transactions management
+
+The JPA `Datastore` API implementation is link:holon-core.html#TransactionalDatastores[transactional^], so it supports *transactions* management through the link:{coreapidir}/com/holonplatform/core/datastore/transaction/Transactional.html[Transactional^] API, which can be used to manage transactions at a higher level, in an abstract and implementation-independent way.
+
+See the link:holon-core.html#TransactionalDatastores[Transactional Datastore^] documentation section for information on transactions management with the `Transactional` API.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastore.java[tag=transactional,indent=0]
+----
+<1> Obtain the `Transactional` API to execute one or more `Datastore` operation within a transaction
+<2> Commit the transaction
+<3> Obtain the `Transactional` API to execute the `Datastore` operation within a transaction and return a value
+<4> The transaction is configured with the _auto commit_ mode, this way the transaction is automatically committed at the transactional operation end if no error occurred
+
+[[JPADatastoreAPI]]
+=== `JpaDatastore` API
+
+The specialized link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.html[JpaDatastore^] API, which extends the standard `Datastore` API, makes available an additional methods through the link:{apidir}/com/holonplatform/datastore/jpa/context/EntityManagerHandler.html[EntityManagerHandler^] interface to *execute operations using a Datastore managed EntityManager*.
+
+The JPA Datastore will take care of the `EntityManager` instance provision and finalization. See the <<EntityManagerLifecyle>> section for information about the `EntityManager` lifecycle management in the JPA `Datastore` API implementation. 
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastore.java[tag=wem,indent=0]
+----
+<1> Execute an operation using a JPA Datastore managed `EntityManager` instance
+<2> Execute an operation using a JPA Datastore managed `EntityManager` instance and return a result
+
+IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core `Datastore` API interface should be used instead of the specific `JpaDatastore` API by your application code. This way, the concrete `Datastore` API implementation may be replaced by a different one at any time, without any change to the codebase.
+
+[[JPADatastoreExtension]]
+=== Extending the JPA Datastore API
+
+[[JPAExpressionResolvers]]
 === Expression resolvers
 
 The JPA Datastore supports `ExpressionResolver` automatic registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreExpressionResolver.html[JpaDatastoreExpressionResolver^] base type and default _Java service extensions_.
