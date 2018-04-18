@@ -15,9 +15,16 @@
  */
 package com.holonplatform.datastore.jpa.examples;
 
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import com.holonplatform.core.datastore.Datastore;
 
@@ -28,10 +35,28 @@ public class ExampleJpaDatastoreSpringBoot1 {
 	@EnableAutoConfiguration
 	class Config {
 
+		@Bean
+		public DataSource dataSource() {
+			return buildDataSource();
+		}
+
+		@Bean
+		public FactoryBean<EntityManagerFactory> entityManagerFactory(DataSource dataSource) {
+			LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+			emf.setDataSource(dataSource);
+			emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+			emf.setPackagesToScan("com.example.entities");
+			return emf;
+		}
+
 	}
 
 	@Autowired
 	Datastore datastore; // <1>
 	// end::config[]
+
+	public static DataSource buildDataSource() {
+		return null;
+	}
 
 }

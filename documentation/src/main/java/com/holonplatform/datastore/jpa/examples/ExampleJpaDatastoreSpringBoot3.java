@@ -15,46 +15,29 @@
  */
 package com.holonplatform.datastore.jpa.examples;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
-import com.holonplatform.core.datastore.Datastore;
-import com.holonplatform.jpa.spring.EnableJpa;
+import com.holonplatform.jpa.spring.boot.JpaEntityScan;
 
-public class ExampleJpaDatastoreSpring5 {
+public class ExampleJpaDatastoreSpringBoot3 {
 
 	class TestEntity1 {
+
 	}
-	
+
 	class TestEntity2 {
+
 	}
 
 	// tag::config[]
 	@Configuration
-	@PropertySource("jdbc.properties")
-	static class Config {
-
-		@Configuration
-		@EnableJpa(dataContextId = "one", entityPackageClasses = TestEntity1.class)
-		static class Config1 {
-		}
-
-		@Configuration
-		@EnableJpa(dataContextId = "two", entityPackageClasses = TestEntity2.class)
-		static class Config2 {
-		}
+	@EnableAutoConfiguration
+	@JpaEntityScan(value = "one", basePackageClasses = TestEntity1.class) // <1>
+	@JpaEntityScan(value = "two", basePackageClasses = TestEntity2.class) // <2>
+	class Config {
 
 	}
-
-	@Autowired
-	@Qualifier("one")
-	Datastore datastore1;
-
-	@Autowired
-	@Qualifier("two")
-	Datastore datastore2;
 	// end::config[]
 
 }

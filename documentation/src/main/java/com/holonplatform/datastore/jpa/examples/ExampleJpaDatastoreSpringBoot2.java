@@ -15,46 +15,37 @@
  */
 package com.holonplatform.datastore.jpa.examples;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.holonplatform.core.datastore.Datastore;
-import com.holonplatform.jpa.spring.EnableJpa;
 
-public class ExampleJpaDatastoreSpring5 {
-
-	class TestEntity1 {
-	}
-	
-	class TestEntity2 {
-	}
+public class ExampleJpaDatastoreSpringBoot2 {
 
 	// tag::config[]
 	@Configuration
-	@PropertySource("jdbc.properties")
-	static class Config {
-
-		@Configuration
-		@EnableJpa(dataContextId = "one", entityPackageClasses = TestEntity1.class)
-		static class Config1 {
-		}
-
-		@Configuration
-		@EnableJpa(dataContextId = "two", entityPackageClasses = TestEntity2.class)
-		static class Config2 {
-		}
+	@EnableAutoConfiguration
+	class Config {
 
 	}
 
 	@Autowired
-	@Qualifier("one")
-	Datastore datastore1;
+	DataSource dataSource;
+
+	@PersistenceUnit
+	EntityManagerFactory entityManagerFactory;
 
 	@Autowired
-	@Qualifier("two")
-	Datastore datastore2;
+	PlatformTransactionManager transactionManager;
+
+	@Autowired
+	Datastore datastore;
 	// end::config[]
 
 }

@@ -11,6 +11,7 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
+[[SpringJPAIntegration]]
 === Integration with the Spring JPA infrastructure
 
 When a JPA `Datastore` API is configured as a Spring bean using the facilities described in this documentation section, a consistent integration with the Spring JPA infrastructure is automatically provided.
@@ -205,42 +206,55 @@ include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatast
 <3> Automatically register a Datastore commodity factory using the `@DatastoreCommodityFactory` annotation
 
 [[EnableJpa]]
-=== Full JPA auto-configuration
+=== Full JPA bean stack auto-configuration
 
 The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] 
 annotation can be used on Spring configuration classes to setup a full JPA enviroment bean stack: 
 
-* *DataSource:* If a `javax.sql.DataSource` type bean is not already registered in Spring context, a `DataSource` instance is created and configured using standard JDBC `DataSourceConfigProperties`;
-* *EntityManagerFactory:* A `javax.persistence.EntityManagerFactory` bean is registered and configured, along with a suitable Spring `JpaVendorAdapter` instance for ORM configuration;
-* *PlatformTransactionManager:* A `org.springframework.transaction.PlatformTransactionManager` bean is registered to be used within the Spring transaction infrastructure;
-* *Datastore:* A `JpaDatastore` is configured and bound to the `EntityManagerFactory` of the JPA stack.
+* *DataSource:* If a `javax.sql.DataSource` type bean is not already registered in Spring context, a `DataSource` instance is created and configured using the link:holon-jdbc.html#DataSourceConfigProperties[Holon Platform DataSource configuration properties^]. See the link:holon-jdbc.html#DataSourceConfiguration[Holon Platform JDBC Module^] documentation for details.
+
+* *EntityManagerFactory:* A JPA `javax.persistence.EntityManagerFactory` bean is registered and configured, along with a suitable Spring `JpaVendorAdapter` instance for ORM configuration. A default Spring `LocalContainerEntityManagerFactoryBean` is used as `EntityManagerFactory` factory bean.
+
+* *PlatformTransactionManager:* A `org.springframework.transaction.PlatformTransactionManager` bean is registered to enable the Spring transactions management APIs and conventions;
+
+* *Datastore:* A JPA `Datastore` is configured and bound to the `EntityManagerFactory` bean of the JPA stack.
+
+In a typical scenario, to enable a full JPA stack in Spring context, the `@EnableJpa` annotation can be used as foolows:
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=jpa,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring4.java[tag=config,indent=0]
+----
+<1> Specify the base package to use to auto-detect the JPA _entity_ definition classes to mapped into the `EntityManagerFactory` instance
+
+The `DataSource` configuration properties in the example above are expected to be provided through the `jdbc.properties` file. For example:
+
+[source, text]
+----
+holon.datasource.url=jdbc:h2:mem:test
+holon.datasource.username=sa
 ----
 
-==== `EnableJpa`: DataSource configuration
+See the next sections to learn about all the available configuration attributes to fine tune the JPA stack beans configuration.
+
+==== `DataSource` configuration
 
 A `DataSource` type bean is automatically configured if:
 
-* A `javax.sql.DataSource` type bean is not already registered in Spring context;
-* The `dataSourceReference` attribute of the `EnableJpa` is not specified. If specified, it indicates the `DataSource` bean name to use, which must be available in Spring context.
+* A `javax.sql.DataSource` type bean is not already registered in the Spring context.
+* The `dataSourceReference` attribute of the `@EnableJpa` annotation is not specified. If specified, it indicates the `DataSource` bean name to use, which must be available in the Spring context.
 
-In order to auto-configure the `DataSource` bean, a suitable set of configuration properties must be available in Spring environment (typically using one or more `PropertySource`).
+In order to auto-configure the `DataSource` bean, a suitable set of configuration properties must be available in the Spring Environment.
 
-See link:../../holon-jdbc/overview.html#DataSourceConfigProperties[DataSource configuration properties^] for details.
+See the link:holon-jdbc.html#DataSourceConfigProperties[Holon Platform DataSource configuration properties^] section of the Holon Platform JDBC Module documentation for details.
 
-==== `EnableJpa`: EntityManagerFactory configuration
+==== `EntityManagerFactory` configuration
 
 A Spring `LocalContainerEntityManagerFactoryBean` instance is used as `javax.persistence.EntityManagerFactory` implementation to ensure a full integration with Spring JPA architecture and provide functionalities such as automatic JPA persistence unit configuration without the need of a `persistence.xml` configuration file.
 
-If a `persistence.xml` configuration file is not available, automatic persistence unit _entity_ classes configuration can be performed using either the annotation attribute:
+If a `persistence.xml` configuration file is not available, automatic persistence unit _entity_ classes configuration can be performed using one of the following `@EnableJpa` annotation attributes:
 
 * `entityPackages` : providing a list of package names to scan in order to map JPA _entity_ classes into the  `EntityManagerFactory`,
-
-or the annotation attribute:
-
 * `entityPackageClasses` : providing a list of classes from which to obtain the package names to scan in order to map JPA _entity_ classes into the `EntityManagerFactory`. Represents a type-safe alternative to `entityPackages` attribute.
 
 Two more annotation attributes are available for persistence unit configuration:
@@ -248,62 +262,75 @@ Two more annotation attributes are available for persistence unit configuration:
 * `validationMode` : Specify the JPA 2.0 validation mode for the persistence unit;
 * `sharedCacheMode` : Specify the JPA 2.0 shared cache mode for the persistence unit.
 
-See the JPA documentation for further details about persistence unit configuration.
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring10.java[tag=config,indent=0]
+----
 
-==== `EnableJpa`: Persistence provider (ORM) configuration
+==== Persistence provider (ORM) configuration
 
-The JPA Persistence provider (ORM) to use is auto-detected from classpath and a suitable Spring `JpaVendorAdapter` instance is configured and bound to the `EntityManagerFactory`.
+By default, the JPA Persistence provider (ORM) to use is *auto-detected from classpath* and a suitable Spring `JpaVendorAdapter` instance is configured and bound to the `EntityManagerFactory` bean.
 
-See link:{apidir}/com/holonplatform/datastore/jpa/ORMPlatform.html[ORMPlatform^] enumeration for a list of supported persistence provider implementations.
+If more than one persistence provider implementation is present in classpath (or to explicitly specify a persistence provider implementation to use, anyway) the `orm` configuration property can be used. See <<JPAConfigurationProperties>> for details.
 
-If more than one persistence provider implementation is present in classpath (or to explicitly specify a persistence provider implementation to use, anyway) the `orm` configuration property can be used. See <<JPA configuration properties>> for details.
-
-==== `EnableJpa`: Transaction manager configuration
+==== Transaction manager configuration
 
 A Spring JPA `PlatformTransactionManager` is auto-configured and bound to the 
-`EntityManagerFactory` to enable Spring's transaction infrastructure support.
+`EntityManagerFactory` bean to enable the Spring's transactions support.
 
-A set of attributes are made available by the `@EnableJpa` annotation to fine tune the transaction manager configuration: `transactionSynchronization`, `defaultTimeout`, `validateExistingTransaction`, `failEarlyOnGlobalRollbackOnly`, `rollbackOnCommitFailure`.
+A set of attributes are made available by the `@EnableJpa` annotation to fine tune the transaction manager configuration: 
 
-See link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] Javadocs for informations about each of these configuration attributes.
+|===
+|Attribute name |Type |Meaning |Default
 
-==== `EnableJpa`: JPA Datastore configuration
+|`transactionSynchronization`
+|int
+|Set when the transaction manager should activate the thread-bound transaction synchronization support. 
+|-1 (always)
 
-By default, using the `EnableJpa` annotation a JPA Datastore is automatically created and configured suing the `EntityManagerFactory` of the JPA beans stack. The JPA Datastore instanc will be a <<SpringJpaDatastore>>, enabling all the Spring-related auto-configuration features described above.
+|`defaultTimeout`
+|int
+|Specify the default timeout that the transaction manager should apply if there is no timeout specified at the transaction level, in seconds.
+|-1 (`TransactionDefinition.TIMEOUT_DEFAULT`)
 
-To disable automatic JPA Datastore configuration, the `enableDatastore` annotation attribute can be used.
+|`validateExistingTransaction`
+|boolean
+|Set whether existing transactions should be validated before participating in them.
+|`false`
 
-The `EnableJpa` annotation makes available two additional configuration attributes related to the JPA Datastore setup:
+|`failEarlyOnGlobalRollbackOnly`
+|boolean
+|Set whether to fail early in case of the transaction being globally marked as rollback-only. 
+|`false`
 
-* `autoFlush` : to enable the JPA Datastore _auto flush_ mode. When auto-flush mode is enabled,
-the `EntityManager.flush()` method is invoked after each Datastore data manipulation operation to ensure the underlying database synchronization.
+|`rollbackOnCommitFailure`
+|boolean
+|Set whether a _rollback_ should be performed on failure of the transaction manager _commit_ call. 
+|`false`
+|===
 
-* `transactionalDatastore` : to add _transactional_ behaviour to
-suitable Datastore methods, i.e. to automatically create or partecipate in a transaction when methods are invoked.
+==== JPA Datastore configuration
 
-==== Using _data context id_ for multiple data sources
+By default, a JPA `Datastore` implementation is automatically configured using the `EntityManagerFactory` bean and made available as Spring bean. The JPA `Datastore` implementation is configured for a seamless integration with the Spring JPA infrastructure, as described in <<SpringJPAIntegration>>.
 
-When a _data context id_ is specified through the `dataContextId` annotation attribute, all the JPA stack beans auto-configured with the `EnableJpa` annotation are bound to the specified _data context id_ name, allowing the support for multiple data sources and persistence units.
-
-When a _data context id_ is specified:
-
-* Any configuration property (for `DataSource` or JPA beans configuration) must be provided using the _data context id_ as prefix. For example, if the _data context id_ is named `test`, the JDBC DataSource url must be specified the following way: `holon.datasource.test.url=...` and so on;
-
-* The _data context id_ will be used as persistence unit name;
-
-* Each of the auto-configured JPA stack bean will be _qualified_ using the _data context id_ name, to allow dependency injection using a Spring `Qualifier`.
-
-In case of multiple data context ids, the `primary()` attribute of the `EnableJpa` annotation can be used to mark one the JPA beans stack as primary candidate for dependency injection when a qualifier is not specified.
+To disable automatic JPA Datastore configuration, the `enableDatastore` attribute of the `@EnableJpa` annotation can be used.
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring.java[tag=multi,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring11.java[tag=config,indent=0]
 ----
+<1> Disable the JPA `Datastore` bean auto configuration
 
-[[JPA configuration properties]]
-=== JPA configuration properties
+The `@EnableJpa` annotation makes available two additional configuration attributes related to the JPA `Datastore` implementation setup:
 
-link:{apidir}/com/holonplatform/jpa/spring/JpaConfigProperties.html[JpaConfigProperties^] interface provides a set of configuration properties to be used with JPA stack beans auto-configuration. It extends a default `ConfigPropertySet` bound to the property name prefix *holon.jpa*.
+* `autoFlush` : whether to enable the JPA `Datastore` _auto flush_ mode. See <<AutoFlush>> for details.
+
+* `transactionalDatastore` : whether to add _transactional_ behaviour to data manipulation `Datastore` API operations. See <<TransactionalJPADatastoreOperations>> for details.
+
+[[JPAConfigurationProperties]]
+==== JPA configuration properties
+
+The link:{apidir}/com/holonplatform/jpa/spring/JpaConfigProperties.html[JpaConfigProperties^] interface provides a set of configuration properties to be used with JPA stack beans auto-configuration. It extends a default `ConfigPropertySet` bound to the property name prefix *holon.jpa*.
 
 The available configuration properties are listed below:
 
@@ -317,7 +344,7 @@ The available configuration properties are listed below:
 
 |_holon.jpa._ *dialect*
 |String
-|ORM dialect class name to use, if supported by the ORM platform.
+|ORM dialect class name to use.
 
 | _holon.jpa._ *database*
 |`com.holonplatform.jdbc.DatabasePlatform` enumeration
@@ -329,18 +356,47 @@ The available configuration properties are listed below:
 
 |_holon.jpa._ *show-sql*
 |Boolean (true/false)
-|Whether to instruct JPA ORM engine to show executed SQL statements, if supported by ORM platform.
+|Whether to instruct JPA ORM engine to show executed SQL statements, if supported by the ORM platform.
 |===
 
 The `JpaConfigProperties` can be loaded from a number a sources using the default `ConfigPropertySet` builder interface.
 
 Using the Spring integration, all `Environment` registered PropertySources will be enabled as a `JpaConfigProperties` source.
 
+==== Multiple JPA bean stacks configuration
+
+When more than one JPA stack has to be configured using the `@EnableJpa` annotation, the `dataContextId` attribute can be used to assign a different *data context id* to each JPA bean definitions stack, in order to:
+
+* Provide different sets of configuration properties using the same Spring environment.
+
+* Provide a default _name pattern strategy_ for the JPA beans stack using the bean name pattern: `beanDefinitionName_{datacontextid}` where `{datacontextid}` is equal to the `dataContextId` attribute of the `@EnableJpa` annotation.
+
+When a _data context id_ is defined, a Spring *qualifier* named the same as the _data context id_ will be associated to each JPA bean definition, and such qualifier can be later used to obtain the right bean instance through dependency injection.
+
+For example, given the following `jdbc.properties` configuration property source file:
+
+[source, text]
+----
+holon.datasource.one.url=jdbc:h2:mem:testdbm1
+holon.datasource.one.username=sa
+
+holon.datasource.two.url=jdbc:h2:mem:testdbm2
+holon.datasource.two.username=sa
+----
+
+To configure two JPA bean stacks, one bound to the `one` _data context id_ and the other to the `two` _data context id_, the `@EnableJpa` annotation can be used as follows:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring5.java[tag=config,indent=0]
+----
+
+[[JPASpringBoot]]
 == Spring Boot integration
 
-The `holon-datastore-jpa-spring-boot` artifact provides integration with https://projects.spring.io/spring-boot[Spring Boot^] for JPA stack and Datastore auto-configuration.
+The `holon-datastore-jpa-spring-boot` artifact provides integration with https://projects.spring.io/spring-boot[Spring Boot^] for JPA stack and JPA `Datastore` beans *auto-configuration*.
 
-To enable Spring Boot auto-configuration the following artifact must be included in your project dependencies:
+To enable Spring Boot JPA auto-configuration features, the following artifact must be included in your project dependencies:
 
 _Maven coordinates_:
 [source, xml, subs="attributes+"]
@@ -350,14 +406,32 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
+[[JPADatastoreSpringBoot]]
 === JPA Datastore auto-configuration
 
-The JPA datastore is auto-configured only when:
+A JPA `Datastore` bean is auto-configured only when:
 
-* A `JpaDatastore` type bean is not already registered in Spring context
-* A valid `EntityManagerFactory` type bean is available in Spring context
+* A `JpaDatastore` type bean is not already available from the Spring application context.
+* A valid `EntityManagerFactory` type bean is available from the Spring application context.
 
-The JPA Datastore auto-configuration behaviour is the same of the one adopted by the `EnableJpaDatastore` annotation. See <<EnableJpaDatastore>> for details.
+The JPA `Datastore` auto-configuration strategy is the same adopted by the `@EnableJpaDatastore` annotation, including the Spring environment configuration properties support. See <<EnableJpaDatastore>> for details.
+
+For example, given an `application.yml` configuration file as follows:
+
+[source, yaml]
+----
+holon: 
+  datastore:
+    trace: true
+----
+
+The Holon platform Spring Boot auto-configuration classes will auto configure a JPA `Datastore` bean bound to the `EntityManagerFactory` bean (which must be available in the Spring application context), enabling operations _tracing_ according to the `holon.datastore.trace` property value.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpringBoot1.java[tag=config,indent=0]
+----
+<1> A JPA `Datastore` type bean is auto-configured ad available from the Spring context
 
 To disable this auto-configuration feature the `JpaDatastoreAutoConfiguration` class can be excluded:
 
@@ -366,13 +440,46 @@ To disable this auto-configuration feature the `JpaDatastoreAutoConfiguration` c
 @EnableAutoConfiguration(exclude={JpaDatastoreAutoConfiguration.class})
 ----
 
-=== Full JPA stack auto-configuration
+[[JPAStackSpringBoot]]
+=== Full JPA beans stack auto-configuration
 
-A full JPA beans stack is auto-configured only when:
+When the `holon-datastore-jpa-spring-boot` artifact is available in classpath, a *full JPA beans stack* is auto-configured when an `EntityManagerFactory` type bean is not already registered in the Spring application context.
 
-* An `EntityManagerFactory` type bean is not already registered in Spring context.
+The JPA beans stack configuration strategy is the same of the one adopted by the `@EnableJpa` annotation, including the Spring environment configuration properties support. See <<EnableJpa>> for details.
 
-The JPA stack auto-configuration behaviour is the same of the one adopted by the `EnableJpa` annotation. See <<EnableJpa>> for details.
+For example, given an `application.yml` configuration file as follows:
+
+[source, yaml]
+----
+spring:
+  datasource:
+    url: "jdbc:h2:mem:test"
+    username: "sa"
+    
+holon: 
+  datastore:
+    trace: true
+----
+
+The Holon platform Spring Boot auto-configuration classes will auto configure a JPA beans stack using the `DataSource` auto-configured by the standard Spring Boot classes `spring.datasource.*` configuration properties. The Datastore operations _tracing_ is enabled according to the `holon.datastore.trace` property value.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpringBoot2.java[tag=config,indent=0]
+----
+
+The Holon Platform `DataSource` auto-configuration capabilities can also be used, replacing the `spring.datasource.*` configuration properties with the `holon.datasource.*` ones. For example:
+
+[source, yaml]
+----
+holon:
+  datasource:
+    url: "jdbc:h2:mem:test"
+    username: "sa"
+ 
+  datastore:
+    trace: true
+----
 
 To disable this auto-configuration feature the `JpaAutoConfiguration` class can be excluded:
 
@@ -381,15 +488,98 @@ To disable this auto-configuration feature the `JpaAutoConfiguration` class can 
 @EnableAutoConfiguration(exclude={JpaAutoConfiguration.class})
 ----
 
+=== Multiple JPA beans stack auto configuration
+
+When the `DataSource` type beans are auto-configured using the Holon Platform JDBC Module features (see the link:holon-jdbc.html#JDBCSpringBoot[Holon Platform JDBC Module Spring Boot integration^] documentation section), the auto-configuration of multiple JPA bean stacks is available out-of-the-box.
+
+The *_data context id_ convention* is used to provide multiple `DataSource` and JPA beans stack auto-configuration capabilities: when multiple `DataSource` type beans are registered, each of them bound to a _data context id_, the Spring Boot auto-configuration classes will provide to configure a JPA beans stack for each detected `DataSource` bean, binding the same _data context id_ to the JPA stack bean definitions.
+
+According to the _data context id_ convention, each `DataSource` and JPA stack bean will be _qualified_ with the corresponding _data context id_, so that the specific bean instance can be later obtained using the _data context id_ as Spring bean *qualifier* name.
+
+For example, given an `application.yml` configuration file as follows:
+
+[source, yaml]
+----
+holon: 
+  datasource:
+    one:
+      url: "jdbc:h2:mem:test1"
+      username: "sa"
+    two:
+      url: "jdbc:h2:mem:test2"
+      username: "sa"
+----
+
+The auto-configuration feature will configure two `DataSource` beans:
+
+* One `DataSource` bean instance using the `one` _data context id_ configuration properties, qualified with the *one* qualifier.
+* Another `DataSource` bean instance using the `two` _data context id_ configuration properties, qualified with the *two* qualifier.
+
+And two corresponding JPA beans stacks:
+
+* One backed by the `DataSource` bound to the `one` _data context id_, qualified with the *one* qualifier.
+* Another backed by the `DataSource` bound to the `two` _data context id_, qualified with the *two* qualifier.
+
+So, for example, the `DataSource` and JPA `Datastore` beans can be obtained as follows:
+
+[source, java]
+----
+// 'one' data context id:
+@Autowired @Qualifier("one")
+DataSource dataSource1;
+	
+@Autowired @Qualifier("one")
+Datastore datastore1;
+
+// 'two' data context id:
+@Autowired @Qualifier("two")
+DataSource dataSource2;
+	
+@Autowired @Qualifier("two")
+Datastore datastore2;
+----
+
 ==== JPA entities scan
 
-When the full JPA stack auto-configuration is enabled, the link:{apidir}/com/holonplatform/jpa/spring/boot/JpaEntityScan.html[JpaEntityScan^] repeatable annotation can be used on Spring configuration classes to specify the base packages to scan for JPA entity classes.
+When more than one JPA beans stack is auto-configured, the link:{apidir}/com/holonplatform/jpa/spring/boot/JpaEntityScan.html[JpaEntityScan^] repeatable annotation can be used to provide the JPA _entity_ set to map to each auto-configured `EntityManagerFactory`, using the _data context id_ value to identify each `EntityManagerFactory` bean.
 
+So, for example, given an `application.yml` configuration file as follows:
+
+[source, yaml]
+----
+holon: 
+  datasource:
+    one:
+      url: "jdbc:h2:mem:test1"
+      username: "sa"
+    two:
+      url: "jdbc:h2:mem:test2"
+      username: "sa"
+----
+
+Two `DataSource` beans and two JPA beans stacks will be auto-configured using the `one` and `two` data context ids.
+
+The `@JpaEntityScan` annotation can be used to specify the packages to scan for JPA entity classes mapping, one for the `one` data context id and another for the `two` data context id:
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpringBoot3.java[tag=config,indent=0]
+----
+<1> Use the base package of the `TestEntity1` class to scan for the JPA entity classes to map to the `EntityManagerFactory` bean associated to the `one` data context id  
+<2> Use the base package of the `TestEntity2` class to scan for the JPA entity classes to map to the `EntityManagerFactory` bean associated to the `two` data context id  
+
+[[JPADatastoreSpringBootStarters]]
 === Spring Boot starters
 
 The following _starter_ artifacts are available to provide a quick project configuration setup using Maven dependency system:
 
-*1.* *JPA Datastore starter using Hibernate* provides the dependencies to the Holon JPA Datastore Spring Boot integration artifacts, in addition to default Holon _core_ Spring Boot starters (see the documentation for further information) and base Spring Boot starter (`spring-boot-starter`). Futhermore, this starter provides the *Hibernate ORM* and the *HikariCP* DataSource dependencies.
+*1.* *JPA starter using Hibernate* provides the dependencies to the Holon JPA Spring Boot integration artifact `holon-datastore-jpa-spring-boot` and the dependencies to use *Hibernate ORM* as persistence provider.
+
+Furthermore, it provides dependencies for:
+
+* The link:holon-core.html#SpringBoot[Holon Platform Core Module Spring Boot integration^] base starter (`holon-starter`).
+* The base Spring Boot starter (`spring-boot-starter`), see the link:https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter[Spring Boot starters documentation^] for details.
+* The https://github.com/brettwooldridge/HikariCP[HikariCP] pooling `DataSource` implementation.
 
 _Maven coordinates_:
 [source, xml, subs="attributes+"]
@@ -399,7 +589,7 @@ _Maven coordinates_:
 <version>{revnumber}</version>
 ----
 
-*2.* *JPA Datastore starter using Eclipselink* provides the dependencies to the Holon JPA Datastore Spring Boot integration artifacts, in addition to default Holon _core_ Spring Boot starters (see the documentation for further information) and base Spring Boot starter (`spring-boot-starter`). Futhermore, this starter provides the *Eclipselink ORM* and the *HikariCP* DataSource dependencies.
+*2.* *JPA starter using Eclipselink* provides the same dependencies as the previous JPA starter, but using *Eclipselink* as persistence provider, instead of Hibernate.
 
 _Maven coordinates_:
 [source, xml, subs="attributes+"]
