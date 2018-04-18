@@ -29,7 +29,6 @@ import com.holonplatform.core.property.StringProperty;
 import com.holonplatform.core.query.QueryFunction;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
-import com.holonplatform.datastore.jpa.test.expression.TrimFunction;
 
 @SuppressWarnings({ "unused", "serial" })
 public class ExampleJpaDatastoreFunction {
@@ -66,10 +65,10 @@ public class ExampleJpaDatastoreFunction {
 	// end::function1[]
 
 	// tag::function2[]
-	public class TrimResolver implements ExpressionResolver<TrimFunction, JPQLFunction> {
+	public class TrimResolver implements ExpressionResolver<Trim, JPQLFunction> {
 
 		@Override
-		public Optional<JPQLFunction> resolve(TrimFunction expression, ResolutionContext context)
+		public Optional<JPQLFunction> resolve(Trim expression, ResolutionContext context)
 				throws InvalidExpressionException {
 			return Optional.of(JPQLFunction.create(args -> { // <1>
 				StringBuilder sb = new StringBuilder();
@@ -81,8 +80,8 @@ public class ExampleJpaDatastoreFunction {
 		}
 
 		@Override
-		public Class<? extends TrimFunction> getExpressionType() {
-			return TrimFunction.class;
+		public Class<? extends Trim> getExpressionType() {
+			return Trim.class;
 		}
 
 		@Override
@@ -102,7 +101,7 @@ public class ExampleJpaDatastoreFunction {
 				.withExpressionResolver(new TrimResolver()) // <1>
 				.build();
 
-		Stream<String> trimmedValues = datastore.query(TARGET).stream(new TrimFunction(STR)); // <2>
+		Stream<String> trimmedValues = datastore.query(TARGET).stream(new Trim(STR)); // <2>
 		// end::function3[]
 	}
 
