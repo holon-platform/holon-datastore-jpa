@@ -112,15 +112,16 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 					EnableJpa.DEFAULT_ENTITYMANAGERFACTORY_BEAN_NAME);
 		}
 
+		PrimaryMode primaryMode = BeanRegistryUtils.getAnnotationValue(attributes, "primary", PrimaryMode.AUTO);
+
 		// defaults
 		JpaDatastoreConfigProperties defaultConfig = JpaDatastoreConfigProperties.builder(dataContextId)
-				.withProperty(JpaDatastoreConfigProperties.PRIMARY_MODE,
-						BeanRegistryUtils.getAnnotationValue(attributes, "primary", PrimaryMode.AUTO))
+				.withProperty(JpaDatastoreConfigProperties.PRIMARY,
+						(primaryMode == PrimaryMode.TRUE) ? Boolean.TRUE : null)
 				.withProperty(JpaDatastoreConfigProperties.AUTO_FLUSH,
 						BeanRegistryUtils.getAnnotationValue(attributes, "autoFlush", false))
 				.withProperty(JpaDatastoreConfigProperties.TRANSACTIONAL,
 						BeanRegistryUtils.getAnnotationValue(attributes, "transactional", true))
-
 				.build();
 
 		registerDatastore(registry, getEnvironment(), dataContextId, emfBeanName, defaultConfig, beanClassLoader);
@@ -150,10 +151,10 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 				.withPropertySource(EnvironmentConfigPropertyProvider.create(environment)).build();
 
 		// Configuration
-		PrimaryMode primaryMode = defaultConfig
-				.getConfigPropertyValueOrElse(JpaDatastoreConfigProperties.PRIMARY_MODE,
-						() -> jpaDatastoreConfig.getConfigPropertyValue(JpaDatastoreConfigProperties.PRIMARY_MODE))
-				.orElse(PrimaryMode.AUTO);
+		boolean primary = defaultConfig
+				.getConfigPropertyValueOrElse(JpaDatastoreConfigProperties.PRIMARY,
+						() -> jpaDatastoreConfig.getConfigPropertyValue(JpaDatastoreConfigProperties.PRIMARY))
+				.orElse(false);
 
 		boolean transactional = defaultConfig
 				.getConfigPropertyValueOrElse(JpaDatastoreConfigProperties.TRANSACTIONAL,
@@ -165,8 +166,7 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 						() -> jpaDatastoreConfig.getConfigPropertyValue(JpaDatastoreConfigProperties.AUTO_FLUSH))
 				.orElse(false);
 
-		boolean primary = PrimaryMode.TRUE == primaryMode;
-		if (!primary && PrimaryMode.AUTO == primaryMode) {
+		if (!primary) {
 			if (registry.containsBeanDefinition(entityManagerFactoryBeanName)) {
 				BeanDefinition bd = registry.getBeanDefinition(entityManagerFactoryBeanName);
 				primary = bd.isPrimary();
@@ -196,7 +196,7 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 		MutablePropertyValues pvs = new MutablePropertyValues();
 		pvs.add("entityManagerFactory", new RuntimeBeanReference(entityManagerFactoryBeanName));
 		pvs.add("autoFlush", autoFlush);
-		
+
 		if (dataContextId != null) {
 			pvs.add("dataContextId", dataContextId);
 		}

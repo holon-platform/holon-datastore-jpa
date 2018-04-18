@@ -387,7 +387,8 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 			// register a JpaDatastore
 
 			JpaDatastoreConfigProperties defaultConfig = JpaDatastoreConfigProperties.builder(dataContextId)
-					.withProperty(JpaDatastoreConfigProperties.PRIMARY_MODE, primaryMode)
+					.withProperty(JpaDatastoreConfigProperties.PRIMARY,
+							(primaryMode == PrimaryMode.TRUE) ? Boolean.TRUE : null)
 					.withProperty(JpaDatastoreConfigProperties.AUTO_FLUSH,
 							BeanRegistryUtils.getAnnotationValue(attributes, "autoFlush", false))
 					.withProperty(JpaDatastoreConfigProperties.TRANSACTIONAL,

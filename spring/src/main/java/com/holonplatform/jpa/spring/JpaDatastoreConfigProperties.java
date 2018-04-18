@@ -18,7 +18,7 @@ package com.holonplatform.jpa.spring;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.sql.DataSource;
+import javax.persistence.EntityManagerFactory;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,6 @@ import com.holonplatform.core.config.ConfigPropertySet;
 import com.holonplatform.core.datastore.DataContextBound;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.internal.config.DefaultConfigPropertySet;
-import com.holonplatform.spring.PrimaryMode;
 
 /**
  * A {@link ConfigPropertySet} for JPA Datastore configuration, using {@link #DEFAULT_NAME} as property prefix.
@@ -45,12 +44,12 @@ public interface JpaDatastoreConfigProperties extends ConfigPropertySet, DataCon
 	 * Whether to qualify the Datastore bean as <code>primary</code>, i.e. the preferential bean to be injected in a
 	 * single-valued dependency when multiple candidates are present.
 	 * <p>
-	 * When mode is {@link PrimaryMode#AUTO} (default mode), the registred Datastore bean is marked as primary only when
-	 * the {@link DataSource} bean to which is bound is registered as primary bean.
+	 * By default, the registred Datastore bean is marked as primary only when the {@link EntityManagerFactory} bean to which is
+	 * bound is registered as primary candidate bean.
 	 * </p>
 	 */
-	static final ConfigProperty<PrimaryMode> PRIMARY_MODE = ConfigProperty.create("primary-mode", PrimaryMode.class);
-
+	static final ConfigProperty<Boolean> PRIMARY = ConfigProperty.create("primary", Boolean.class);
+	
 	/**
 	 * Whether to enable the {@link EntityManager} auto-flush mode. When auto-flush is enabled, the
 	 * {@link EntityManager#flush()} method is invoked after the execution of any Datastore data manipulation operation.
