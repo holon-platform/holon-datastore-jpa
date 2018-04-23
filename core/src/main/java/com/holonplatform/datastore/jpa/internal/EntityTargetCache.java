@@ -22,10 +22,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-import javax.persistence.metamodel.Metamodel;
+import javax.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.datastore.DataTarget;
-import com.holonplatform.core.internal.utils.ClassUtils;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 
 /**
@@ -38,55 +37,43 @@ public final class EntityTargetCache implements Serializable {
 	private static final long serialVersionUID = 1780346234469898465L;
 
 	/**
-	 * Query target name - entity class mappings cache
+	 * Data target name - entity class mappings cache
 	 */
-	private final static WeakHashMap<ClassLoader, Map<String, Class<?>>> ENTITY_TARGETS = new WeakHashMap<>();
+	private final static WeakHashMap<EntityManagerFactory, Map<String, Class<?>>> ENTITY_TARGETS = new WeakHashMap<>();
 
 	private EntityTargetCache() {
 	}
 
 	/**
-	 * Try to obtain JPA Entity mapping class from given path name using default ClassLoader
-	 * @param name Path name (not null)
-	 * @param metamodel JPA Metamodel (not null)
-	 * @return Entity class, or <code>null</code> target was null
-	 */
-	public synchronized static Optional<Class<?>> resolveEntityClass(String name, Metamodel metamodel) {
-		return resolveEntityClass(ClassUtils.getDefaultClassLoader(), name, metamodel);
-	}
-
-	/**
 	 * Try to obtain JPA Entity mapping class from given path name using given ClassLoader
-	 * @param classLoader ClassLoader to use
+	 * @param entityManagerFactory EntityManagerFactory to use
 	 * @param name Path name (not null)
-	 * @param metamodel JPA Metamodel (not null)
 	 * @return Entity class, or <code>null</code> target was null
 	 */
-	public synchronized static Optional<Class<?>> resolveEntityClass(ClassLoader classLoader, String name,
-			Metamodel metamodel) {
+	public synchronized static Optional<Class<?>> resolveEntityClass(EntityManagerFactory entityManagerFactory,
+			String name) {
 
 		ObjectUtils.argumentNotNull(name, "Name must be not null");
-		ObjectUtils.argumentNotNull(metamodel, "Metamodel name must be not null");
-
-		final ClassLoader cl = (classLoader != null) ? classLoader : ClassUtils.getDefaultClassLoader();
+		ObjectUtils.argumentNotNull(entityManagerFactory, "EntityManagerFactory must be not null");
 
 		// check cache
-		Map<String, Class<?>> mappings = ENTITY_TARGETS.getOrDefault(cl, Collections.emptyMap());
+		Map<String, Class<?>> mappings = ENTITY_TARGETS.getOrDefault(entityManagerFactory, Collections.emptyMap());
 		if (mappings.containsKey(name)) {
 			return Optional.of(mappings.get(name));
 		}
 
 		// try to resolve by entity name
-		Optional<Class<?>> entityClass = metamodel.getEntities().stream().filter(e -> e.getName().equals(name))
-				.findFirst().map(e -> e.getJavaType());
+		Optional<Class<?>> entityClass = entityManagerFactory.getMetamodel().getEntities().stream()
+				.filter(e -> e.getName().equals(name)).findFirst().map(e -> e.getJavaType());
 		// try to resolve by entity type
 		if (!entityClass.isPresent()) {
-			entityClass = metamodel.getEntities().stream().filter(e -> e.getJavaType().getName().equals(name))
-					.findFirst().map(e -> e.getJavaType());
+			entityClass = entityManagerFactory.getMetamodel().getEntities().stream()
+					.filter(e -> e.getJavaType().getName().equals(name)).findFirst().map(e -> e.getJavaType());
 		}
 
 		// cache value
-		entityClass.ifPresent(e -> ENTITY_TARGETS.computeIfAbsent(cl, c -> new HashMap<>()).put(name, e));
+		entityClass.ifPresent(
+				e -> ENTITY_TARGETS.computeIfAbsent(entityManagerFactory, c -> new HashMap<>()).put(name, e));
 
 		return entityClass;
 

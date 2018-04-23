@@ -1,0 +1,79 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+
+	<persistence-unit name="test_hibernate"
+		transaction-type="RESOURCE_LOCAL">
+		<!-- Persistence provider -->
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<!-- Entity classes -->
+		<class>com.holonplatform.datastore.jpa.test.model.entity.Test1</class>
+		<class>com.holonplatform.datastore.jpa.test.model.entity.Test2</class>
+		<class>com.holonplatform.datastore.jpa.test.model.entity.Test3</class>
+		<class>com.holonplatform.datastore.jpa.test.model.entity.Test3Pk</class>
+		<class>com.holonplatform.datastore.jpa.test.model.entity.TestRec</class>
+		<class>com.holonplatform.datastore.jpa.test.model.entity.TestTx</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- Configuration properties -->
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:h2:mem:datastore1;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="" />
+			<!-- <property name="hibernate.show_sql" value="true" /> -->
+			<property name="hibernate.hbm2ddl.auto" value="none" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="test_metamodel"
+		transaction-type="RESOURCE_LOCAL">
+		<!-- Persistence provider -->
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<!-- Entity classes -->
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.SingleIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.SinglePrimitiveIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.EmbeddedIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.EmbeddedEntityId</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.MultiEmbeddedIdEntity</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.MultiEmbeddedId</class>
+		<class>com.holonplatform.datastore.jpa.test.model.metamodel.IdClassEntity</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- Configuration properties -->
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:h2:mem:metamodel;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="hibernate.hbm2ddl.auto" value="none" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="test_datanucleus"
+		transaction-type="RESOURCE_LOCAL">
+		<!-- Persistence provider -->
+		<provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
+		<!-- Entity classes -->
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.Test1</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.Test2</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.Test3</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.Test3Pk</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.TestRec</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.TestTx</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.TestNested</class>
+		<class>com.holonplatform.datastore.jpa.test.model.dentity.SubNested</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- Configuration properties -->
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:h2:mem:datastore4;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

@@ -20,14 +20,12 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.relational.SubQuery;
-import com.holonplatform.core.internal.query.QueryStructure;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLQueryComposition;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext.AliasMode;
+import com.holonplatform.core.query.QueryOperation;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLQueryDefinition;
 
 /**
  * {@link SubQuery} expression resolver.
@@ -36,7 +34,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE - 100)
-public enum SubQueryResolver implements ExpressionResolver<SubQuery, JPQLToken> {
+public enum SubQueryResolver implements JPQLContextExpressionResolver<SubQuery, JPQLExpression> {
 
 	INSTANCE;
 
@@ -54,35 +52,27 @@ public enum SubQueryResolver implements ExpressionResolver<SubQuery, JPQLToken> 
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<JPQLToken> resolve(SubQuery expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(SubQuery expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
-		try {
-			JpaResolutionContext subQueryContext = JpaResolutionContext.checkContext(context)
-					.childContext(AliasMode.AUTO);
+		// resolve as JPQLQueryDefinition
+		final JPQLQueryDefinition definition = context.resolveOrFail(
+				QueryOperation.create(expression.getQueryConfiguration(), expression.getSelection()),
+				JPQLQueryDefinition.class);
 
-			// resolve query
-			final JPQLQueryComposition<?, ?> query = JpaDatastoreUtils.resolveExpression(subQueryContext,
-					QueryStructure.create(expression.getQueryConfiguration(), expression.getSelection()),
-					JPQLQueryComposition.class, subQueryContext);
-
-			// return subquery expression
-			return Optional.of(JPQLToken.create(query.serialize()));
-
-		} catch (Exception e) {
-			throw new InvalidExpressionException("Failed to resolve sub query [" + expression + "]", e);
-		}
+		// serialize query
+		return context.resolve(definition, JPQLExpression.class);
 	}
 
 }

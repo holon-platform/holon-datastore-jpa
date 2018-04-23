@@ -19,10 +19,11 @@ import java.util.Map;
 
 import javax.persistence.Tuple;
 
+import com.holonplatform.core.TypedExpression;
+import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.property.Property;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.property.PropertySet;
-import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
 
 /**
  * {@link PropertyBox} {@link Tuple} converter.
@@ -31,29 +32,42 @@ import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
  */
 public class PropertyBoxTupleConverter extends AbstractPropertyBoxConverter<Tuple> {
 
-	public PropertyBoxTupleConverter(PropertySet<?> propertySet, Property<?>[] selection,
-			Map<Property<?>, String> selectionAlias) {
-		super(propertySet, selection, selectionAlias);
+	/**
+	 * Constructor.
+	 * @param propertySet Property set to use to build the {@link PropertyBox} instance (not null)
+	 * @param selection Query selection (not null)
+	 * @param selectionAlias Selection aliases
+	 * @param selectionProperties Selection properties
+	 */
+	public PropertyBoxTupleConverter(PropertySet<?> propertySet, TypedExpression<?>[] selection,
+			Map<TypedExpression<?>, String> selectionAlias, Map<TypedExpression<?>, Property<?>> selectionProperties) {
+		super(propertySet, selection, selectionAlias, selectionProperties);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.internal.jpql.converters.AbstractPropertyBoxConverter#getResult(com.holonplatform
-	 * .core.property.Property, java.lang.Object, java.lang.String, int)
+	 * @see com.holonplatform.datastore.jpa.operation.JpaResultConverter#getQueryResultType()
 	 */
 	@Override
-	protected Object getResult(Property<?> property, Tuple queryResult, String alias, int index)
-			throws QueryResultConversionException {
-		if (alias == null) {
-			throw new QueryResultConversionException(
-					"Missing selection alias for selection property [" + property + "]");
-		}
+	public Class<? extends Tuple> getQueryResultType() {
+		return Tuple.class;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.internal.converters.AbstractPropertyBoxConverter#getResult(java.lang.Object,
+	 * java.lang.String, int)
+	 */
+	@Override
+	protected Object getResult(Tuple queryResult, String alias, int index) throws DataAccessException {
 		try {
-			return getResult(property, queryResult.get(alias));
-		} catch (IllegalArgumentException e) {
-			throw new QueryResultConversionException("Failed to obtain result from tuple using alias [" + alias + "]",
-					e);
+			if (alias == null) {
+				return queryResult.get(index);
+			}
+			return queryResult.get(alias);
+		} catch (Exception e) {
+			throw new DataAccessException("Failed to obtain result from tuple [" + queryResult + "] at index [" + index
+					+ "] with alias [" + alias + "]", e);
 		}
 	}
 

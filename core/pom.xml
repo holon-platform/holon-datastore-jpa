@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>com.holon-platform.jpa</groupId>
 		<artifactId>holon-datastore-jpa-root</artifactId>
-		<version>5.0.5-SNAPSHOT</version>
+		<version>5.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>holon-datastore-jpa</artifactId>
@@ -14,6 +15,21 @@
 	<description>Holon Datastore implementation for JPA</description>
 
 	<url>https://holon-platform.com</url>
+
+	<build>
+		<plugins>
+			<!-- Unit test -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>com/holonplatform/datastore/jpa/test/Test*.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencyManagement>
 		<dependencies>
@@ -46,6 +62,13 @@
 			<version>${holon.jdbc.version}</version>
 		</dependency>
 
+		<!-- Holon jpa -->
+		<dependency>
+			<groupId>com.holon-platform.jpa</groupId>
+			<artifactId>holon-jpa-bean-processors</artifactId>
+			<version>${holon.jpa.version}</version>
+		</dependency>
+
 		<!-- JPA 2.1 API -->
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>
@@ -66,11 +89,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 			<version>${hikaricp.version}</version>
@@ -84,6 +102,25 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.7.25</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Test ORMs -->
+
+		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>${hibernate.version}</version>
@@ -95,27 +132,129 @@
 			<version>${eclipselink.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.openjpa</groupId>
+			<artifactId>openjpa</artifactId>
+			<version>${openjpa.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-core</artifactId>
+			<version>${datanucleus.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-api-jpa</artifactId>
+			<version>5.1.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-rdbms</artifactId>
+			<version>${datanucleus.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>openjpa</id>
+			<build>
+				<plugins>
+					<!-- Unit test -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>com/holonplatform/datastore/jpa/test/OpenJpaTest.java</include>
+							</includes>
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</plugin>
+					<!-- OpenJPA entity enhancement -->
+					<plugin>
+						<groupId>org.apache.openjpa</groupId>
+						<artifactId>openjpa-maven-plugin</artifactId>
+						<version>${openjpa.version}</version>
+						<configuration>
+							<includes>**/test/model/oentity/*.class</includes>
+							<addDefaultConstructor>true</addDefaultConstructor>
+							<persistenceXmlFile>src/test/resources/META-INF/persistence-openjpa.xml</persistenceXmlFile>
+						</configuration>
+						<executions>
+							<execution>
+								<id>enhancer</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>test-enhance</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.openjpa</groupId>
+								<artifactId>openjpa</artifactId>
+								<version>${openjpa.version}</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>datanucleus</id>
+			<build>
+				<plugins>
+					<!-- Unit test -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>com/holonplatform/datastore/jpa/test/DatanucleusTest.java</include>
+							</includes>
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</plugin>
+					<!-- Danucleus entity enhancer -->
+					<plugin>
+						<groupId>org.datanucleus</groupId>
+						<artifactId>datanucleus-maven-plugin</artifactId>
+						<version>5.0.2</version>
+						<configuration>
+							<api>JPA</api>
+							<log4jConfiguration>${project.basedir}/src/test/resources/log4j-datanucleus.properties</log4jConfiguration>
+							<persistenceUnitName>test_datanucleus</persistenceUnitName>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>test-enhance</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.datanucleus</groupId>
+								<artifactId>datanucleus-core</artifactId>
+								<version>${datanucleus.version}</version>
+							</dependency>
+							<dependency>
+								<groupId>org.datanucleus</groupId>
+								<artifactId>datanucleus-api-jpa</artifactId>
+								<version>5.1.4</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

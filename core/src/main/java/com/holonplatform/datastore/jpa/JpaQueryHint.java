@@ -17,6 +17,7 @@ package com.holonplatform.datastore.jpa;
 
 import java.io.Serializable;
 
+import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.query.Query;
 import com.holonplatform.datastore.jpa.internal.DefaultQueryHint;
 
@@ -29,13 +30,13 @@ import com.holonplatform.datastore.jpa.internal.DefaultQueryHint;
 public interface JpaQueryHint extends Serializable {
 
 	/**
-	 * {@link Query} parameter to set a query hint (use {@link Query#parameter(String, Object)} to set query
-	 * parameters).
+	 * A {@link Query} parameter to set a JPA query hint, using {@link Query#parameter(ConfigProperty, Object)}.
 	 * <p>
-	 * Parameter value must be a {@link JpaQueryHint} instance.
+	 * The {@link JpaQueryHint} class must be used to provide the query hint name and value.
 	 * </p>
 	 */
-	public static final String QUERY_PARAMETER_HINT = "jpaQueryHint";
+	public static final ConfigProperty<JpaQueryHint> QUERY_PARAMETER_HINT = ConfigProperty.create("jpaQueryHint",
+			JpaQueryHint.class);
 
 	/**
 	 * Hint name

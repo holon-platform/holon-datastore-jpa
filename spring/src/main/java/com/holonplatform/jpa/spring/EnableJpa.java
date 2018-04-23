@@ -38,7 +38,7 @@ import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.jdbc.DataSourceConfigProperties;
 import com.holonplatform.jdbc.spring.SpringDataSourceConfigProperties;
 import com.holonplatform.jpa.spring.internal.JpaRegistrar;
-import com.holonplatform.spring.internal.PrimaryMode;
+import com.holonplatform.spring.PrimaryMode;
 
 /**
  * Annotation to be used on Spring Configuration classes to setup a full JPA enviroment bean stack: DataSource (if not
@@ -156,10 +156,10 @@ public @interface EnableJpa {
 	 * invoked. Affected methods are:
 	 * <ul>
 	 * <li>{@link Datastore#refresh(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox)}</li>
-	 * <li>{@link Datastore#insert(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.Datastore.WriteOption...)}
-	 * <li>{@link Datastore#update(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.Datastore.WriteOption...)}
-	 * <li>{@link Datastore#save(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.Datastore.WriteOption...)}</li>
-	 * <li>{@link Datastore#delete(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.Datastore.WriteOption...)}</li>
+	 * <li>{@link Datastore#insert(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.DatastoreOperations.WriteOption...)}</li>
+	 * <li>{@link Datastore#update(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.DatastoreOperations.WriteOption...)}</li>
+	 * <li>{@link Datastore#save(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.DatastoreOperations.WriteOption...)}</li>
+	 * <li>{@link Datastore#delete(com.holonplatform.core.datastore.DataTarget, com.holonplatform.core.property.PropertyBox, com.holonplatform.core.datastore.DatastoreOperations.WriteOption...)}</li>
 	 * </ul>
 	 * @return Whether to add {@link Transactional} behaviour to transactional datastore methods. Defaults to
 	 *         <code>true</code>.

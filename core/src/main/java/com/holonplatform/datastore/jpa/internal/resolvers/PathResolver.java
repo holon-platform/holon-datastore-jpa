@@ -20,11 +20,10 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.Path;
-import com.holonplatform.core.datastore.DataTarget;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link Path} expression resolver.
@@ -33,7 +32,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum PathResolver implements ExpressionResolver<Path, JPQLToken> {
+public enum PathResolver implements JPQLContextExpressionResolver<Path, JPQLExpression> {
 
 	INSTANCE;
 
@@ -51,46 +50,38 @@ public enum PathResolver implements ExpressionResolver<Path, JPQLToken> {
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(Path expression, ResolutionContext context) throws InvalidExpressionException {
+	public Optional<JPQLExpression> resolve(Path expression, JPQLResolutionContext context)
+			throws InvalidExpressionException {
 
-		final JpaResolutionContext ctx = JpaResolutionContext.checkContext(context);
+		// validate
+		expression.validate();
 
-		// intermediate resolution and validation
-		Path<?> path = context.resolve(expression, Path.class, context).orElse(expression);
-		path.validate();
-
-		// data targets
-		if (DataTarget.class.isAssignableFrom(path.getClass())) {
-			return Optional.of(JPQLToken.create(ctx.getTargetAlias(expression).orElse(path.getName())));
-		}
+		// intermediate resolution
+		final Path<?> path = context.resolve(expression, Path.class).orElse(expression);
 
 		// get path name
 		final String name = path.relativeName();
 
-		// ignore wildcard resolution
-		if ("*".equals(name)) {
-			return Optional.of(JPQLToken.create(name));
+		// check parent alias
+		Optional<String> alias = path.getParent()
+				.flatMap(parent -> context.isStatementCompositionContext().flatMap(ctx -> ctx.getAliasOrRoot(parent)));
+		if (!alias.isPresent()) {
+			alias = context.isStatementCompositionContext().flatMap(ctx -> ctx.getAliasOrRoot(path));
 		}
 
-		// Root parent
-		Path<?> parent = path.getParent().orElse(null);
-		while (parent != null && !DataTarget.class.isAssignableFrom(parent.getClass())) {
-			parent = parent.getParent().orElse(null);
-		}
+		// serialize path
+		return Optional.of(JPQLExpression.create(alias.map(a -> a + "." + name).orElse(name)));
 
-		// resolve checking alias
-		String jpql = ctx.getTargetAlias(parent).map(a -> a + "." + name).orElse(name);
-		return Optional.of(JPQLToken.create(jpql));
 	}
 
 }

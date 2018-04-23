@@ -20,10 +20,10 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.internal.datastore.relational.NotExistsFilter;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link NotExistsFilter} expression resolver.
@@ -31,7 +31,7 @@ import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
  * @since 5.0.0
  */
 @Priority(Integer.MAX_VALUE - 50)
-public enum NotExistFilterResolver implements ExpressionResolver<NotExistsFilter, JPQLToken> {
+public enum NotExistFilterResolver implements JPQLContextExpressionResolver<NotExistsFilter, JPQLExpression> {
 
 	INSTANCE;
 
@@ -49,17 +49,17 @@ public enum NotExistFilterResolver implements ExpressionResolver<NotExistsFilter
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(NotExistsFilter expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(NotExistsFilter expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
@@ -69,12 +69,11 @@ public enum NotExistFilterResolver implements ExpressionResolver<NotExistsFilter
 		sb.append("NOT EXISTS (");
 
 		// resolve sub query
-		sb.append(JpaDatastoreUtils.resolveExpression(context, expression.getSubQuery(), JPQLToken.class, context)
-				.getValue());
+		sb.append(context.resolveOrFail(expression.getSubQuery(), JPQLExpression.class).getValue());
 
 		sb.append(")");
 
-		return Optional.of(JPQLToken.create(sb.toString()));
+		return Optional.of(JPQLExpression.create(sb.toString()));
 	}
 
 }

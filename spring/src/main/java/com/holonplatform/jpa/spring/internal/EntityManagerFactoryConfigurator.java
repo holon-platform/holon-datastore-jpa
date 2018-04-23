@@ -271,8 +271,6 @@ class EntityManagerFactoryConfigurator {
 	protected JpaVendorAdapter buildJpaVendorAdapter(ORMPlatform orm) {
 		AbstractJpaVendorAdapter adapter = null;
 		switch (orm) {
-		case BATOO:
-			break;
 		case DATANUCLEUS:
 			break;
 		case ECLIPSELINK:

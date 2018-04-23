@@ -43,7 +43,7 @@ import com.holonplatform.datastore.jpa.JpaTarget;
 import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 import com.holonplatform.jpa.spring.test.domain2.TestJpaDomain2;
-import com.holonplatform.spring.internal.PrimaryMode;
+import com.holonplatform.spring.PrimaryMode;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestMultiDataContextWithPrimary.Config.class)

@@ -24,7 +24,7 @@ import com.holonplatform.core.query.QueryProjection;
 import com.holonplatform.datastore.jpa.internal.DefaultJpaTarget;
 
 /**
- * A {@link DataTarget} bound to a JPA Entity
+ * A {@link DataTarget} bound to a JPA Entity.
  * 
  * @param <T> Entity class type
  *
@@ -43,8 +43,8 @@ public interface JpaTarget<T> extends DataTarget<T>, QueryProjection<T> {
 	/**
 	 * Build a {@link JpaTarget} using given <code>entityClass</code>
 	 * @param <T> Entity class type
-	 * @param entityClass JPA entity mapping class (not null)
-	 * @return A JpaTarget on given entity class
+	 * @param entityClass JPA entity class (not null)
+	 * @return A new {@link JpaTarget}
 	 */
 	static <T> JpaTarget<T> of(Class<T> entityClass) {
 		return new DefaultJpaTarget<>(entityClass);

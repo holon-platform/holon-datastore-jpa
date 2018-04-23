@@ -1,3 +1,0 @@
-com.holonplatform.datastore.jpa.internal.beans.JpaTemporalBeanPropertyPostProcessor
-com.holonplatform.datastore.jpa.internal.beans.JpaEnumeratedBeanPropertyPostProcessor
-com.holonplatform.datastore.jpa.internal.beans.JpaConfigBeanPropertyPostProcessor

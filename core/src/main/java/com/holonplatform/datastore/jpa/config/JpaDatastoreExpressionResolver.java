@@ -19,6 +19,7 @@ import java.util.ServiceLoader;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.core.ExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
 
 /**
  * JPA {@link ExpressionResolver} extension type to allow automatic registration using Java {@link ServiceLoader}
@@ -31,6 +32,6 @@ import com.holonplatform.core.ExpressionResolver;
  * @since 5.0.0
  */
 public interface JpaDatastoreExpressionResolver<E extends Expression, R extends Expression>
-		extends ExpressionResolver<E, R> {
+		extends JPQLContextExpressionResolver<E, R> {
 
 }

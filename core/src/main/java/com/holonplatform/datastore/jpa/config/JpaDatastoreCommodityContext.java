@@ -15,51 +15,14 @@
  */
 package com.holonplatform.datastore.jpa.config;
 
-import java.util.Optional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
 import com.holonplatform.core.datastore.DatastoreCommodityContext;
-import com.holonplatform.datastore.jpa.JpaDatastore;
-import com.holonplatform.datastore.jpa.ORMPlatform;
+import com.holonplatform.datastore.jpa.context.JpaOperationContext;
 
 /**
  * JPA Datastore {@link DatastoreCommodityContext}.
  *
  * @since 5.0.0
  */
-public interface JpaDatastoreCommodityContext extends DatastoreCommodityContext, JpaDatastore {
-
-	/**
-	 * Get the EntityManagerFactory.
-	 * @return The EntityManagerFactory
-	 */
-	EntityManagerFactory getEntityManagerFactory();
-
-	/**
-	 * Obtain an {@link EntityManager} instance using configured {@link EntityManagerInitializer}.
-	 * @return A new {@link EntityManager} instance
-	 */
-	EntityManager getEntityManager();
-
-	/**
-	 * Get the ORM platform, if detected.
-	 * @return Optional ORM platform
-	 */
-	Optional<ORMPlatform> getORMPlatform();
-
-	/**
-	 * Checks whether to auto-flush mode is enabled. When auto-flush mode is enabled, {@link EntityManager#flush()} is
-	 * called after each Datastore data manipulation operation, such as <code>save</code> or <code>delete</code>.
-	 * @return <code>true</code> if auto-flush mode is enabled, <code>false</code> otherwise
-	 */
-	boolean isAutoFlush();
-
-	/**
-	 * Get whether to trace Datastore operations.
-	 * @return the trace <code>true</code> if tracing is enabled, <code>false</code> otherwise
-	 */
-	boolean isTraceEnabled();
+public interface JpaDatastoreCommodityContext extends JpaOperationContext, DatastoreCommodityContext {
 
 }

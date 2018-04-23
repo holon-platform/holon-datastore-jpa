@@ -19,7 +19,10 @@ import java.util.Map;
 
 import com.holonplatform.core.Path;
 import com.holonplatform.core.beans.BeanPropertySet;
-import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
+import com.holonplatform.core.exceptions.DataAccessException;
+import com.holonplatform.core.internal.utils.ObjectUtils;
+import com.holonplatform.datastore.jpa.context.JpaExecutionContext;
+import com.holonplatform.datastore.jpa.jpql.JPQLValueDeserializer;
 
 /**
  * Abstract bean query results converter.
@@ -29,16 +32,34 @@ import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
  * 
  * @since 5.0.0
  */
-public abstract class AbstractBeanConverter<Q, T> extends AbstractConverter<Q, T> {
+public abstract class AbstractBeanConverter<Q, T> extends AbstractResultConverter<Q, T> {
 
+	/**
+	 * Bean property set
+	 */
 	private final BeanPropertySet<T> beanPropertySet;
-	@SuppressWarnings("rawtypes")
-	private final Path[] selection;
+
+	/**
+	 * Selection
+	 */
+	private final Path<?>[] selection;
+
+	/**
+	 * Selection alias
+	 */
 	private final Map<Path<?>, String> selectionAlias;
 
+	/**
+	 * Constructor.
+	 * @param beanPropertySet Bean property set (not null)
+	 * @param selection Selection paths (not null)
+	 * @param selectionAlias Selection aliases
+	 */
 	public AbstractBeanConverter(BeanPropertySet<T> beanPropertySet, Path<?>[] selection,
 			Map<Path<?>, String> selectionAlias) {
 		super();
+		ObjectUtils.argumentNotNull(beanPropertySet, "BeanPropertySet must be not null");
+		ObjectUtils.argumentNotNull(selection, "Selection must be not null");
 		this.beanPropertySet = beanPropertySet;
 		this.selection = selection;
 		this.selectionAlias = selectionAlias;
@@ -46,32 +67,60 @@ public abstract class AbstractBeanConverter<Q, T> extends AbstractConverter<Q, T
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.internal.jpql.expressions.QueryResultConverter#convert(java.lang.Object)
+	 * @see com.holonplatform.datastore.jpa.operation.JpaResultConverter#getConversionType()
+	 */
+	@Override
+	public Class<? extends T> getConversionType() {
+		return beanPropertySet.getBeanClass();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.datastore.jpa.operation.JpaResultConverter#convert(com.holonplatform.datastore.jpa.context.
+	 * JpaExecutionContext, java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public T convert(Q result) throws QueryResultConversionException {
+	public T convert(JpaExecutionContext context, Q result) throws DataAccessException {
+
+		final JPQLValueDeserializer deserializer = context.getValueDeserializer();
+
+		T instance;
 		try {
-
-			T instance = beanPropertySet.getBeanClass().newInstance();
-
-			for (int i = 0; i < selection.length; i++) {
-				beanPropertySet.write(selection[i],
-						getResult(selection[i], result, selectionAlias.get(selection[i]), i), instance);
-			}
-
-			return instance;
-
+			instance = beanPropertySet.getBeanClass().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			throw new QueryResultConversionException("Unsupporterted bean projection type - bean class ["
-					+ beanPropertySet.getBeanClass().getName() + "] must provide a public empty constructor", e);
-		} catch (Exception e) {
-			throw new QueryResultConversionException(
-					"Failed to convert results using bean class [" + beanPropertySet.getBeanClass().getName() + "]", e);
+			throw new DataAccessException("Failed to istantiate bean class [" + beanPropertySet.getBeanClass() + "]",
+					e);
 		}
-	}
 
-	protected abstract Object getResult(Path<?> path, Q queryResult, String alias, int index)
-			throws QueryResultConversionException;
+		LOGGER.debug(() -> "Convert result to a bean instance of type [" + beanPropertySet.getBeanClass() + "]");
+
+		for (int i = 0; i < selection.length; i++) {
+
+			final Path<?> expression = selection[i];
+
+			// result index and alias
+			final int index = i;
+			final String alias = selectionAlias.get(expression);
+
+			// get result value
+			final Object value = getResult(result, alias, index);
+
+			LOGGER.debug(() -> "Result value for selection alias [" + alias + "] at index [" + index + "] is [" + value
+					+ "]");
+
+			// deserialize value
+			Object deserialized = deserializer.deserialize(context, expression, value);
+
+			LOGGER.debug(() -> "Deserialized value for selection alias [" + alias + "] at index [" + index + "] is ["
+					+ deserialized + "]");
+
+			// write value in bean instance
+			beanPropertySet.write((Path<Object>) expression, deserialized, instance);
+		}
+
+		return instance;
+	}
 
 }

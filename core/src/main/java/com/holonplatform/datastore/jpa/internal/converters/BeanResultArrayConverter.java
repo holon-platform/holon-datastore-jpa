@@ -19,8 +19,8 @@ import java.util.Map;
 
 import com.holonplatform.core.Path;
 import com.holonplatform.core.beans.BeanPropertySet;
+import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.query.BeanProjection;
-import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
 
 /**
  * {@link BeanProjection} results array converter.
@@ -31,6 +31,12 @@ import com.holonplatform.core.query.QueryResults.QueryResultConversionException;
  */
 public class BeanResultArrayConverter<T> extends AbstractBeanConverter<Object[], T> {
 
+	/**
+	 * Constructor.
+	 * @param beanPropertySet Bean property set (not null)
+	 * @param selection Selection paths (not null)
+	 * @param selectionAlias Selection aliases
+	 */
 	public BeanResultArrayConverter(BeanPropertySet<T> beanPropertySet, Path<?>[] selection,
 			Map<Path<?>, String> selectionAlias) {
 		super(beanPropertySet, selection, selectionAlias);
@@ -38,18 +44,24 @@ public class BeanResultArrayConverter<T> extends AbstractBeanConverter<Object[],
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.internal.jpql.converters.AbstractBeanConverter#getResult(com.holonplatform.core.
-	 * Path, java.lang.Object, java.lang.String, int)
+	 * @see com.holonplatform.datastore.jpa.operation.JpaResultConverter#getQueryResultType()
 	 */
 	@Override
-	protected Object getResult(Path<?> path, Object[] queryResult, String alias, int index)
-			throws QueryResultConversionException {
+	public Class<? extends Object[]> getQueryResultType() {
+		return Object[].class;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.internal.converters.AbstractResultConverter#getResult(java.lang.Object,
+	 * java.lang.String, int)
+	 */
+	@Override
+	protected Object getResult(Object[] queryResult, String alias, int index) throws DataAccessException {
 		if (index < 0 || index > (queryResult.length - 1)) {
-			throw new QueryResultConversionException(
-					"Invalid index [" + index + "] - Tuple size: " + queryResult.length);
+			throw new DataAccessException("Invalid result index [" + index + "] - Tuple size: " + queryResult.length);
 		}
-		return getResult(path, queryResult[index]);
+		return queryResult[index];
 	}
 
 }

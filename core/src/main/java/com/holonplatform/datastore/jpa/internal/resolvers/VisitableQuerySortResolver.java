@@ -23,16 +23,15 @@ import java.util.stream.Collectors;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.internal.query.QuerySortVisitor;
 import com.holonplatform.core.internal.query.QuerySortVisitor.VisitableQuerySort;
 import com.holonplatform.core.internal.query.QueryUtils;
 import com.holonplatform.core.query.QuerySort.CompositeQuerySort;
 import com.holonplatform.core.query.QuerySort.PathQuerySort;
 import com.holonplatform.core.query.QuerySort.SortDirection;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * JPA {@link VisitableQuerySort} expression resolver.
@@ -40,8 +39,8 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  * @since 5.0.0
  */
 @Priority(Integer.MAX_VALUE - 10)
-public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQuerySort, JPQLToken>,
-		QuerySortVisitor<JPQLToken, JpaResolutionContext> {
+public enum VisitableQuerySortResolver implements JPQLContextExpressionResolver<VisitableQuerySort, JPQLExpression>,
+		QuerySortVisitor<JPQLExpression, JPQLResolutionContext> {
 
 	INSTANCE;
 
@@ -59,8 +58,8 @@ public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQu
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
@@ -69,14 +68,14 @@ public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQu
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(VisitableQuerySort expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(VisitableQuerySort expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
 		// resolve using visitor
-		return Optional.ofNullable(expression.accept(this, JpaResolutionContext.checkContext(context)));
+		return Optional.ofNullable(expression.accept(this, context));
 	}
 
 	/*
@@ -85,16 +84,16 @@ public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQu
 	 * PathQuerySort, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(PathQuerySort<?> sort, JpaResolutionContext context) {
+	public JPQLExpression visit(PathQuerySort<?> sort, JPQLResolutionContext context) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(JpaDatastoreUtils.resolveExpression(context, sort.getPath(), JPQLToken.class, context).getValue());
+		sb.append(context.resolveOrFail(sort.getPath(), JPQLExpression.class).getValue());
 		sb.append(" ");
 		if (sort.getDirection() == SortDirection.ASCENDING) {
 			sb.append("asc");
 		} else {
 			sb.append("desc");
 		}
-		return JPQLToken.create(sb.toString());
+		return JPQLExpression.create(sb.toString());
 	}
 
 	/*
@@ -103,12 +102,12 @@ public enum VisitableQuerySortResolver implements ExpressionResolver<VisitableQu
 	 * CompositeQuerySort, java.lang.Object)
 	 */
 	@Override
-	public JPQLToken visit(CompositeQuerySort sort, JpaResolutionContext context) {
+	public JPQLExpression visit(CompositeQuerySort sort, JPQLResolutionContext context) {
 		List<String> resolved = new LinkedList<>();
 		QueryUtils.flattenQuerySort(sort).forEach(s -> {
-			resolved.add(JpaDatastoreUtils.resolveExpression(context, s, JPQLToken.class, context).getValue());
+			resolved.add(context.resolveOrFail(s, JPQLExpression.class).getValue());
 		});
-		return JPQLToken.create(resolved.stream().collect(Collectors.joining(",")));
+		return JPQLExpression.create(resolved.stream().collect(Collectors.joining(",")));
 	}
 
 }

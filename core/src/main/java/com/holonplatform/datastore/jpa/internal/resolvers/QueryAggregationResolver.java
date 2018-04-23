@@ -21,18 +21,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.Path;
 import com.holonplatform.core.query.QueryAggregation;
-import com.holonplatform.datastore.jpa.internal.JpaDatastoreUtils;
-import com.holonplatform.datastore.jpa.internal.expressions.JPQLToken;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 
 /**
  * {@link QueryAggregation} expression resolver.
  *
  * @since 5.0.0
  */
-public enum QueryAggregationResolver implements ExpressionResolver<QueryAggregation, JPQLToken> {
+public enum QueryAggregationResolver implements JPQLContextExpressionResolver<QueryAggregation, JPQLExpression> {
 
 	INSTANCE;
 
@@ -50,18 +50,18 @@ public enum QueryAggregationResolver implements ExpressionResolver<QueryAggregat
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
-	public Class<? extends JPQLToken> getResolvedType() {
-		return JPQLToken.class;
+	public Class<? extends JPQLExpression> getResolvedType() {
+		return JPQLExpression.class;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.Expression.ExpressionResolverFunction#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLToken> resolve(QueryAggregation expression,
-			com.holonplatform.core.ExpressionResolver.ResolutionContext context) throws InvalidExpressionException {
+	public Optional<JPQLExpression> resolve(QueryAggregation expression, JPQLResolutionContext context)
+			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
@@ -71,15 +71,15 @@ public enum QueryAggregationResolver implements ExpressionResolver<QueryAggregat
 		// group by
 		List<String> groupBys = new ArrayList<>(expression.getAggregationPaths().length);
 		for (Path<?> path : expression.getAggregationPaths()) {
-			groupBys.add(JpaDatastoreUtils.resolveExpression(context, path, JPQLToken.class, context).getValue());
+			groupBys.add(context.resolveOrFail(path, JPQLExpression.class).getValue());
 		}
 		sb.append(groupBys.stream().collect(Collectors.joining(",")));
 		// having
 		expression.getAggregationFilter().ifPresent(f -> {
 			sb.append(" HAVING ");
-			sb.append(JpaDatastoreUtils.resolveExpression(context, f, JPQLToken.class, context).getValue());
+			sb.append(context.resolveOrFail(f, JPQLExpression.class).getValue());
 		});
 
-		return Optional.of(JPQLToken.create(sb.toString()));
+		return Optional.of(JPQLExpression.create(sb.toString()));
 	}
 }

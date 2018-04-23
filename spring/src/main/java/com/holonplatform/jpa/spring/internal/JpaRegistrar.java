@@ -51,12 +51,13 @@ import com.holonplatform.jdbc.spring.EnableDataSource;
 import com.holonplatform.jdbc.spring.internal.DataSourceRegistrar;
 import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.JpaConfigProperties;
+import com.holonplatform.jpa.spring.JpaDatastoreConfigProperties;
 import com.holonplatform.spring.EnvironmentConfigPropertyProvider;
+import com.holonplatform.spring.PrimaryMode;
 import com.holonplatform.spring.internal.AbstractConfigPropertyRegistrar;
 import com.holonplatform.spring.internal.BeanRegistryUtils;
 import com.holonplatform.spring.internal.DefaultEnvironmentConfigPropertyProvider;
 import com.holonplatform.spring.internal.GenericDataContextBoundBeanDefinition;
-import com.holonplatform.spring.internal.PrimaryMode;
 
 /**
  * Registrar for JPA beans registration using {@link EnableJpa} annotation.
@@ -384,9 +385,19 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 		boolean enableDatastore = BeanRegistryUtils.getAnnotationValue(attributes, "enableDatastore", true);
 		if (enableDatastore) {
 			// register a JpaDatastore
-			JpaDatastoreRegistrar.registerDatastore(registry, dataContextId, primaryMode, emfBeanName,
-					BeanRegistryUtils.getAnnotationValue(attributes, "transactionalDatastore", true),
-					BeanRegistryUtils.getAnnotationValue(attributes, "autoFlush", false), beanClassLoader);
+
+			JpaDatastoreConfigProperties defaultConfig = JpaDatastoreConfigProperties.builder(dataContextId)
+					.withProperty(JpaDatastoreConfigProperties.PRIMARY,
+							(primaryMode == PrimaryMode.TRUE) ? Boolean.TRUE : null)
+					.withProperty(JpaDatastoreConfigProperties.AUTO_FLUSH,
+							BeanRegistryUtils.getAnnotationValue(attributes, "autoFlush", false))
+					.withProperty(JpaDatastoreConfigProperties.TRANSACTIONAL,
+							BeanRegistryUtils.getAnnotationValue(attributes, "transactionalDatastore", true))
+
+					.build();
+
+			JpaDatastoreRegistrar.registerDatastore(registry, environment, dataContextId, emfBeanName, defaultConfig,
+					beanClassLoader);
 		}
 
 		return emfBeanName;

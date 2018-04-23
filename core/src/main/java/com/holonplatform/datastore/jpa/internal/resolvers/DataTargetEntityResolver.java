@@ -15,16 +15,22 @@
  */
 package com.holonplatform.datastore.jpa.internal.resolvers;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
 
 import javax.annotation.Priority;
+import javax.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.datastore.DataTarget;
+import com.holonplatform.datastore.jpa.JpaTarget;
 import com.holonplatform.datastore.jpa.internal.EntityTargetCache;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaEntity;
-import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
+import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
+import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
  * {@link DataTarget} as {@link JpaEntity} resolver.
@@ -33,9 +39,14 @@ import com.holonplatform.datastore.jpa.internal.expressions.JpaResolutionContext
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum DataTargetEntityResolver implements ExpressionResolver<DataTarget, JpaEntity> {
+public enum DataTargetEntityResolver implements JPQLContextExpressionResolver<DataTarget, JpaEntity> {
 
+	/**
+	 * Singleton instance
+	 */
 	INSTANCE;
+
+	private final static WeakHashMap<EntityManagerFactory, Map<Class<?>, JpaEntity<?>>> ENTITY_CACHE = new WeakHashMap<>();
 
 	/*
 	 * (non-Javadoc)
@@ -57,25 +68,44 @@ public enum DataTargetEntityResolver implements ExpressionResolver<DataTarget, J
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.ExpressionResolver#resolve(com.holonplatform.core.Expression,
-	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
+	 * @see com.holonplatform.datastore.jpa.resolvers.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.context.JPQLResolutionContext)
 	 */
 	@Override
-	public Optional<JpaEntity> resolve(DataTarget expression, ResolutionContext context)
+	public Optional<JpaEntity> resolve(DataTarget expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
+		// validate
+		expression.validate();
+
 		// intermediate resolution and validation
-		DataTarget target = context.resolve(expression, DataTarget.class, context).orElse(expression);
-		target.validate();
+		DataTarget target = context.resolve(expression, DataTarget.class).orElse(expression);
 
-		// resolve entity class
-		Class<?> entityClass = EntityTargetCache
-				.resolveEntityClass(expression.getName(),
-						JpaResolutionContext.checkContext(context).getEntityManagerFactory().getMetamodel())
-				.orElseThrow(() -> new InvalidExpressionException("Invalid data target name [" + expression.getName()
-						+ "]: no matching entity class is available from JPA metamodel"));
+		final EntityManagerFactory emf = context.getEntityManagerFactory();
 
-		return Optional.of(JpaEntity.create(entityClass));
+		final Class<?> entityClass;
+
+		// get entity class
+		if (target instanceof JpaTarget) {
+			entityClass = ((JpaTarget<?>) target).getEntityClass();
+		} else {
+			entityClass = EntityTargetCache.resolveEntityClass(emf, target.getName())
+					.orElseThrow(() -> new InvalidExpressionException("Invalid data target name [" + target.getName()
+							+ "]: an entity class with given entity name is not available from JPA metamodel"));
+		}
+
+		// check cache
+		Map<Class<?>, JpaEntity<?>> cached = ENTITY_CACHE.getOrDefault(emf, Collections.emptyMap());
+		if (cached.containsKey(entityClass)) {
+			return Optional.of(cached.get(entityClass));
+		}
+
+		// create JpaEntity and cache it
+		final JpaEntity entity = JpaEntity.create(emf.getMetamodel(), entityClass);
+
+		ENTITY_CACHE.computeIfAbsent(emf, c -> new HashMap<>()).put(entityClass, entity);
+
+		return Optional.of(entity);
 	}
 
 }
