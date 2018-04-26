@@ -24,6 +24,7 @@ import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.datastore.DatastoreCommodity;
 import com.holonplatform.core.datastore.DatastoreCommodityRegistrar;
+import com.holonplatform.core.datastore.DatastoreOperations;
 import com.holonplatform.core.datastore.transaction.Transactional;
 import com.holonplatform.core.query.Query;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
@@ -66,7 +67,7 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 	/**
 	 * {@link JpaDatastore} builder.
 	 */
-	public interface Builder<D extends JpaDatastore> extends Datastore.Builder<D, Builder<D>> {
+	public interface Builder<D extends JpaDatastore> extends DatastoreOperations.Builder<D, Builder<D>> {
 
 		/**
 		 * Set the {@link EntityManagerFactory} to use to obtain {@link EntityManager}s used for datastore operations.
