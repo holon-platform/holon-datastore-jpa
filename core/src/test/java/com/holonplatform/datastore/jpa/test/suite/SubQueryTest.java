@@ -43,7 +43,7 @@ public class SubQueryTest extends AbstractJpaDatastoreSuiteTest {
 				.filter(KEY.nin(SubQuery.create(TEST3_CODE).target(TEST3).filter(TEST3_CODE.isNotNull()))).count();
 		assertEquals(1, count);
 
-		final PathProperty<Long> T_KEY = KEY.clone().parent(JPA_TARGET);
+		final PathProperty<Long> T_KEY = KEY.clone(b -> b.parent(JPA_TARGET));
 
 		count = getDatastore().query().target(JPA_TARGET)
 				.filter(SubQuery.create().target(TEST3).filter(TEST3_CODE.eq(T_KEY)).exists()).count();
