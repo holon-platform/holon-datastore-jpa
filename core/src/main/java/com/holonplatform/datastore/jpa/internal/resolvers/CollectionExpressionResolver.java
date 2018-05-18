@@ -21,18 +21,18 @@ import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
-import com.holonplatform.core.query.CollectionExpression;
+import com.holonplatform.core.query.CollectionConstantExpression;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLLiteral;
 
 /**
- * {@link CollectionExpression} resolver.
+ * {@link CollectionConstantExpression} resolver.
  *
  * @since 5.1.0
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE - 100)
-public enum CollectionExpressionResolver implements ExpressionResolver<CollectionExpression, JPQLExpression> {
+public enum CollectionExpressionResolver implements ExpressionResolver<CollectionConstantExpression, JPQLExpression> {
 
 	/**
 	 * Singleton instance.
@@ -44,8 +44,8 @@ public enum CollectionExpressionResolver implements ExpressionResolver<Collectio
 	 * @see com.holonplatform.core.ExpressionResolver#getExpressionType()
 	 */
 	@Override
-	public Class<? extends CollectionExpression> getExpressionType() {
-		return CollectionExpression.class;
+	public Class<? extends CollectionConstantExpression> getExpressionType() {
+		return CollectionConstantExpression.class;
 	}
 
 	/*
@@ -63,7 +63,7 @@ public enum CollectionExpressionResolver implements ExpressionResolver<Collectio
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLExpression> resolve(CollectionExpression expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(CollectionConstantExpression expression, ResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
@@ -72,7 +72,7 @@ public enum CollectionExpressionResolver implements ExpressionResolver<Collectio
 		// resolve as Literal
 		return context.resolve(
 				JPQLLiteral.create(expression.getModelValue(),
-						((CollectionExpression<?>) expression).getTemporalType().orElse(null)),
+						((CollectionConstantExpression<?>) expression).getTemporalType().orElse(null)),
 				JPQLExpression.class, context);
 	}
 }
