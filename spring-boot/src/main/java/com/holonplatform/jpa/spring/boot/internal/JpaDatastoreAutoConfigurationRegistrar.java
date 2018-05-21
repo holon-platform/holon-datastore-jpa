@@ -21,6 +21,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -83,12 +84,15 @@ public class JpaDatastoreAutoConfigurationRegistrar
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
-		for (String[] emfDefinition : BeanRegistryUtils.getBeanNamesWithDataContextId(registry, beanFactory,
-				EntityManagerFactory.class, AbstractEntityManagerFactoryBean.class)) {
-			// register JPA Datastore
-			final String dataContextId = emfDefinition[1];
-			JpaDatastoreRegistrar.registerDatastore(registry, environment, dataContextId, emfDefinition[0],
-					JpaDatastoreConfigProperties.builder(dataContextId).build(), beanClassLoader);
+		if (beanFactory instanceof ListableBeanFactory) {
+			for (String[] emfDefinition : BeanRegistryUtils.getBeanNamesWithDataContextId(registry,
+					(ListableBeanFactory) beanFactory, EntityManagerFactory.class,
+					AbstractEntityManagerFactoryBean.class)) {
+				// register JPA Datastore
+				final String dataContextId = emfDefinition[1];
+				JpaDatastoreRegistrar.registerDatastore(registry, environment, dataContextId, emfDefinition[0],
+						JpaDatastoreConfigProperties.builder(dataContextId).build(), beanClassLoader);
+			}
 		}
 	}
 

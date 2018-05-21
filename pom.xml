@@ -58,11 +58,11 @@
 		<bintray.package>holon-datastore-jpa</bintray.package>
 
 		<!-- Holon core -->
-		<holon.core.version>5.1.0</holon.core.version>
+		<holon.core.version>5.1.1</holon.core.version>
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.1.0</holon.jdbc.version>
+		<holon.jdbc.version>5.1.2</holon.jdbc.version>
 		<!-- Holon JPA -->
-		<holon.jpa.version>5.1.0</holon.jpa.version>
+		<holon.jpa.version>5.1.1</holon.jpa.version>
 
 		<!-- JPA -->
 		<hibernate.jpa.api.version>1.0.0.Final</hibernate.jpa.api.version>
@@ -80,7 +80,7 @@
 		<hikaricp.version>3.1.0</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.8.7</bytebuddy.version>
+		<bytebuddy.version>1.8.11</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.196</h2.version>
