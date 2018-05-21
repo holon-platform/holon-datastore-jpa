@@ -115,21 +115,23 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testFunctionExpression() {
-		inTransaction(() -> {
+		if (AbstractJpaDatastoreTestSuite.customFunctionExpressionTest) {
+			inTransaction(() -> {
 
-			PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 50101L).set(STR, "  toTrim ")
-					.set(NBOOL, true).build();
-			OperationResult result = getDatastore().insert(JPA_TARGET, value);
-			assertEquals(1, result.getAffectedCount());
+				PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 50101L).set(STR, "  toTrim ")
+						.set(NBOOL, true).build();
+				OperationResult result = getDatastore().insert(JPA_TARGET, value);
+				assertEquals(1, result.getAffectedCount());
 
-			String trimmed = getDatastore().query().withExpressionResolver(new TrimFunctionResolver())
-					.target(JPA_TARGET).filter(KEY.eq(50101L)).findOne(new TrimFunction(STR)).orElse(null);
+				String trimmed = getDatastore().query().withExpressionResolver(new TrimFunctionResolver())
+						.target(JPA_TARGET).filter(KEY.eq(50101L)).findOne(new TrimFunction(STR)).orElse(null);
 
-			assertEquals("toTrim", trimmed);
+				assertEquals("toTrim", trimmed);
 
-			getDatastore().delete(JPA_TARGET, value);
+				getDatastore().delete(JPA_TARGET, value);
 
-		});
+			});
+		}
 	}
 
 }
