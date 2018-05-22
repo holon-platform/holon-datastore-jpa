@@ -99,8 +99,8 @@ public class JpaAutoConfigurationRegistrar
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
 		if (beanFactory instanceof ListableBeanFactory) {
-			for (String[] dataSourceDefinition : BeanRegistryUtils.getBeanNamesWithDataContextId(registry, beanFactory,
-					DataSource.class, DataSourceFactoryBean.class)) {
+			for (String[] dataSourceDefinition : BeanRegistryUtils.getBeanNamesWithDataContextId(registry,
+					(ListableBeanFactory) beanFactory, DataSource.class, DataSourceFactoryBean.class)) {
 				final String dataSourceBeanName = dataSourceDefinition[0];
 				final String dataContextId = dataSourceDefinition[1];
 				// check EntityManagerFactory bean

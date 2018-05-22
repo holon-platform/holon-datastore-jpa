@@ -90,5 +90,7 @@ public abstract class AbstractJpaDatastoreTestSuite {
 	public static boolean updateWithFunctionTest = true;
 	
 	public static boolean updateNestedTest = true;
+	
+	public static boolean customFunctionExpressionTest = true;
 
 }

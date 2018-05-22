@@ -82,11 +82,11 @@
 			<version>${holon.jpa.version}</version>
 		</dependency>
 
-		<!-- JPA 2.1 API -->
+		<!-- JPA API -->
 		<dependency>
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.1-api</artifactId>
-			<version>${hibernate.jpa.api.version}</version>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
+			<version>${jpa.api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
