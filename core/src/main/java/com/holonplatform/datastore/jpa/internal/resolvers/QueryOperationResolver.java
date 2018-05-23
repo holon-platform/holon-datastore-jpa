@@ -113,6 +113,8 @@ public enum QueryOperationResolver implements JPQLContextExpressionResolver<Quer
 		});
 
 		// ------- select
+		clauses.setDistinct(configuration.isDistinct());
+
 		final JPQLProjection<?, ?> projection = queryContext.resolveOrFail(expression.getProjection(),
 				JPQLProjection.class);
 
@@ -120,7 +122,7 @@ public enum QueryOperationResolver implements JPQLContextExpressionResolver<Quer
 		clauses.setSelect(projection.getSelection().stream()
 				.map(s -> s + projection.getSelectionAlias(s).map(a -> " AS " + a).orElse(""))
 				.collect(Collectors.joining(", ")));
-		
+
 		// query result type
 		clauses.setQueryResultType(projection.getQueryResultType());
 		// result converter

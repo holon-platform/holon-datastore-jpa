@@ -34,6 +34,12 @@ public interface JPQLQueryDefinition extends Expression {
 	String getSelect();
 
 	/**
+	 * Get whether to add the DISTINCT clause.
+	 * @return Whether to add the DISTINCT clause
+	 */
+	boolean isDistinct();
+
+	/**
 	 * Get the <code>FROM</code> clause.
 	 * @return From SQL clause
 	 */

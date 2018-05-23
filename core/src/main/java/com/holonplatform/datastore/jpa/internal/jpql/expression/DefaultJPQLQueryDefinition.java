@@ -33,6 +33,11 @@ public class DefaultJPQLQueryDefinition implements JPQLQueryDefinition {
 	private String select;
 
 	/**
+	 * DISTINCT clause
+	 */
+	private boolean distinct;
+
+	/**
 	 * FROM clause
 	 */
 	private String from;
@@ -72,6 +77,11 @@ public class DefaultJPQLQueryDefinition implements JPQLQueryDefinition {
 	}
 
 	@Override
+	public boolean isDistinct() {
+		return distinct;
+	}
+
+	@Override
 	public String getFrom() {
 		return from;
 	}
@@ -97,6 +107,14 @@ public class DefaultJPQLQueryDefinition implements JPQLQueryDefinition {
 	 */
 	public void setSelect(String select) {
 		this.select = select;
+	}
+
+	/**
+	 * Set whether to add the DISTINCT caluse.
+	 * @param distinct Whether to add the DISTINCT caluse
+	 */
+	public void setDistinct(boolean distinct) {
+		this.distinct = distinct;
 	}
 
 	/**
