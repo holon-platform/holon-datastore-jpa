@@ -17,8 +17,8 @@ package com.holonplatform.datastore.jpa.internal.operations;
 
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
-import com.holonplatform.core.datastore.operation.RefreshOperation;
-import com.holonplatform.core.internal.datastore.operation.AbstractRefreshOperation;
+import com.holonplatform.core.datastore.operation.Refresh;
+import com.holonplatform.core.internal.datastore.operation.AbstractRefresh;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
@@ -26,25 +26,25 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
- * JPA {@link RefreshOperation}.
+ * JPA {@link Refresh}.
  *
  * @since 5.1.0
  */
-public class JpaRefresh extends AbstractRefreshOperation {
+public class JpaRefresh extends AbstractRefresh {
 
 	private static final long serialVersionUID = -7246131153825486563L;
 
 	// Commodity factory
 	@SuppressWarnings("serial")
-	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, RefreshOperation> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, RefreshOperation>() {
+	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, Refresh> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, Refresh>() {
 
 		@Override
-		public Class<? extends RefreshOperation> getCommodityType() {
-			return RefreshOperation.class;
+		public Class<? extends Refresh> getCommodityType() {
+			return Refresh.class;
 		}
 
 		@Override
-		public RefreshOperation createCommodity(JpaDatastoreCommodityContext context)
+		public Refresh createCommodity(JpaDatastoreCommodityContext context)
 				throws CommodityConfigurationException {
 			return new JpaRefresh(context);
 		}

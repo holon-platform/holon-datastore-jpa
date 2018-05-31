@@ -19,8 +19,8 @@ import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
-import com.holonplatform.core.datastore.operation.UpdateOperation;
-import com.holonplatform.core.internal.datastore.operation.AbstractUpdateOperation;
+import com.holonplatform.core.datastore.operation.Update;
+import com.holonplatform.core.internal.datastore.operation.AbstractUpdate;
 import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
@@ -28,25 +28,25 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
- * JPA {@link UpdateOperation}.
+ * JPA {@link Update}.
  *
  * @since 5.1.0
  */
-public class JpaUpdate extends AbstractUpdateOperation {
+public class JpaUpdate extends AbstractUpdate {
 
 	private static final long serialVersionUID = 118863316193871221L;
 
 	// Commodity factory
 	@SuppressWarnings("serial")
-	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, UpdateOperation> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, UpdateOperation>() {
+	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, Update> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, Update>() {
 
 		@Override
-		public Class<? extends UpdateOperation> getCommodityType() {
-			return UpdateOperation.class;
+		public Class<? extends Update> getCommodityType() {
+			return Update.class;
 		}
 
 		@Override
-		public UpdateOperation createCommodity(JpaDatastoreCommodityContext context)
+		public Update createCommodity(JpaDatastoreCommodityContext context)
 				throws CommodityConfigurationException {
 			return new JpaUpdate(context);
 		}

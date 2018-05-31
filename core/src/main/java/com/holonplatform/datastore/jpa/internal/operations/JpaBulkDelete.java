@@ -22,8 +22,8 @@ import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
 import com.holonplatform.core.datastore.bulk.BulkDelete;
-import com.holonplatform.core.datastore.operation.DeleteOperationConfiguration;
-import com.holonplatform.core.internal.datastore.bulk.AbstractBulkDeleteOperation;
+import com.holonplatform.core.datastore.operation.commons.DeleteOperationConfiguration;
+import com.holonplatform.core.internal.datastore.bulk.AbstractBulkDelete;
 import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
@@ -35,7 +35,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLStatement;
  * 
  * @since 5.1.0
  */
-public class JpaBulkDelete extends AbstractBulkDeleteOperation<BulkDelete> implements BulkDelete {
+public class JpaBulkDelete extends AbstractBulkDelete {
 
 	private static final long serialVersionUID = 2063304568395041817L;
 
@@ -59,15 +59,6 @@ public class JpaBulkDelete extends AbstractBulkDeleteOperation<BulkDelete> imple
 	public JpaBulkDelete(JpaOperationContext operationContext) {
 		super();
 		this.operationContext = operationContext;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.core.internal.datastore.operation.AbstractDatastoreOperation#getActualOperation()
-	 */
-	@Override
-	protected BulkDelete getActualOperation() {
-		return this;
 	}
 
 	/*

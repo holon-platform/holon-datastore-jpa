@@ -25,7 +25,7 @@ import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfi
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
 import com.holonplatform.core.datastore.bulk.BulkInsert;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.datastore.bulk.AbstractBulkInsertOperation;
+import com.holonplatform.core.internal.datastore.bulk.AbstractBulkInsert;
 import com.holonplatform.core.property.PathPropertyBoxAdapter;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.property.PropertySet;
@@ -42,7 +42,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
  * 
  * @since 5.1.0
  */
-public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> implements BulkInsert {
+public class JpaBulkInsert extends AbstractBulkInsert {
 
 	private static final long serialVersionUID = -2659369449773116773L;
 
@@ -82,15 +82,6 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 	public BulkInsert operationPaths(PropertySet<?> propertySet) {
 		this.propertySet = propertySet;
 		return super.operationPaths(propertySet);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.core.internal.datastore.operation.AbstractDatastoreOperation#getActualOperation()
-	 */
-	@Override
-	protected BulkInsert getActualOperation() {
-		return this;
 	}
 
 	/*
