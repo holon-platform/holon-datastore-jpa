@@ -20,8 +20,8 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
+import com.holonplatform.core.CollectionConstantExpression;
 import com.holonplatform.core.ExpressionResolver;
-import com.holonplatform.core.query.CollectionConstantExpression;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLLiteral;
 

@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
 
+import com.holonplatform.core.CollectionConstantExpression;
+import com.holonplatform.core.ConstantConverterExpression;
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.NullExpression;
 import com.holonplatform.core.TypedExpression;
-import com.holonplatform.core.query.CollectionConstantExpression;
-import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
@@ -88,15 +88,9 @@ public enum JPQLParameterizableExpressionResolver
 			namedParameter = context.addNamedParameter(
 					JPQLParameter.create(nullExpression.getModelValue(), nullExpression.getModelType()));
 		}
-		// ConstantExpression
-		if (expression instanceof ConstantExpression) {
-			expression.validate();
-			final ConstantExpression<?> constant = (ConstantExpression<?>) expression;
-			namedParameter = context.addNamedParameter(JPQLParameter.create(constant.getModelValue(),
-					constant.getModelType(), constant.getTemporalType().orElse(null)));
-		}
+
 		// CollectionExpression
-		if (expression instanceof CollectionConstantExpression) {
+		else if (expression instanceof CollectionConstantExpression) {
 			expression.validate();
 			final CollectionConstantExpression<?> collection = (CollectionConstantExpression<?>) expression;
 			Collection<?> values = collection.getModelValue();
@@ -107,6 +101,14 @@ public enum JPQLParameterizableExpressionResolver
 						.map(value -> context.addNamedParameter(JPQLParameter.create(value, collection.getModelType())))
 						.collect(Collectors.joining(","));
 			}
+		}
+
+		// ConstantExpression
+		else if (expression instanceof ConstantConverterExpression) {
+			expression.validate();
+			final ConstantConverterExpression<?, ?> constant = (ConstantConverterExpression<?, ?>) expression;
+			namedParameter = context.addNamedParameter(JPQLParameter.create(constant.getModelValue(),
+					constant.getModelType(), constant.getTemporalType().orElse(null)));
 		}
 
 		if (namedParameter != null) {

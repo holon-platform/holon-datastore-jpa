@@ -51,7 +51,7 @@ import org.junit.Test;
 import com.holonplatform.core.beans.BeanIntrospector;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.query.BeanProjection;
-import com.holonplatform.core.query.ConstantExpressionProjection;
+import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.datastore.jpa.test.model.TestData;
 import com.holonplatform.datastore.jpa.test.model.TestEnum;
 import com.holonplatform.datastore.jpa.test.model.TestProjectionBean;
@@ -172,7 +172,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testLiteral() {
 		Long value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L))
-				.findOne(ConstantExpressionProjection.create(1L)).orElse(null);
+				.findOne(ConstantExpression.create(1L)).orElse(null);
 		assertNotNull(value);
 		assertEquals(Long.valueOf(1L), value);
 	}

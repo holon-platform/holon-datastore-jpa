@@ -21,7 +21,7 @@ import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.internal.utils.TypeUtils;
-import com.holonplatform.core.query.ConstantExpressionProjection;
+import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.datastore.jpa.internal.converters.TypedExpressionResultConverter;
 import com.holonplatform.datastore.jpa.internal.jpql.expression.DefaultJPQLProjection;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
@@ -31,14 +31,14 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLLiteral;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLProjection;
 
 /**
- * {@link ConstantExpressionProjection} resolver.
+ * {@link ConstantExpression} projection resolver.
  *
  * @since 5.1.0
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE - 1000)
 public enum ConstantExpressionProjectionResolver
-		implements JPQLContextExpressionResolver<ConstantExpressionProjection, JPQLProjection> {
+		implements JPQLContextExpressionResolver<ConstantExpression, JPQLProjection> {
 
 	/**
 	 * Singleton instance
@@ -52,7 +52,7 @@ public enum ConstantExpressionProjectionResolver
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<JPQLProjection> resolve(ConstantExpressionProjection expression, JPQLResolutionContext context)
+	public Optional<JPQLProjection> resolve(ConstantExpression expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
@@ -60,7 +60,7 @@ public enum ConstantExpressionProjectionResolver
 
 		// resolve literal value
 		final JPQLLiteral literal = JPQLLiteral.create(expression.getValue(),
-				((ConstantExpressionProjection<?>) expression).getTemporalType().orElse(null));
+				((ConstantExpression<?>) expression).getTemporalType().orElse(null));
 
 		final String serialized = context.resolveOrFail(literal, JPQLExpression.class).getValue();
 
@@ -77,8 +77,8 @@ public enum ConstantExpressionProjectionResolver
 	 * @see com.holonplatform.core.ExpressionResolver#getExpressionType()
 	 */
 	@Override
-	public Class<? extends ConstantExpressionProjection> getExpressionType() {
-		return ConstantExpressionProjection.class;
+	public Class<? extends ConstantExpression> getExpressionType() {
+		return ConstantExpression.class;
 	}
 
 	/*
