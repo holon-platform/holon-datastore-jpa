@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,6 +44,7 @@ import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,7 @@ import com.holonplatform.core.beans.BeanIntrospector;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.query.BeanProjection;
 import com.holonplatform.core.query.ConstantExpression;
+import com.holonplatform.core.query.SelectAllProjection;
 import com.holonplatform.datastore.jpa.test.model.TestData;
 import com.holonplatform.datastore.jpa.test.model.TestEnum;
 import com.holonplatform.datastore.jpa.test.model.TestProjectionBean;
@@ -171,8 +174,8 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testLiteral() {
-		Long value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L))
-				.findOne(ConstantExpression.create(1L)).orElse(null);
+		Long value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(ConstantExpression.create(1L))
+				.orElse(null);
 		assertNotNull(value);
 		assertEquals(Long.valueOf(1L), value);
 	}
@@ -228,6 +231,16 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 		assertEquals(2, values.size());
 		assertEquals(Boolean.TRUE, values.get(0));
 		assertEquals(Boolean.FALSE, values.get(1));
+	}
+
+	@Test
+	public void testSelectAll() {
+		Map<String, Object> result = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L))
+				.findOne(SelectAllProjection.create()).orElse(null);
+		
+		assertNotNull(result);
+		assertTrue(result.containsKey("key"));
+		assertNotNull(result.get("key"));
 	}
 
 	private static void checkKey1Value(PropertyBox value) {

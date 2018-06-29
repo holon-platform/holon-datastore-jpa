@@ -88,6 +88,7 @@ import com.holonplatform.datastore.jpa.internal.resolvers.projection.CurrentLoca
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.DataTargetProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.PropertySetProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.QueryProjectionResolver;
+import com.holonplatform.datastore.jpa.internal.resolvers.projection.SelectAllProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.TypedExpressionProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.transaction.JpaTransaction;
 import com.holonplatform.datastore.jpa.internal.transaction.JpaTransactionProvider;
@@ -214,6 +215,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		addExpressionResolver(SubQueryResolver.INSTANCE);
 		addExpressionResolver(QueryProjectionResolver.INSTANCE);
 		addExpressionResolver(DataTargetProjectionResolver.INSTANCE);
+		addExpressionResolver(SelectAllProjectionResolver.INSTANCE);
 		addExpressionResolver(ConstantExpressionProjectionResolver.INSTANCE);
 		addExpressionResolver(TypedExpressionProjectionResolver.INSTANCE);
 		addExpressionResolver(PropertySetProjectionResolver.INSTANCE);
