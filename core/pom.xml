@@ -73,6 +73,12 @@
 			<groupId>com.holon-platform.jdbc</groupId>
 			<artifactId>holon-jdbc</artifactId>
 			<version>${holon.jdbc.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.holon-platform.core</groupId>
+					<artifactId>holon-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Holon jpa -->
@@ -80,6 +86,12 @@
 			<groupId>com.holon-platform.jpa</groupId>
 			<artifactId>holon-jpa-bean-processors</artifactId>
 			<version>${holon.jpa.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.holon-platform.core</groupId>
+					<artifactId>holon-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- JPA API -->
@@ -155,19 +167,19 @@
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
-			<version>${datanucleus.version}</version>
+			<version>${datanucleus.core.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-api-jpa</artifactId>
-			<version>5.1.4</version>
+			<version>${datanucleus.jpa.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-rdbms</artifactId>
-			<version>${datanucleus.version}</version>
+			<version>${datanucleus.rdbms.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -238,7 +250,7 @@
 					<plugin>
 						<groupId>org.datanucleus</groupId>
 						<artifactId>datanucleus-maven-plugin</artifactId>
-						<version>5.0.2</version>
+						<version>${datanucleus.plugin.version}</version>
 						<configuration>
 							<api>JPA</api>
 							<log4jConfiguration>${project.basedir}/src/test/resources/log4j-datanucleus.properties</log4jConfiguration>
@@ -256,12 +268,12 @@
 							<dependency>
 								<groupId>org.datanucleus</groupId>
 								<artifactId>datanucleus-core</artifactId>
-								<version>${datanucleus.version}</version>
+								<version>${datanucleus.core.version}</version>
 							</dependency>
 							<dependency>
 								<groupId>org.datanucleus</groupId>
 								<artifactId>datanucleus-api-jpa</artifactId>
-								<version>5.1.4</version>
+								<version>${datanucleus.jpa.version}</version>
 							</dependency>
 						</dependencies>
 					</plugin>
