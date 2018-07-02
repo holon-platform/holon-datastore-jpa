@@ -58,9 +58,9 @@
 		<bintray.package>holon-datastore-jpa</bintray.package>
 
 		<!-- Holon core -->
-		<holon.core.version>5.1.1</holon.core.version>
+		<holon.core.version>5.1.2</holon.core.version>
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.1.2</holon.jdbc.version>
+		<holon.jdbc.version>5.1.4</holon.jdbc.version>
 		<!-- Holon JPA -->
 		<holon.jpa.version>5.1.1</holon.jpa.version>
 
