@@ -68,7 +68,7 @@
 		<jpa.api.version>2.2</jpa.api.version>
 
 		<!-- ORMs -->
-		<hibernate.version>5.3.0.Final</hibernate.version>
+		<hibernate.version>5.3.1.Final</hibernate.version>
 		<eclipselink.version>2.7.1</eclipselink.version>
 		<openjpa.version>2.4.2</openjpa.version>
 		<datanucleus.version>5.1.9</datanucleus.version>
@@ -77,7 +77,7 @@
 		<hibernate.validator.version>6.0.2.Final</hibernate.validator.version>
 
 		<!-- HikariCP -->
-		<hikaricp.version>3.1.0</hikaricp.version>
+		<hikaricp.version>3.2.0</hikaricp.version>
 
 		<!-- ByteBuddy -->
 		<bytebuddy.version>1.8.11</bytebuddy.version>
