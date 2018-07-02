@@ -80,7 +80,7 @@
 		<hikaricp.version>3.2.0</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.8.11</bytebuddy.version>
+		<bytebuddy.version>1.8.12</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.196</h2.version>
