@@ -37,7 +37,7 @@ import com.holonplatform.datastore.jpa.ORMPlatform;
 		BulkDeleteAliasTest.class, AggregationFunctionsTest.class, StringFunctionsTest.class,
 		TemporalFunctionsTest.class, DataTargetResolverTest.class, CustomExpressionsTest.class,
 		EntityProjectionTest.class, InsertedKeysTest.class, DistinctTest.class, TransactionTest.class,
-		QueryHintTest.class, LockModeTest.class, SharedEntityManagerTest.class })
+		QueryHintTest.class, LockModeTest.class, SharedEntityManagerTest.class, LockTest.class })
 public abstract class AbstractJpaDatastoreTestSuite {
 
 	public static Datastore datastore;

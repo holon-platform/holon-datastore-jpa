@@ -239,6 +239,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		registerCommodity(JpaBulkUpdate.FACTORY);
 		registerCommodity(JpaBulkDelete.FACTORY);
 		registerCommodity(JpaQuery.FACTORY);
+		registerCommodity(JpaQuery.LOCK_FACTORY);
 	}
 
 	/**
