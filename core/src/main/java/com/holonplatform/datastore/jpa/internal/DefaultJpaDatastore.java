@@ -593,6 +593,9 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 			if (tx.getConfiguration().isRollbackOnError()) {
 				tx.setRollbackOnly();
 			}
+			if (e instanceof DataAccessException) {
+				throw (DataAccessException) e;
+			}
 			throw new DataAccessException("Failed to execute operation", e);
 		} finally {
 			try {

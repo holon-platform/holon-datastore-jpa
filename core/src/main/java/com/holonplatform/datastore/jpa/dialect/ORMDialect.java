@@ -18,8 +18,14 @@ package com.holonplatform.datastore.jpa.dialect;
 import java.time.temporal.Temporal;
 import java.util.Optional;
 
+import javax.persistence.LockTimeoutException;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
+import javax.persistence.PessimisticLockException;
 import javax.persistence.Tuple;
 
+import com.holonplatform.core.exceptions.DataAccessException;
+import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.query.QueryFunction;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
@@ -136,6 +142,24 @@ public interface ORMDialect {
 	 */
 	default Optional<JPQLFunction> resolveFunction(QueryFunction<?, ?> function) {
 		return Optional.empty();
+	}
+
+	/**
+	 * Translates given {@link PersistenceException} into a suitable {@link DataAccessException}.
+	 * @param exception Exception to translate (not null)
+	 * @return Translated {@link PersistenceException}
+	 */
+	default DataAccessException translateException(PersistenceException exception) {
+		if (LockTimeoutException.class.isAssignableFrom(exception.getClass())) {
+			return new LockAcquisitionException("Failed to acquire lock", exception);
+		}
+		if (PessimisticLockException.class.isAssignableFrom(exception.getClass())) {
+			return new LockAcquisitionException("Failed to acquire lock", exception);
+		}
+		if (OptimisticLockException.class.isAssignableFrom(exception.getClass())) {
+			return new LockAcquisitionException("Failed to acquire lock", exception);
+		}
+		return new DataAccessException(exception);
 	}
 
 	/**

@@ -18,7 +18,14 @@ package com.holonplatform.datastore.jpa.dialect;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import javax.persistence.PersistenceException;
+
+import org.hibernate.PessimisticLockException;
+import org.hibernate.dialect.lock.LockingStrategyException;
+
+import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
+import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.internal.utils.ClassUtils;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 
@@ -44,7 +51,8 @@ public class HibernateDialect implements ORMDialect {
 		try {
 			String version = context.withEntityManager(em -> {
 				try {
-					Class<?> versionCls = ClassUtils.forName("org.hibernate.Version", em.getDelegate().getClass().getClassLoader());
+					Class<?> versionCls = ClassUtils.forName("org.hibernate.Version",
+							em.getDelegate().getClass().getClassLoader());
 					Method m = versionCls.getDeclaredMethod("getVersionString");
 					return (String) m.invoke(null);
 				} catch (Exception e) {
@@ -52,7 +60,7 @@ public class HibernateDialect implements ORMDialect {
 					return null;
 				}
 			});
-			
+
 			int majorVersion = -1;
 			int minorVersion = -1;
 
@@ -158,6 +166,25 @@ public class HibernateDialect implements ORMDialect {
 	@Override
 	public boolean deleteStatementAliasSupported() {
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.datastore.jpa.dialect.ORMDialect#translateException(javax.persistence.PersistenceException)
+	 */
+	@Override
+	public DataAccessException translateException(PersistenceException exception) {
+		if (org.hibernate.exception.LockAcquisitionException.class.isAssignableFrom(exception.getClass())) {
+			return new LockAcquisitionException("Failed to acquire lock", exception);
+		}
+		if (LockingStrategyException.class.isAssignableFrom(exception.getClass())) {
+			return new LockAcquisitionException("Failed to acquire lock", exception);
+		}
+		if (PessimisticLockException.class.isAssignableFrom(exception.getClass())) {
+			return new LockAcquisitionException("Failed to acquire lock", exception);
+		}
+		return ORMDialect.super.translateException(exception);
 	}
 
 }

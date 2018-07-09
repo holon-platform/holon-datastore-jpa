@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
+import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.query.lock.LockQuery;
 
@@ -83,6 +84,45 @@ public class LockTest extends AbstractJpaDatastoreSuiteTest {
 				assertFalse(locked.get());
 			} catch (InterruptedException | ExecutionException e1) {
 				throw new RuntimeException(e1);
+			}
+
+			es.shutdown();
+			try {
+				es.awaitTermination(30, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+
+		});
+
+	}
+
+	@Test
+	public void testLockException() {
+
+		assertTrue(getDatastore().hasCommodity(LockQuery.class));
+
+		inTransaction(() -> {
+			// lock
+			Long key = getDatastore().create(LockQuery.class).target(JPA_TARGET).filter(KEY.eq(1L)).lock().findOne(KEY)
+					.orElse(null);
+			assertNotNull(key);
+
+			// try lock different thread
+			ExecutorService es = Executors.newSingleThreadExecutor();
+
+			final Future<Long> locked = es.submit(() -> {
+				return inTransaction(() -> {
+					return getDatastore().create(LockQuery.class).target(JPA_TARGET).filter(KEY.eq(1L)).lock(0)
+							.findOne(KEY).orElse(null);
+				});
+			});
+
+			try {
+				locked.get();
+			} catch (InterruptedException | ExecutionException fe) {
+				assertNotNull(fe.getCause());
+				assertTrue(fe.getCause() instanceof LockAcquisitionException);
 			}
 
 			es.shutdown();

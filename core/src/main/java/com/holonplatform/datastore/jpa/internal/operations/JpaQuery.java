@@ -20,8 +20,7 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.LockTimeoutException;
-import javax.persistence.PessimisticLockException;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
@@ -30,6 +29,7 @@ import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.query.QueryAdapterQuery;
 import com.holonplatform.core.internal.query.QueryDefinition;
 import com.holonplatform.core.internal.query.QueryUtils;
+import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.internal.query.lock.LockQueryAdapterQuery;
 import com.holonplatform.core.internal.utils.TypeUtils;
 import com.holonplatform.core.query.Query;
@@ -135,7 +135,12 @@ public class JpaQuery implements LockQueryAdapter<QueryConfiguration> {
 			// execute and convert results
 			final JpaExecutionContext ctx = JpaExecutionContext.create(operationContext, entityManager);
 
-			return QueryUtils.asResultsStream(q.getResultList(), null).map(t -> converter.convert(ctx, t));
+			try {
+				return QueryUtils.asResultsStream(q.getResultList(), null).map(t -> converter.convert(ctx, t));
+			} catch (PersistenceException e) {
+				// translate PersistenceException using dialect
+				throw operationContext.getDialect().translateException(e);
+			}
 
 		});
 
@@ -171,8 +176,14 @@ public class JpaQuery implements LockQueryAdapter<QueryConfiguration> {
 			// execute
 			try {
 				q.getResultList();
-			} catch (@SuppressWarnings("unused") PessimisticLockException | LockTimeoutException e) {
-				return false;
+			} catch (PersistenceException e) {
+				// translate PersistenceException using dialect
+				DataAccessException dae = operationContext.getDialect().translateException(e);
+				// check lock acquistion exception
+				if (LockAcquisitionException.class.isAssignableFrom(dae.getClass())) {
+					return false;
+				}
+				throw e;
 			}
 
 			return true;
