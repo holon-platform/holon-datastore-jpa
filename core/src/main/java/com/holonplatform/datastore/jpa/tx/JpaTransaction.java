@@ -13,12 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.datastore.jpa.internal.transaction;
+package com.holonplatform.datastore.jpa.tx;
 
 import javax.persistence.EntityManager;
 
 import com.holonplatform.core.datastore.transaction.Transaction;
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
+import com.holonplatform.datastore.jpa.internal.tx.DefaultJpaTransaction;
 
 /**
  * JPA {@link Transaction}.
@@ -50,5 +51,29 @@ public interface JpaTransaction extends Transaction {
 	 * @return the transaction configuration
 	 */
 	TransactionConfiguration getConfiguration();
+
+	/**
+	 * Add a transaction lifecycle handler.
+	 * @param handler The handler to add (not null)
+	 */
+	void addLifecycleHandler(JpaTransactionLifecycleHandler handler);
+
+	/**
+	 * Remove a transaction lifecycle handler.
+	 * @param handler The handler to remove
+	 */
+	void removeLifecycleHandler(JpaTransactionLifecycleHandler handler);
+
+	/**
+	 * Create a new {@link JpaTransaction}.
+	 * @param entityManager EntityManager (not null)
+	 * @param configuration Transaction configuration (not null)
+	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
+	 *        transaction is committed or rollbacked)
+	 */
+	static JpaTransaction create(EntityManager entityManager, TransactionConfiguration configuration,
+			boolean endTransactionWhenCompleted) {
+		return new DefaultJpaTransaction(entityManager, configuration, endTransactionWhenCompleted);
+	}
 
 }

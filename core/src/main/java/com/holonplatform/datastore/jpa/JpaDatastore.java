@@ -32,6 +32,7 @@ import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory;
 import com.holonplatform.datastore.jpa.context.EntityManagerHandler;
 import com.holonplatform.datastore.jpa.dialect.ORMDialect;
 import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
+import com.holonplatform.datastore.jpa.tx.JpaTransactionFactory;
 
 /**
  * JPA {@link Datastore}.
@@ -89,6 +90,13 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		 * @return this
 		 */
 		Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer);
+
+		/**
+		 * Set a custom {@link JpaTransactionFactory} to be used by the Datastore to create new transactions.
+		 * @param transactionFactory The transaction factory to set (not null)
+		 * @return this
+		 */
+		Builder<D> transactionFactory(JpaTransactionFactory transactionFactory);
 
 		/**
 		 * Set the {@link ORMPlatform} to use.

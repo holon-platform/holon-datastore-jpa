@@ -102,6 +102,14 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- For Hibernate dialect -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -145,12 +153,6 @@
 
 		<!-- Test ORMs -->
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>org.eclipse.persistence.jpa</artifactId>
