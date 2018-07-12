@@ -32,8 +32,7 @@ import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
 import com.holonplatform.core.datastore.transaction.TransactionalOperation;
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.datastore.AbstractDatastore;
-import com.holonplatform.core.internal.utils.ClassUtils;
+import com.holonplatform.core.internal.datastore.AbstractInitializableDatastore;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.ORMPlatform;
@@ -100,12 +99,12 @@ import com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler;
 /**
  * Default {@link JpaDatastore} implementation.
  * <p>
- * Uses JPA {@link EntityManager} and criteria query api to configure and execute datastore operations.
+ * The Datastore instance must be initialized using the {@link #initialize()} method before using it.
  * </p>
  * 
  * @since 5.0.0
  */
-public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodityContext>
+public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatastoreCommodityContext>
 		implements JpaDatastore, JpaDatastoreCommodityContext, JpaTransactionLifecycleHandler {
 
 	private static final long serialVersionUID = -8695844962665825169L;
@@ -162,29 +161,10 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	private boolean autoFlush = false;
 
 	/**
-	 * Whether the datastore was initialized
-	 */
-	private boolean initialized = false;
-
-	/**
-	 * Whether to auto-initialize the Datastore at EntityManagerFactory setup
-	 */
-	private final boolean autoInitialize;
-
-	/**
-	 * Default constructor
+	 * Constructor.
 	 */
 	public DefaultJpaDatastore() {
-		this(true);
-	}
-
-	/**
-	 * Constructor
-	 * @param autoInitialize Whether to initialize the Datastore at EntityManagerFactory setup
-	 */
-	public DefaultJpaDatastore(boolean autoInitialize) {
 		super(JpaDatastoreCommodityFactory.class, JpaDatastoreExpressionResolver.class);
-		this.autoInitialize = autoInitialize;
 
 		// EntityManager lifecycle
 		setEntityManagerInitializer((emf) -> emf.createEntityManager());
@@ -243,70 +223,45 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		registerCommodity(JpaQuery.LOCK_FACTORY);
 	}
 
-	/**
-	 * Whether to initialize the Datastore at EntityManagerFactory setup.
-	 * @return the autoInitialize <code>true</code> if auto-initialize is enabled
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.core.internal.datastore.AbstractInitializableDatastore#initialize(java.lang.ClassLoader)
 	 */
-	protected boolean isAutoInitialize() {
-		return autoInitialize;
-	}
+	@Override
+	protected boolean initialize(ClassLoader classLoader) {
 
-	/**
-	 * Initialize the datastore
-	 * @param classLoader ClassLoader to use to load default factories and resolvers
-	 * @throws IllegalStateException If initialization fails
-	 */
-	protected void initialize(ClassLoader classLoader) throws IllegalStateException {
-		if (!initialized) {
-
-			// check getEntityManagerFactory
-			if (getEntityManagerFactory() == null) {
-				throw new IllegalStateException("No EntityManagerFactory available");
-			}
-
-			// platform
-			if (!getORMPlatform().isPresent()) {
-				// try to detect
-				detectORMPlatform().ifPresent(platform -> setORMPlatform(platform));
-			}
-
-			// dialect
-			if (getDialect() == null) {
-				setDialect(
-						getORMPlatform().flatMap(platform -> ORMDialect.detect(platform)).orElse(new DefaultDialect()));
-			}
-
-			// init dialect
-			final ORMDialect dialect = getDialect();
-
-			LOGGER.debug(() -> "ORM dialect: [" + ((dialect != null) ? dialect.getClass().getName() : null) + "]");
-			try {
-				dialect.init(new JpaDatastoreDialectContext());
-			} catch (Exception e) {
-				throw new IllegalStateException("Failed to initialize dialect [" + dialect.getClass().getName() + "]",
-						e);
-			}
-
-			getORMPlatform().ifPresent(platform -> LOGGER.info("ORM platform: " + platform));
-			LOGGER.info("ORM dialect: [" + dialect.getClass().getName() + "] - Supported JPA version: "
-					+ dialect.getSupportedJPAMajorVersion() + "." + dialect.getSupportedJPAMinorVersion());
-
-			// default factories and resolvers
-			loadExpressionResolvers(classLoader);
-			loadCommodityFactories(classLoader);
-
-			initialized = true;
+		// check getEntityManagerFactory
+		if (getEntityManagerFactory() == null) {
+			throw new IllegalStateException("No EntityManagerFactory available");
 		}
-	}
 
-	/**
-	 * Checks whether to auto-initialize the Datastore, if {@link #isAutoInitialize()} is <code>true</code> and the
-	 * Datastore wasn't already initialized.
-	 */
-	protected void checkInitialize() {
-		if (isAutoInitialize()) {
-			initialize(ClassUtils.getDefaultClassLoader());
+		// platform
+		if (!getORMPlatform().isPresent()) {
+			// try to detect
+			detectORMPlatform().ifPresent(platform -> setORMPlatform(platform));
 		}
+
+		// dialect
+		if (getDialect() == null) {
+			setDialect(getORMPlatform().flatMap(platform -> ORMDialect.detect(platform)).orElse(new DefaultDialect()));
+		}
+
+		// init dialect
+		final ORMDialect dialect = getDialect();
+		try {
+			dialect.init(new JpaDatastoreDialectContext());
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to initialize dialect [" + dialect.getClass().getName() + "]", e);
+		}
+
+		// default factories and resolvers
+		loadExpressionResolvers(classLoader);
+		loadCommodityFactories(classLoader);
+
+		LOGGER.info("JpaDatastore initialized - Using dialect [" + dialect.getClass().getName() + "]");
+		getORMPlatform().ifPresent(platform -> LOGGER.info("JpaDatastore ORM platform: " + platform));
+
+		return true;
 	}
 
 	/*
@@ -328,8 +283,6 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		// reset
 		this.platform = null;
 		this.dialect = null;
-		// check initialization
-		checkInitialize();
 	}
 
 	/*
@@ -449,7 +402,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 * Sets the {@link EntityManager} instance provider for Datastore operations execution
 	 * @param entityManagerInitializer the EntityManagerInitializer to set
 	 */
-	protected void setEntityManagerInitializer(EntityManagerInitializer entityManagerInitializer) {
+	public void setEntityManagerInitializer(EntityManagerInitializer entityManagerInitializer) {
 		ObjectUtils.argumentNotNull(entityManagerInitializer, "EntityManagerInitializer must be not null");
 		this.entityManagerInitializer = entityManagerInitializer;
 	}
@@ -466,7 +419,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 * Sets the {@link EntityManager} finalizer to use after Datastore operations execution.
 	 * @param entityManagerFinalizer the EntityManagerFinalizer to set
 	 */
-	protected void setEntityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
+	public void setEntityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
 		this.entityManagerFinalizer = entityManagerFinalizer;
 	}
 
@@ -520,6 +473,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 */
 	@Override
 	public <R> R withEntityManager(EntityManagerOperation<R> operation) {
+		checkInitialized();
 		ObjectUtils.argumentNotNull(operation, "Operation must be not null");
 
 		EntityManager entityManager = null;
@@ -564,6 +518,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	@Override
 	public <R> R withTransaction(TransactionalOperation<R> operation,
 			TransactionConfiguration transactionConfiguration) {
+		checkInitialized();
 		ObjectUtils.argumentNotNull(operation, "TransactionalOperation must be not null");
 
 		final JpaTransaction tx = beginTransaction(transactionConfiguration, false);
@@ -642,9 +597,6 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		if (!stack.isEmpty()) {
 			if (stack.remove(tx)) {
 				return Optional.of(tx);
-			} else {
-				// TODO
-				System.err.println("MISSING - " + tx);
 			}
 		}
 		return Optional.empty();
@@ -905,6 +857,20 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		/*
 		 * (non-Javadoc)
 		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerHandler(com.holonplatform.datastore.jpa.
+		 * JpaDatastore.EntityManagerLifecycleHandler)
+		 */
+		@Override
+		public Builder<D> entityManagerHandler(EntityManagerLifecycleHandler entityManagerHandler) {
+			ObjectUtils.argumentNotNull(entityManagerHandler, "EntityManagerLifecycleHandler must be not null");
+			datastore.setEntityManagerInitializer(entityManagerHandler);
+			datastore.setEntityManagerFinalizer(entityManagerHandler);
+			return this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
 		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#transactionFactory(com.holonplatform.datastore.jpa.tx.
 		 * JpaTransactionFactory)
 		 */
@@ -991,10 +957,8 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		 */
 		@Override
 		public JpaDatastore build() {
-			if (datastore.getEntityManagerFactory() == null) {
-				throw new IllegalStateException(
-						"No EntityManagerFactory available: a EntityManagerFactory must be provided to build the JpaDatastore instance");
-			}
+			// init
+			datastore.initialize();
 			return datastore;
 		}
 

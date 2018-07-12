@@ -92,6 +92,14 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer);
 
 		/**
+		 * Set both the {@link EntityManager} initializer (instance provider) and finalizer using the
+		 * {@link EntityManagerLifecycleHandler} convenience interface.
+		 * @param entityManagerHandler the {@link EntityManagerLifecycleHandler} to set (not null)
+		 * @return this
+		 */
+		Builder<D> entityManagerHandler(EntityManagerLifecycleHandler entityManagerHandler);
+
+		/**
 		 * Set a custom {@link JpaTransactionFactory} to be used by the Datastore to create new transactions.
 		 * @param transactionFactory The transaction factory to set (not null)
 		 * @return this
@@ -194,6 +202,15 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		static EntityManagerFinalizer createDefault() {
 			return em -> em.close();
 		}
+
+	}
+
+	/**
+	 * Convenience interface which combines {@link EntityManagerInitializer} and {@link EntityManagerFinalizer}.
+	 * 
+	 * @since 5.2.0
+	 */
+	public interface EntityManagerLifecycleHandler extends EntityManagerInitializer, EntityManagerFinalizer {
 
 	}
 

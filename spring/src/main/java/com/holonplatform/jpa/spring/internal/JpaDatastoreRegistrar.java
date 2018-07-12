@@ -34,10 +34,12 @@ import com.holonplatform.core.datastore.DatastoreConfigProperties;
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.dialect.ORMDialect;
+import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.EnableJpaDatastore;
 import com.holonplatform.jpa.spring.JpaDatastoreConfigProperties;
+import com.holonplatform.jpa.spring.SpringEntityManagerLifecycleHandler;
 import com.holonplatform.spring.EnvironmentConfigPropertyProvider;
 import com.holonplatform.spring.PrimaryMode;
 import com.holonplatform.spring.internal.AbstractConfigPropertyRegistrar;
@@ -177,8 +179,8 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 		definition.setDataContextId(dataContextId);
 
 		Class<?> datastoreClass = transactional
-				? addTransactionalAnnotations(DefaultSpringJpaDatastore.class, dataContextId, beanClassLoader)
-				: DefaultSpringJpaDatastore.class;
+				? addTransactionalAnnotations(DefaultJpaDatastore.class, dataContextId, beanClassLoader)
+				: DefaultJpaDatastore.class;
 
 		definition.setBeanClass(datastoreClass);
 
@@ -193,8 +195,14 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 		String beanName = BeanRegistryUtils.buildBeanName(dataContextId,
 				EnableJpaDatastore.DEFAULT_DATASTORE_BEAN_NAME);
 
+		final SpringEntityManagerLifecycleHandler entityManagerLifecycleHandler = SpringEntityManagerLifecycleHandler
+				.create();
+
 		MutablePropertyValues pvs = new MutablePropertyValues();
+		pvs.add("initializationClassLoader", beanClassLoader);
 		pvs.add("entityManagerFactory", new RuntimeBeanReference(entityManagerFactoryBeanName));
+		pvs.add("entityManagerInitializer", entityManagerLifecycleHandler);
+		pvs.add("entityManagerFinalizer", entityManagerLifecycleHandler);
 		pvs.add("autoFlush", autoFlush);
 
 		if (dataContextId != null) {
@@ -220,6 +228,9 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 		}
 
 		definition.setPropertyValues(pvs);
+
+		// init method
+		definition.setInitMethodName("initialize");
 
 		registry.registerBeanDefinition(beanName, definition);
 

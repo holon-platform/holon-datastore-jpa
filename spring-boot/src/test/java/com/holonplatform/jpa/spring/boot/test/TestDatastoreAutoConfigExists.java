@@ -40,8 +40,9 @@ import com.holonplatform.core.property.PathProperty;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.JpaTarget;
+import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
+import com.holonplatform.jpa.spring.SpringEntityManagerLifecycleHandler;
 import com.holonplatform.jpa.spring.boot.test.domain1.TestJpaDomain1;
-import com.holonplatform.jpa.spring.internal.DefaultSpringJpaDatastore;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -55,7 +56,11 @@ public class TestDatastoreAutoConfigExists {
 
 		@Bean
 		public JpaDatastore datastore(EntityManagerFactory entityManagerFactory) {
-			return new TestDatastore(entityManagerFactory);
+			TestDatastore ds = new TestDatastore(entityManagerFactory);
+			ds.setEntityManagerInitializer(SpringEntityManagerLifecycleHandler.create());
+			ds.setEntityManagerFinalizer(SpringEntityManagerLifecycleHandler.create());
+			ds.initialize();
+			return ds;
 		}
 
 	}
@@ -91,7 +96,7 @@ public class TestDatastoreAutoConfigExists {
 	}
 
 	@SuppressWarnings("serial")
-	public static class TestDatastore extends DefaultSpringJpaDatastore {
+	public static class TestDatastore extends DefaultJpaDatastore {
 
 		public TestDatastore(EntityManagerFactory entityManagerFactory) {
 			super();

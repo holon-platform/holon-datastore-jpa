@@ -187,6 +187,7 @@ holon.datastore.jpa.transactional=false // <4>
 <3> Enable the auto-flush mode
 <4> Disable the automatic _transactional_ behavior of the Datastore operations
 
+[[SpringDatastoreExtensionConfiguration]]
 ==== Datastore extension and configuration using the Spring context
 
 The JPA Datastore implementation supports the standard link:holon-core.html#SpringDatastoreConfiguration[Holon Platform Datastore Spring integration^] features for Datastore beans configuration and extension, which includes:
@@ -390,6 +391,22 @@ To configure two JPA bean stacks, one bound to the `one` _data context id_ and t
 ----
 include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring5.java[tag=config,indent=0]
 ----
+
+[[ProgrammaticJPADatastoreConfiguration]]
+==== Programmatic JPA Datastore bean configuration
+
+When a JPA `Datastore` is not istantiated and configured in a Spring context using the `@EnableJpaDatastore` annotation, but rather providing the bean implementation programmatically (for example using the `JpaDatastore` builder API), the Spring integration features described in the previous sections must be explicitly enabled:
+
+* To use the Spring managed `EntityManager` instances, the link:{apidir}/com/holonplatform/jpa/spring/SpringEntityManagerLifecycleHandler.html[SpringEntityManagerLifecycleHandler^] `EntityManager` lifecycle handler can be configured for the `JpaDatastore` bean.
+
+* To enable the automatic Datastore bean configuration, as described in <<SpringDatastoreExtensionConfiguration>>, the `@EnableDatastoreConfiguration` annotation can be used on Spring configuration classes.
+
+[source, java]
+----
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreSpring12.java[tag=config,indent=0]
+----
+<1> Use the `@EnableDatastoreConfiguration` to automatically configure the `Datastore` with auto-detected `Datastore` configuration context beans
+<2> Set a `SpringEntityManagerLifecycleHandler` instance as `Datastore` `EntityManager` lifecycle handler to use Spring managed `EntityManager` proxies
 
 [[JPASpringBoot]]
 == Spring Boot integration
