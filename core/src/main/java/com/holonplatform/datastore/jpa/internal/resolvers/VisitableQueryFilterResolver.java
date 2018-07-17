@@ -216,11 +216,13 @@ public enum VisitableQueryFilterResolver implements JPQLContextExpressionResolve
 		StringBuilder sb = new StringBuilder();
 		sb.append(serialize(filter.getLeftOperand(), context));
 		sb.append(" BETWEEN ");
-		sb.append(serialize(JPQLParameterizableExpression.create(ConstantConverterExpression.create(filter.getFromValue())),
+		sb.append(serialize(
+				JPQLParameterizableExpression.create(ConstantConverterExpression.create(filter.getFromValue())),
 				context));
 		sb.append(" AND ");
-		sb.append(serialize(JPQLParameterizableExpression.create(ConstantConverterExpression.create(filter.getToValue())),
-				context));
+		sb.append(
+				serialize(JPQLParameterizableExpression.create(ConstantConverterExpression.create(filter.getToValue())),
+						context));
 		return JPQLExpression.create(sb.toString());
 	}
 
@@ -278,10 +280,9 @@ public enum VisitableQueryFilterResolver implements JPQLContextExpressionResolve
 		sb.append(path);
 
 		sb.append(" LIKE ");
-		sb.append(context
-				.resolveOrFail(JPQLParameterizableExpression.create(ConstantConverterExpression.create(value, String.class)),
-						JPQLExpression.class)
-				.getValue());
+		sb.append(context.resolveOrFail(
+				JPQLParameterizableExpression.create(ConstantConverterExpression.create(value, String.class)),
+				JPQLExpression.class).getValue());
 
 		if (escapeSupported) {
 			sb.append(" ESCAPE ");

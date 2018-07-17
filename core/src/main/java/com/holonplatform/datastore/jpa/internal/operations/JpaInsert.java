@@ -70,8 +70,7 @@ public class JpaInsert extends AbstractInsert {
 		}
 
 		@Override
-		public Insert createCommodity(JpaDatastoreCommodityContext context)
-				throws CommodityConfigurationException {
+		public Insert createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
 			return new JpaInsert(context);
 		}
 	};
@@ -108,13 +107,13 @@ public class JpaInsert extends AbstractInsert {
 			final BeanPropertySet<Object> set = operationContext.getBeanIntrospector().getPropertySet(entity);
 			// persist entity
 			entityManager.persist(set.write(getConfiguration().getValue(), instance));
-			
+
 			operationContext.traceOperation("PERSIST entity [" + entity.getName() + "]");
 
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
-				
+
 				operationContext.traceOperation("FLUSH EntityManager");
 			}
 

@@ -35,14 +35,15 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 
 	private final JpaContext context;
 	private final EntityManager entityManager;
-	
+
 	public DefaultJpaExecutionContext(JpaContext context, EntityManager entityManager) {
 		super();
 		this.context = context;
 		this.entityManager = entityManager;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JpaContext#getEntityManagerFactory()
 	 */
 	@Override
@@ -50,7 +51,8 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 		return context.getEntityManagerFactory();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JpaContext#getDialect()
 	 */
 	@Override
@@ -58,7 +60,8 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 		return context.getDialect();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JpaContext#getORMPlatform()
 	 */
 	@Override
@@ -66,7 +69,8 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 		return context.getORMPlatform();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JpaContext#trace(java.lang.String)
 	 */
 	@Override
@@ -74,7 +78,8 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 		context.trace(jpql);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JpaContext#traceOperation(java.lang.String)
 	 */
 	@Override
@@ -82,7 +87,8 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 		context.traceOperation(operation);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverProvider#getExpressionResolvers()
 	 */
 	@SuppressWarnings("rawtypes")
@@ -91,7 +97,8 @@ public class DefaultJpaExecutionContext implements JpaExecutionContext {
 		return context.getExpressionResolvers();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.context.JpaExecutionContext#getEntityManager()
 	 */
 	@Override

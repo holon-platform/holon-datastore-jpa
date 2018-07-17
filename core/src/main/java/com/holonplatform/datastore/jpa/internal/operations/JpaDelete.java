@@ -46,8 +46,7 @@ public class JpaDelete extends AbstractDelete {
 		}
 
 		@Override
-		public Delete createCommodity(JpaDatastoreCommodityContext context)
-				throws CommodityConfigurationException {
+		public Delete createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
 			return new JpaDelete(context);
 		}
 	};

@@ -83,7 +83,7 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 				assertEquals("Unstr", value.getValue(NST_STR));
 				assertEquals(TestSampleData.BD1, value.getValue(NST_DEC));
 			}
-			
+
 			assertFalse(value.getValue(NBOOL));
 			assertEquals(TestSampleData.DATETIME1, value.getValue(TMS));
 			assertEquals(TestSampleData.LDATETIME1, value.getValue(LTMS));

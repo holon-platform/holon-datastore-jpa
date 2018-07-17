@@ -69,8 +69,8 @@ public class DeleteTest extends AbstractJpaDatastoreSuiteTest {
 			OperationResult result = getDatastore().delete(JPA_TARGET, value);
 			assertEquals(1, result.getAffectedCount());
 
-			assertFalse(getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES_NOID)
-					.isPresent());
+			assertFalse(
+					getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES_NOID).isPresent());
 
 		});
 	}

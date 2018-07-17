@@ -110,8 +110,9 @@ public enum UpdateOperationConfigurationResolver
 
 		pathValues.forEach((path, pathExpression) -> {
 			paths.add(setContext.resolveOrFail(path, JPQLExpression.class).getValue());
-			values.add(setContext.resolveOrFail(JPQLParameterizableExpression.create(pathExpression), JPQLExpression.class)
-					.getValue());
+			values.add(
+					setContext.resolveOrFail(JPQLParameterizableExpression.create(pathExpression), JPQLExpression.class)
+							.getValue());
 		});
 
 		operation.append(" SET ");

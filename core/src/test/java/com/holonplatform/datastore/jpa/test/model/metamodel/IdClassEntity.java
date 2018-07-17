@@ -28,7 +28,7 @@ public class IdClassEntity {
 
 	@Id
 	private String pk2;
-	
+
 	private String value;
 
 	public Long getPk1() {
@@ -54,5 +54,5 @@ public class IdClassEntity {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+
 }

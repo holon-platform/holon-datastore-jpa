@@ -61,8 +61,8 @@ public interface JpaTarget<T> extends DataTarget<T>, QueryProjection<T> {
 	static ExpressionResolver<DataTarget, DataTarget> nameResolver(final String name, final Class<?> entityClass) {
 		ObjectUtils.argumentNotNull(name, "Data target name must be not null");
 		ObjectUtils.argumentNotNull(entityClass, "Entity class must be not null");
-		return DataTargetResolver.create(DataTarget.class, (target, context) -> name.equals(target.getName())
-				? Optional.of(JpaTarget.of(entityClass)) : Optional.empty());
+		return DataTargetResolver.create(DataTarget.class, (target,
+				context) -> name.equals(target.getName()) ? Optional.of(JpaTarget.of(entityClass)) : Optional.empty());
 	}
 
 }

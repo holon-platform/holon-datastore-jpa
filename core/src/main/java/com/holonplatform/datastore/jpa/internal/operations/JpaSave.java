@@ -52,8 +52,7 @@ public class JpaSave extends AbstractSave {
 		}
 
 		@Override
-		public Save createCommodity(JpaDatastoreCommodityContext context)
-				throws CommodityConfigurationException {
+		public Save createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
 			return new JpaSave(context);
 		}
 	};
@@ -123,8 +122,8 @@ public class JpaSave extends AbstractSave {
 	 * @return Operation result
 	 */
 	private OperationResult insert(PropertyBoxOperationConfiguration configuration) {
-		return operationContext.create(Insert.class).target(configuration.getTarget())
-				.value(configuration.getValue()).withWriteOptions(configuration.getWriteOptions()).execute();
+		return operationContext.create(Insert.class).target(configuration.getTarget()).value(configuration.getValue())
+				.withWriteOptions(configuration.getWriteOptions()).execute();
 	}
 
 	/**
@@ -133,8 +132,8 @@ public class JpaSave extends AbstractSave {
 	 * @return Operation result
 	 */
 	private OperationResult update(PropertyBoxOperationConfiguration configuration) {
-		return operationContext.create(Update.class).target(configuration.getTarget())
-				.value(configuration.getValue()).withWriteOptions(configuration.getWriteOptions()).execute();
+		return operationContext.create(Update.class).target(configuration.getTarget()).value(configuration.getValue())
+				.withWriteOptions(configuration.getWriteOptions()).execute();
 	}
 
 }

@@ -43,7 +43,7 @@ public interface JPQLProjection<Q, R> extends TypedExpression<R> {
 	 * @return Optional selection alias
 	 */
 	Optional<String> getSelectionAlias(String selection);
-	
+
 	/**
 	 * Get the query result type.
 	 * @return The query result type

@@ -45,8 +45,7 @@ public class BulkDeleteAliasTest extends AbstractJpaDatastoreSuiteTest {
 				OperationResult result = getDatastore().insert(TEST3, t3);
 				assertEquals(1, result.getAffectedCount());
 
-				final SubQuery<?> sq = SubQuery.create().target(TEST3)
-						.filter(TEST3_TEXT.eq(JPA_TARGET.property(STR)));
+				final SubQuery<?> sq = SubQuery.create().target(TEST3).filter(TEST3_TEXT.eq(JPA_TARGET.property(STR)));
 
 				List<PropertyBox> values = getDatastore().query().target(JPA_TARGET).filter(sq.exists())
 						.list(PROPERTIES);

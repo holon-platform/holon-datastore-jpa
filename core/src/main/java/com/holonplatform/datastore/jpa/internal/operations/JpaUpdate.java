@@ -46,8 +46,7 @@ public class JpaUpdate extends AbstractUpdate {
 		}
 
 		@Override
-		public Update createCommodity(JpaDatastoreCommodityContext context)
-				throws CommodityConfigurationException {
+		public Update createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
 			return new JpaUpdate(context);
 		}
 	};

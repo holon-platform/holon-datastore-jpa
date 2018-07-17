@@ -23,7 +23,7 @@ public class SingleIdEntity {
 
 	@Id
 	private String id;
-	
+
 	private String value;
 
 	public String getId() {
@@ -41,5 +41,5 @@ public class SingleIdEntity {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+
 }

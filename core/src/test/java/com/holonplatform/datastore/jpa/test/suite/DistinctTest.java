@@ -53,7 +53,7 @@ public class DistinctTest extends AbstractJpaDatastoreSuiteTest {
 
 		});
 	}
-	
+
 	@Test
 	public void testDistinctMultiple() {
 		inTransaction(() -> {
@@ -79,31 +79,33 @@ public class DistinctTest extends AbstractJpaDatastoreSuiteTest {
 
 		});
 	}
-	
+
 	@Test
 	public void testDistinctEntity() {
 		if (AbstractJpaDatastoreTestSuite.entityProjectionTest) {
-		inTransaction(() -> {
+			inTransaction(() -> {
 
-			getDatastore().insert(TEST3,
-					PropertyBox.builder(TEST3_CODE, TEST3_TEXT).set(TEST3_CODE, 101L).set(TEST3_TEXT, "v1").build());
-			getDatastore().insert(TEST3,
-					PropertyBox.builder(TEST3_CODE, TEST3_TEXT).set(TEST3_CODE, 102L).set(TEST3_TEXT, "v2").build());
-			getDatastore().insert(TEST3,
-					PropertyBox.builder(TEST3_CODE, TEST3_TEXT).set(TEST3_CODE, 103L).set(TEST3_TEXT, "v1").build());
+				getDatastore().insert(TEST3, PropertyBox.builder(TEST3_CODE, TEST3_TEXT).set(TEST3_CODE, 101L)
+						.set(TEST3_TEXT, "v1").build());
+				getDatastore().insert(TEST3, PropertyBox.builder(TEST3_CODE, TEST3_TEXT).set(TEST3_CODE, 102L)
+						.set(TEST3_TEXT, "v2").build());
+				getDatastore().insert(TEST3, PropertyBox.builder(TEST3_CODE, TEST3_TEXT).set(TEST3_CODE, 103L)
+						.set(TEST3_TEXT, "v1").build());
 
-			List<Test3> values = getDatastore().query(JpaTarget.of(Test3.class)).filter(TEST3_CODE.goe(101L)).list(JpaTarget.of(Test3.class));
-			assertEquals(3, values.size());
+				List<Test3> values = getDatastore().query(JpaTarget.of(Test3.class)).filter(TEST3_CODE.goe(101L))
+						.list(JpaTarget.of(Test3.class));
+				assertEquals(3, values.size());
 
-			values  = getDatastore().query(JpaTarget.of(Test3.class)).filter(TEST3_CODE.goe(101L)).distinct().list(JpaTarget.of(Test3.class));
-			assertEquals(3, values.size());
+				values = getDatastore().query(JpaTarget.of(Test3.class)).filter(TEST3_CODE.goe(101L)).distinct()
+						.list(JpaTarget.of(Test3.class));
+				assertEquals(3, values.size());
 
-			List<Long> keys = values.stream().map(v -> v.getPk().getCode()).collect(Collectors.toList());
-			assertTrue(keys.contains(Long.valueOf(101L)));
-			assertTrue(keys.contains(Long.valueOf(102L)));
-			assertTrue(keys.contains(Long.valueOf(103L)));
+				List<Long> keys = values.stream().map(v -> v.getPk().getCode()).collect(Collectors.toList());
+				assertTrue(keys.contains(Long.valueOf(101L)));
+				assertTrue(keys.contains(Long.valueOf(102L)));
+				assertTrue(keys.contains(Long.valueOf(103L)));
 
-		});
+			});
 		}
 	}
 

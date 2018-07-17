@@ -79,7 +79,7 @@ public enum QueryResolver implements JPQLContextExpressionResolver<QueryOperatio
 
 		// build SQLQuery
 		return Optional.of(new DefaultJPQLQuery(jpql, (Class) clauses.getQueryResultType(),
-				(JPQLResultConverter)clauses.getResultConverter()
+				(JPQLResultConverter) clauses.getResultConverter()
 						.orElseThrow(() -> new InvalidExpressionException("Missing query results converter")),
 				context.getNamedParametersHandler().getNamedParameters()));
 	}

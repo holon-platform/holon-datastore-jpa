@@ -44,8 +44,7 @@ public class JpaRefresh extends AbstractRefresh {
 		}
 
 		@Override
-		public Refresh createCommodity(JpaDatastoreCommodityContext context)
-				throws CommodityConfigurationException {
+		public Refresh createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
 			return new JpaRefresh(context);
 		}
 	};

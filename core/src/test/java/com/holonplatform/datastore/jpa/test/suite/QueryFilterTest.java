@@ -110,30 +110,31 @@ public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 		assertEquals(1, count);
 
 	}
-	
+
 	@Test
 	public void testEscape() {
 		inTransaction(() -> {
-			
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 1001L).set(STR, "50%").set(NBOOL, false).build();
+
+			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 1001L).set(STR, "50%").set(NBOOL, false)
+					.build();
 			getDatastore().insert(JPA_TARGET, value);
 			value = PropertyBox.builder(PROPERTIES).set(KEY, 1002L).set(STR, "100%").set(NBOOL, false).build();
 			getDatastore().insert(JPA_TARGET, value);
 			value = PropertyBox.builder(PROPERTIES).set(KEY, 1003L).set(STR, "_3").set(NBOOL, false).build();
 			getDatastore().insert(JPA_TARGET, value);
-			
+
 			long count = getDatastore().query().target(JPA_TARGET).filter(STR.endsWith("%")).count();
 			assertEquals(2, count);
-			
+
 			count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("0%")).count();
 			assertEquals(2, count);
-			
+
 			count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("100%")).count();
 			assertEquals(1, count);
-			
+
 			count = getDatastore().query().target(JPA_TARGET).filter(STR.startsWith("_")).count();
 			assertEquals(1, count);
-			
+
 		});
 	}
 

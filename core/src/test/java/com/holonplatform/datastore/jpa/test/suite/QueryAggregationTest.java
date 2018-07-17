@@ -97,8 +97,8 @@ public class QueryAggregationTest extends AbstractJpaDatastoreSuiteTest {
 
 		Property<Long> MAX_KEY = KEY.max();
 
-		List<PropertyBox> pbs = getDatastore().query().target(JPA_TARGET).sort(STR.asc()).aggregate(STR, DBL)
-				.list(STR, MAX_KEY);
+		List<PropertyBox> pbs = getDatastore().query().target(JPA_TARGET).sort(STR.asc()).aggregate(STR, DBL).list(STR,
+				MAX_KEY);
 		assertEquals(2, pbs.size());
 		assertEquals(Long.valueOf(1), pbs.get(0).getValue(MAX_KEY));
 		assertEquals(Long.valueOf(2), pbs.get(1).getValue(MAX_KEY));

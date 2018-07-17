@@ -37,13 +37,13 @@ public interface JpaContext extends ExpressionResolverProvider {
 	 * @return The EntityManagerFactory
 	 */
 	EntityManagerFactory getEntityManagerFactory();
-	
+
 	/**
 	 * Get the {@link ORMDialect} to use.
 	 * @return The ORM dialect
 	 */
 	ORMDialect getDialect();
-	
+
 	/**
 	 * Get the ORM platform, if detected.
 	 * @return Optional ORM platform
@@ -75,12 +75,12 @@ public interface JpaContext extends ExpressionResolverProvider {
 	 * @param jpql JPQL to trace
 	 */
 	void trace(String jpql);
-	
+
 	/**
 	 * Trace given JPA operation.
 	 * <p>
-	 * If tracing is enabled, the operation is logged using the <code>INFO</code> level, otherwise it is logged
-	 * using the <code>DEBUG</code> level.
+	 * If tracing is enabled, the operation is logged using the <code>INFO</code> level, otherwise it is logged using
+	 * the <code>DEBUG</code> level.
 	 * </p>
 	 * @param operation Operation to trace
 	 */

@@ -48,7 +48,7 @@ public class BulkDeleteTest extends AbstractJpaDatastoreSuiteTest {
 			assertEquals(0, getDatastore().query().target(JPA_TARGET).count());
 		});
 	}
-	
+
 	@Test
 	public void testBulkDeleteAll() {
 		inTransaction(() -> {

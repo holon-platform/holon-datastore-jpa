@@ -29,8 +29,8 @@ import com.holonplatform.datastore.jpa.internal.jpql.expression.DefaultJPQLParam
 public interface JPQLParameterizableExpression<T> extends TypedExpression<T> {
 
 	/**
-	 * Get the actual expression which should be resolved using a JPQL statement parameter if the expression type and the
-	 * resolution context are suitable to use a JPQL parameter for its representation.
+	 * Get the actual expression which should be resolved using a JPQL statement parameter if the expression type and
+	 * the resolution context are suitable to use a JPQL parameter for its representation.
 	 * @return The expression
 	 */
 	TypedExpression<T> getExpression();

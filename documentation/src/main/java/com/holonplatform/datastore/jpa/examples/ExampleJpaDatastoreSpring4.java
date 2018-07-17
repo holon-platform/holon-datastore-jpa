@@ -42,10 +42,10 @@ public class ExampleJpaDatastoreSpring4 {
 
 	@Autowired
 	DataSource dataSource;
-	
+
 	@PersistenceUnit
 	EntityManagerFactory entityManagerFactory;
-	
+
 	@Autowired
 	PlatformTransactionManager transactionManager;
 

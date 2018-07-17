@@ -44,12 +44,12 @@ public interface JpaDatastoreConfigProperties extends ConfigPropertySet, DataCon
 	 * Whether to qualify the Datastore bean as <code>primary</code>, i.e. the preferential bean to be injected in a
 	 * single-valued dependency when multiple candidates are present.
 	 * <p>
-	 * By default, the registred Datastore bean is marked as primary only when the {@link EntityManagerFactory} bean to which is
-	 * bound is registered as primary candidate bean.
+	 * By default, the registred Datastore bean is marked as primary only when the {@link EntityManagerFactory} bean to
+	 * which is bound is registered as primary candidate bean.
 	 * </p>
 	 */
 	static final ConfigProperty<Boolean> PRIMARY = ConfigProperty.create("primary", Boolean.class);
-	
+
 	/**
 	 * Whether to enable the {@link EntityManager} auto-flush mode. When auto-flush is enabled, the
 	 * {@link EntityManager#flush()} method is invoked after the execution of any Datastore data manipulation operation.

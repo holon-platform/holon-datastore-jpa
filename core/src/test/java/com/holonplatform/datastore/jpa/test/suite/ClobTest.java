@@ -30,8 +30,6 @@ import com.holonplatform.core.property.PropertyBox;
 
 public class ClobTest extends AbstractJpaDatastoreSuiteTest {
 
-	
-
 	@Test
 	public void testClobString() {
 		inTransaction(() -> {

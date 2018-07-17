@@ -83,7 +83,7 @@ public class OpenJpaTest extends AbstractJpaDatastoreTestSuite {
 				.withCommodity(DatastoreConfigCommodity.FACTORY).withExpressionResolver(KeyIsFilter.RESOLVER).build();
 
 		platform = ORMPlatform.OPENJPA;
-		
+
 		rightJoinTest = false;
 		blobArrayProjectionTest = false;
 		entityProjectionTest = false;

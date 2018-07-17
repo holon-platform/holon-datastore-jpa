@@ -67,11 +67,11 @@ public enum TypedExpressionProjectionResolver
 
 		// query result type
 		Class<?> queryResultType = TypeUtils.box((converter != null) ? converter.getModelType() : expression.getType());
-		
+
 		if (TypeUtils.isTemporal(queryResultType) && !context.getDialect().temporalTypeProjectionSupported()) {
 			queryResultType = Date.class;
 		}
-		
+
 		final DefaultJPQLProjection<?, ?> projection = new DefaultJPQLProjection<>(context, queryResultType,
 				expression.getType());
 		projection.addSelection(context.resolveOrFail(expression, JPQLExpression.class).getValue(), false);

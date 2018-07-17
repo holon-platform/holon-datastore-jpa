@@ -237,7 +237,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 	public void testSelectAll() {
 		Map<String, Object> result = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L))
 				.findOne(SelectAllProjection.create()).orElse(null);
-		
+
 		assertNotNull(result);
 		assertTrue(result.containsKey("key"));
 		assertNotNull(result.get("key"));

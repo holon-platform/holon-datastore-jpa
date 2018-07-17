@@ -27,7 +27,7 @@ public class ExampleJpaDatastoreSpring5 {
 
 	class TestEntity1 {
 	}
-	
+
 	class TestEntity2 {
 	}
 

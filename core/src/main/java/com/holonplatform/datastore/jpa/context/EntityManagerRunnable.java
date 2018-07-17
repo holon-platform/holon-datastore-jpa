@@ -36,5 +36,5 @@ public interface EntityManagerRunnable {
 	 * @throws Exception If an operation execution error occurred
 	 */
 	void execute(EntityManager entityManager) throws Exception;
-	
+
 }

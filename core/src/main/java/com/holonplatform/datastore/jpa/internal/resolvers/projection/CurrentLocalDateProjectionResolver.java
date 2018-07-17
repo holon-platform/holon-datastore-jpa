@@ -39,7 +39,8 @@ public enum CurrentLocalDateProjectionResolver
 	 */
 	INSTANCE;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.core.ExpressionResolver#getExpressionType()
 	 */
 	@Override
@@ -47,7 +48,8 @@ public enum CurrentLocalDateProjectionResolver
 		return CurrentLocalDate.class;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.core.ExpressionResolver#getResolvedType()
 	 */
 	@Override
@@ -55,19 +57,20 @@ public enum CurrentLocalDateProjectionResolver
 		return JPQLProjection.class;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver#resolve(com.holonplatform.core.Expression, com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext)
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver#resolve(com.holonplatform.core.
+	 * Expression, com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Optional<JPQLProjection> resolve(CurrentLocalDate expression, JPQLResolutionContext context)
 			throws InvalidExpressionException {
-		
+
 		// validate
 		expression.validate();
-		
-		final DefaultJPQLProjection projection = new DefaultJPQLProjection<>(context, Date.class,
-				expression.getType());
+
+		final DefaultJPQLProjection projection = new DefaultJPQLProjection<>(context, Date.class, expression.getType());
 		projection.addSelection(context.resolveOrFail(expression, JPQLExpression.class).getValue(), false);
 		projection.setConverter(new TypedExpressionResultConverter(expression));
 

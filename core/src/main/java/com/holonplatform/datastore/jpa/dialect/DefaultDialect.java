@@ -31,7 +31,8 @@ public class DefaultDialect implements ORMDialect {
 	public void init(ORMDialectContext context) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getSupportedJPAMajorVersion()
 	 */
 	@Override
@@ -39,7 +40,8 @@ public class DefaultDialect implements ORMDialect {
 		return 2;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.holonplatform.datastore.jpa.dialect.ORMDialect#getSupportedJPAMinorVersion()
 	 */
 	@Override
