@@ -28,6 +28,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -118,10 +119,17 @@ public class JpaEntityScanPackages {
 
 	private static String[] addPackageNames(ConstructorArgumentValues constructorArguments,
 			Collection<String> packageNames) {
-		String[] existing = (String[]) constructorArguments.getIndexedArgumentValue(0, String[].class).getValue();
-		Set<String> merged = new LinkedHashSet<>();
-		merged.addAll(Arrays.asList(existing));
+		final ValueHolder vh = constructorArguments.getIndexedArgumentValue(0, String[].class);
+		final String[] existing = (vh != null) ? (String[]) vh.getValue() : null;
+
+		final Set<String> merged = new LinkedHashSet<>();
+
+		if (existing != null && existing.length > 0) {
+			merged.addAll(Arrays.asList(existing));
+		}
+
 		merged.addAll(packageNames);
+
 		return merged.toArray(new String[merged.size()]);
 	}
 
@@ -143,9 +151,10 @@ public class JpaEntityScanPackages {
 		@Override
 		protected void register(Map<String, Object> attributes, BeanDefinitionRegistry registry,
 				boolean fromRepeatableAnnotationContainer) {
-			AnnotationAttributes annotationAttributes = AnnotationAttributes.fromMap(attributes);
-			registerPackageNames(annotationAttributes.getString("value"), registry,
-					getPackagesToScan(annotationAttributes));
+			final AnnotationAttributes annotationAttributes = AnnotationAttributes.fromMap(attributes);
+			registerPackageNames((annotationAttributes != null) ? annotationAttributes.getString("value") : null,
+					registry,
+					(annotationAttributes != null) ? getPackagesToScan(annotationAttributes) : Collections.emptySet());
 		}
 
 		private static Set<String> getPackagesToScan(AnnotationAttributes attributes) {

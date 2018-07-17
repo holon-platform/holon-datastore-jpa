@@ -29,6 +29,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -142,10 +143,10 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 			// check DataSource
 			dsBeanName = getDataSourceBeanName(registry, beanFactory, dataContextId);
 			if (dsBeanName == null) {
+				dsBeanName = BeanRegistryUtils.buildBeanName(dataContextId,
+						EnableDataSource.DEFAULT_DATASOURCE_BEAN_NAME);
 				// create and register a DataSource
 				if (environment != null) {
-					dsBeanName = BeanRegistryUtils.buildBeanName(dataContextId,
-							EnableDataSource.DEFAULT_DATASOURCE_BEAN_NAME);
 					dsBeanName = DataSourceRegistrar.registerDataSource(environment, registry, dataContextId,
 							primaryMode);
 				}
@@ -153,11 +154,16 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 		}
 
 		// check primary
-		if (registry.containsBeanDefinition(dsBeanName)) {
+		if (dsBeanName != null && registry.containsBeanDefinition(dsBeanName)) {
 			if (!primary && PrimaryMode.AUTO == primaryMode) {
 				BeanDefinition bd = registry.getBeanDefinition(dsBeanName);
 				primary = bd.isPrimary();
 			}
+		}
+
+		// check DataSource bean name
+		if (dsBeanName == null) {
+			throw new BeanCreationException("Failed to register JPA beans: missing DataSource bean name");
 		}
 
 		// JPA configuration
