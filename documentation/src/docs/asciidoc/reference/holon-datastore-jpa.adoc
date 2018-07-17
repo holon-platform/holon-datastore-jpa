@@ -2,6 +2,7 @@
 :description: Holon platform JPA Datastore module reference documentation. \
 The Holon JPA Datastore is the Java Persistence API (JPA) reference implementation of the Datastore API, using the JPA architecture for data access and management.
 :revnumber: {project-version}
+:coreapidir: ../api/holon-core
 :apidir: ../api/holon-datastore-jpa
 :linkattrs:
 :sectnums:
@@ -15,11 +16,11 @@ _Copies of this document may be made for your own use and for distribution to ot
 
 == Introduction
 
-The Holon *JPA Datastore* is the _Java Persistence API_ reference implementation of the link:../../api/holon-core/com/holonplatform/core/datastore/Datastore.html[Datastore^] API. 
+The Holon *JPA Datastore* is the _Java Persistence API_ reference implementation of the link:{coreapidir}/com/holonplatform/core/datastore/Datastore.html[Datastore^] API. 
 
-TIP: See the link:holon-core.html#Datastore[Datastore] documentation for further information about the Datastore `API`.
+TIP: See the link:holon-core.html#Datastore[Datastore^] documentation for further information about the Datastore `API`.
 
-The JPA `Datastore` uses the  link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory] API as a factory to obtain link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager] API instances to perform data access and management operations through the standard JPA `JPQL` language and the `EntityManager` API operations.
+The JPA `Datastore` uses the  link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html[EntityManagerFactory^] API as a factory to obtain link:https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[EntityManager^] API instances to perform data access and management operations through the standard JPA `JPQL` language and the `EntityManager` API operations.
 
 IMPORTANT: The Holon Platform JPA modules and components require *JPA version 2.0 or higher*, so a JPA 2.0+  compliant persistence provider (ORM) is needed at runtime.
 
@@ -102,7 +103,7 @@ The logger name for the *JPA Datastore* module is `com.holonplatform.datastore.j
 
 === Java
 
-The Holon Platform JPA Datastore module requires https://www.java.com[Java] *8* or higher.
+The Holon Platform JPA Datastore module requires https://www.java.com[Java^] *8* or higher.
 
 === JPA
 

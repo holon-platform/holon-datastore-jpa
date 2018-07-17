@@ -25,7 +25,7 @@ This way, the JPA `Datastore` API can be seamlessly used along with the Spring t
 [[EnableJpaDatastore]]
 === JPA Datastore configuration
 
-The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpaDatastore.html[EnableJpaDatastore^] 
+The link:{apidir}/com/holonplatform/jpa/spring/EnableJpaDatastore.html[EnableJpaDatastore^] 
 annotation can be used on Spring configuration classes to enable automatic JPA `Datastore` beans configuration.
 
 NOTE: By default, the JPA Datastore bean name configured with the `@EnableJpaDatastore` annotation will be `jpaDatastore`.
@@ -209,7 +209,7 @@ include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatast
 [[EnableJpa]]
 === Full JPA bean stack auto-configuration
 
-The link:{apidir}/com/holonplatform/datastore/jpa/spring/EnableJpa.html[EnableJpa^] 
+The link:{apidir}/com/holonplatform/jpa/spring/EnableJpa.html[EnableJpa^] 
 annotation can be used on Spring configuration classes to setup a full JPA enviroment bean stack: 
 
 * *DataSource:* If a `javax.sql.DataSource` type bean is not already registered in Spring context, a `DataSource` instance is created and configured using the link:holon-jdbc.html#DataSourceConfigProperties[Holon Platform DataSource configuration properties^]. See the link:holon-jdbc.html#DataSourceConfiguration[Holon Platform JDBC Module^] documentation for details.

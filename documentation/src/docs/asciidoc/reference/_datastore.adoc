@@ -16,7 +16,7 @@ The link:{apidir}/com/holonplatform/datastore/jpa/JpaDatastore.html[JpaDatastore
 The `JpaDatastore` API, besides the standard `Datastore` API operations, provides methods to:
 
 * Create and configure a `JpaDatastore` API instance, using the provided _builder_.
-* Directly working with `JpaDatastore` managed _EntityManagers_, with a consistent and integrated `EntityManager` instance and related _persistence context_ lifecycle management. See <<JpaDatastoreAPI>>.
+* Directly working with `JpaDatastore` managed _EntityManagers_, with a consistent and integrated `EntityManager` instance and related _persistence context_ lifecycle management. See <<JpaDatastoreAPI,JpaDatastore API>>.
 
 IMPORTANT: If you want to reach the goal of a *_complete abstraction_* from the persistence store technology and the persistence model, the core `Datastore` API interface should be used instead of the specific `JpaDatastore` API by your application code. This way, the concrete `Datastore` API implementation may be replaced by a different one at any time, without any change to the codebase.
 
@@ -52,7 +52,7 @@ The JPA Datastore builder API extends the core `Datastore` builder API, which pr
 
 |`dataContextId`
 |The _data context id_ `String` value
-|Set the _data context id_ to which the Datastore is bound. Can be used, for example, to declare configuration properties for multiple Datastore instances. See the link:holon-core#DatastoreDataContextId[Multiple Datastores configuration^] documentation section.
+|Set the _data context id_ to which the Datastore is bound. Can be used, for example, to declare configuration properties for multiple Datastore instances.
 
 |`traceEnabled`
 |`true` or `false`
@@ -107,7 +107,7 @@ include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatast
 
 For some internal operations, the JPA Datastore needs to know the _ORM platform_ which manages the concrete `EntityManagerFactory` (and accorrdingly the `EntityManager`) instances (for example _Hibernate_, _Eclipselink_ and so on). The _ORM platform_ is used, for example, to auto-detect the <<Dialect,ORM dialect>> to use if not directly specified at JPA Datastore configuration time.
 
-The _ORM platform_ can be explicitly specified using the JPA Datastore `platform` builder method, using the link:{apidir}/com/holonplatform/jpa/ORMPlatform.html[ORMPlatform^] enumeration.
+The _ORM platform_ can be explicitly specified using the JPA Datastore `platform` builder method, using the link:{apidir}/com/holonplatform/datastore/jpa/ORMPlatform.html[ORMPlatform^] enumeration.
 
 [source, java]
 ----
@@ -122,7 +122,7 @@ When the _ORM platform_ is not explicitly specified, the JPA Datastore will *aut
 [[Dialect]]
 ==== ORM Dialect configuration
 
-To ensure operations consistency and efficiency, the JPA Datastore uses the link:{apidir}/com/holonplatform/jpa/dialect/ORMDialect.html[ORMDialect^] API abstraction in order to resolve each ORM platform specificity and JPQL language difference.
+To ensure operations consistency and efficiency, the JPA Datastore uses the link:{apidir}/com/holonplatform/datastore/jpa/dialect/ORMDialect.html[ORMDialect^] API abstraction in order to resolve each ORM platform specificity and JPQL language difference.
 
 Normally, the `ORMDialect` implementation to use is *auto-detected* by the JPA Datastore, relying on the _ORM platform_ to which the `EntityManagerFactory` instance is bound, as described in the previous section.
 
@@ -357,13 +357,13 @@ As link:holon-core.html#RelationalDatastores[relational Datastore^], the JPA `Da
 
 *1. Sub-query:*
 
-The link:{apidir}/com/holonplatform/core/datastore/relational/SubQuery.html[SubQuery^] interface can be used to represent a _sub-query_,  which can be used in a query definition to express query restrictions (filters) that involve a sub-query as filter operand.
+The link:{coreapidir}/com/holonplatform/core/datastore/relational/SubQuery.html[SubQuery^] interface can be used to represent a _sub-query_,  which can be used in a query definition to express query restrictions (filters) that involve a sub-query as filter operand.
 
 See the core link:holon-core.html#subquery[sub query expression documentation^] for further information on sub query expressions.
 
 *2. Alias and Joins:*
 
-The link:{apidir}/com/holonplatform/core/datastore/relational/RelationalTarget.html[RelationalTarget^] interface can be used to declare *alias* and *joins* for a `DataTarget` expression.
+The link:{coreapidir}/com/holonplatform/core/datastore/relational/RelationalTarget.html[RelationalTarget^] interface can be used to declare *alias* and *joins* for a `DataTarget` expression.
 
 See the core link:holon-core.html#joins[alias and joins documentation^] for further information on alias and join expressions.
 
