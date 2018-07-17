@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Import;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.jpa.spring.boot.internal.JpaDatastoreAutoConfigurationRegistrar;
+import com.holonplatform.spring.EnableDatastoreConfiguration;
 
 /**
  * Spring boot auto-configuration to enable JPA {@link Datastore} beans.
@@ -42,6 +43,7 @@ public class JpaDatastoreAutoConfiguration {
 	@Configuration
 	@ConditionalOnMissingBean({ JpaDatastore.class })
 	@ConditionalOnSingleCandidate(EntityManagerFactory.class)
+	@EnableDatastoreConfiguration
 	@Import(JpaDatastoreAutoConfigurationRegistrar.class)
 	static class JpaDatastoreConfiguration {
 

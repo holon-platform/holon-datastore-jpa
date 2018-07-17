@@ -19,12 +19,12 @@ import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
-import com.holonplatform.core.datastore.operation.InsertOperation;
-import com.holonplatform.core.datastore.operation.PropertyBoxOperationConfiguration;
-import com.holonplatform.core.datastore.operation.SaveOperation;
-import com.holonplatform.core.datastore.operation.UpdateOperation;
+import com.holonplatform.core.datastore.operation.Insert;
+import com.holonplatform.core.datastore.operation.Save;
+import com.holonplatform.core.datastore.operation.Update;
+import com.holonplatform.core.datastore.operation.commons.PropertyBoxOperationConfiguration;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.datastore.operation.AbstractSaveOperation;
+import com.holonplatform.core.internal.datastore.operation.AbstractSave;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
@@ -32,11 +32,11 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
- * JPA {@link SaveOperation}.
+ * JPA {@link Save}.
  *
  * @since 5.1.0
  */
-public class JpaSave extends AbstractSaveOperation {
+public class JpaSave extends AbstractSave {
 
 	private static final long serialVersionUID = -823102485809986906L;
 
@@ -44,15 +44,15 @@ public class JpaSave extends AbstractSaveOperation {
 
 	// Commodity factory
 	@SuppressWarnings("serial")
-	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, SaveOperation> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, SaveOperation>() {
+	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, Save> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, Save>() {
 
 		@Override
-		public Class<? extends SaveOperation> getCommodityType() {
-			return SaveOperation.class;
+		public Class<? extends Save> getCommodityType() {
+			return Save.class;
 		}
 
 		@Override
-		public SaveOperation createCommodity(JpaDatastoreCommodityContext context)
+		public Save createCommodity(JpaDatastoreCommodityContext context)
 				throws CommodityConfigurationException {
 			return new JpaSave(context);
 		}
@@ -123,7 +123,7 @@ public class JpaSave extends AbstractSaveOperation {
 	 * @return Operation result
 	 */
 	private OperationResult insert(PropertyBoxOperationConfiguration configuration) {
-		return operationContext.create(InsertOperation.class).target(configuration.getTarget())
+		return operationContext.create(Insert.class).target(configuration.getTarget())
 				.value(configuration.getValue()).withWriteOptions(configuration.getWriteOptions()).execute();
 	}
 
@@ -133,7 +133,7 @@ public class JpaSave extends AbstractSaveOperation {
 	 * @return Operation result
 	 */
 	private OperationResult update(PropertyBoxOperationConfiguration configuration) {
-		return operationContext.create(UpdateOperation.class).target(configuration.getTarget())
+		return operationContext.create(Update.class).target(configuration.getTarget())
 				.value(configuration.getValue()).withWriteOptions(configuration.getWriteOptions()).execute();
 	}
 

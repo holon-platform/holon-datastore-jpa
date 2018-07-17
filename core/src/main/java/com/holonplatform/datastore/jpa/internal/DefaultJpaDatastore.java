@@ -26,13 +26,13 @@ import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.beans.BeanIntrospector;
 import com.holonplatform.core.datastore.DatastoreCommodity;
 import com.holonplatform.core.datastore.DatastoreConfigProperties;
+import com.holonplatform.core.datastore.transaction.Transaction;
 import com.holonplatform.core.datastore.transaction.Transaction.TransactionException;
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
 import com.holonplatform.core.datastore.transaction.TransactionalOperation;
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.datastore.AbstractDatastore;
-import com.holonplatform.core.internal.utils.ClassUtils;
+import com.holonplatform.core.internal.datastore.AbstractInitializableDatastore;
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.ORMPlatform;
@@ -88,22 +88,24 @@ import com.holonplatform.datastore.jpa.internal.resolvers.projection.CurrentLoca
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.DataTargetProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.PropertySetProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.QueryProjectionResolver;
+import com.holonplatform.datastore.jpa.internal.resolvers.projection.SelectAllProjectionResolver;
 import com.holonplatform.datastore.jpa.internal.resolvers.projection.TypedExpressionProjectionResolver;
-import com.holonplatform.datastore.jpa.internal.transaction.JpaTransaction;
-import com.holonplatform.datastore.jpa.internal.transaction.JpaTransactionProvider;
 import com.holonplatform.datastore.jpa.jpql.JPQLValueDeserializer;
 import com.holonplatform.datastore.jpa.jpql.JPQLValueSerializer;
+import com.holonplatform.datastore.jpa.tx.JpaTransaction;
+import com.holonplatform.datastore.jpa.tx.JpaTransactionFactory;
+import com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler;
 
 /**
  * Default {@link JpaDatastore} implementation.
  * <p>
- * Uses JPA {@link EntityManager} and criteria query api to configure and execute datastore operations.
+ * The Datastore instance must be initialized using the {@link #initialize()} method before using it.
  * </p>
  * 
  * @since 5.0.0
  */
-public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodityContext>
-		implements JpaDatastore, JpaDatastoreCommodityContext {
+public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatastoreCommodityContext>
+		implements JpaDatastore, JpaDatastoreCommodityContext, JpaTransactionLifecycleHandler {
 
 	private static final long serialVersionUID = -8695844962665825169L;
 
@@ -114,7 +116,6 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 
 	/**
 	 * Current operation EntityManager
-	 * 
 	 */
 	private static final ThreadLocal<EntityManager> CURRENT_ENTITY_MANAGER = new ThreadLocal<>();
 
@@ -150,9 +151,9 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	private EntityManagerFinalizer entityManagerFinalizer = EntityManagerFinalizer.createDefault();
 
 	/**
-	 * Transaction provider
+	 * Transaction factory
 	 */
-	private JpaTransactionProvider transactionProvider = JpaTransactionProvider.getDefault();
+	private JpaTransactionFactory transactionFactory = JpaTransactionFactory.getDefault();
 
 	/**
 	 * Auto-flush mode
@@ -160,29 +161,10 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	private boolean autoFlush = false;
 
 	/**
-	 * Whether the datastore was initialized
-	 */
-	private boolean initialized = false;
-
-	/**
-	 * Whether to auto-initialize the Datastore at EntityManagerFactory setup
-	 */
-	private final boolean autoInitialize;
-
-	/**
-	 * Default constructor
+	 * Constructor.
 	 */
 	public DefaultJpaDatastore() {
-		this(true);
-	}
-
-	/**
-	 * Constructor
-	 * @param autoInitialize Whether to initialize the Datastore at EntityManagerFactory setup
-	 */
-	public DefaultJpaDatastore(boolean autoInitialize) {
 		super(JpaDatastoreCommodityFactory.class, JpaDatastoreExpressionResolver.class);
-		this.autoInitialize = autoInitialize;
 
 		// EntityManager lifecycle
 		setEntityManagerInitializer((emf) -> emf.createEntityManager());
@@ -214,6 +196,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		addExpressionResolver(SubQueryResolver.INSTANCE);
 		addExpressionResolver(QueryProjectionResolver.INSTANCE);
 		addExpressionResolver(DataTargetProjectionResolver.INSTANCE);
+		addExpressionResolver(SelectAllProjectionResolver.INSTANCE);
 		addExpressionResolver(ConstantExpressionProjectionResolver.INSTANCE);
 		addExpressionResolver(TypedExpressionProjectionResolver.INSTANCE);
 		addExpressionResolver(PropertySetProjectionResolver.INSTANCE);
@@ -237,72 +220,48 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		registerCommodity(JpaBulkUpdate.FACTORY);
 		registerCommodity(JpaBulkDelete.FACTORY);
 		registerCommodity(JpaQuery.FACTORY);
+		registerCommodity(JpaQuery.LOCK_FACTORY);
 	}
 
-	/**
-	 * Whether to initialize the Datastore at EntityManagerFactory setup.
-	 * @return the autoInitialize <code>true</code> if auto-initialize is enabled
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.core.internal.datastore.AbstractInitializableDatastore#initialize(java.lang.ClassLoader)
 	 */
-	protected boolean isAutoInitialize() {
-		return autoInitialize;
-	}
+	@Override
+	protected boolean initialize(ClassLoader classLoader) {
 
-	/**
-	 * Initialize the datastore
-	 * @param classLoader ClassLoader to use to load default factories and resolvers
-	 * @throws IllegalStateException If initialization fails
-	 */
-	protected void initialize(ClassLoader classLoader) throws IllegalStateException {
-		if (!initialized) {
-
-			// check getEntityManagerFactory
-			if (getEntityManagerFactory() == null) {
-				throw new IllegalStateException("No EntityManagerFactory available");
-			}
-
-			// platform
-			if (!getORMPlatform().isPresent()) {
-				// try to detect
-				detectORMPlatform().ifPresent(platform -> setORMPlatform(platform));
-			}
-
-			// dialect
-			if (getDialect() == null) {
-				setDialect(
-						getORMPlatform().flatMap(platform -> ORMDialect.detect(platform)).orElse(new DefaultDialect()));
-			}
-
-			// init dialect
-			final ORMDialect dialect = getDialect();
-
-			LOGGER.debug(() -> "ORM dialect: [" + ((dialect != null) ? dialect.getClass().getName() : null) + "]");
-			try {
-				dialect.init(new JpaDatastoreDialectContext());
-			} catch (Exception e) {
-				throw new IllegalStateException("Failed to initialize dialect [" + dialect.getClass().getName() + "]",
-						e);
-			}
-
-			getORMPlatform().ifPresent(platform -> LOGGER.info("ORM platform: " + platform));
-			LOGGER.info("ORM dialect: [" + dialect.getClass().getName() + "] - Supported JPA version: "
-					+ dialect.getSupportedJPAMajorVersion() + "." + dialect.getSupportedJPAMinorVersion());
-
-			// default factories and resolvers
-			loadExpressionResolvers(classLoader);
-			loadCommodityFactories(classLoader);
-
-			initialized = true;
+		// check getEntityManagerFactory
+		if (getEntityManagerFactory() == null) {
+			throw new IllegalStateException("No EntityManagerFactory available");
 		}
-	}
 
-	/**
-	 * Checks whether to auto-initialize the Datastore, if {@link #isAutoInitialize()} is <code>true</code> and the
-	 * Datastore wasn't already initialized.
-	 */
-	protected void checkInitialize() {
-		if (isAutoInitialize()) {
-			initialize(ClassUtils.getDefaultClassLoader());
+		// platform
+		if (!getORMPlatform().isPresent()) {
+			// try to detect
+			detectORMPlatform().ifPresent(platform -> setORMPlatform(platform));
 		}
+
+		// dialect
+		if (getDialect() == null) {
+			setDialect(getORMPlatform().flatMap(platform -> ORMDialect.detect(platform)).orElse(new DefaultDialect()));
+		}
+
+		// init dialect
+		final ORMDialect dialect = getDialect();
+		try {
+			dialect.init(new JpaDatastoreDialectContext());
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to initialize dialect [" + dialect.getClass().getName() + "]", e);
+		}
+
+		// default factories and resolvers
+		loadExpressionResolvers(classLoader);
+		loadCommodityFactories(classLoader);
+
+		LOGGER.info("JpaDatastore initialized - Using dialect [" + dialect.getClass().getName() + "]");
+		getORMPlatform().ifPresent(platform -> LOGGER.info("JpaDatastore ORM platform: " + platform));
+
+		return true;
 	}
 
 	/*
@@ -324,8 +283,6 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		// reset
 		this.platform = null;
 		this.dialect = null;
-		// check initialization
-		checkInitialize();
 	}
 
 	/*
@@ -445,7 +402,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 * Sets the {@link EntityManager} instance provider for Datastore operations execution
 	 * @param entityManagerInitializer the EntityManagerInitializer to set
 	 */
-	protected void setEntityManagerInitializer(EntityManagerInitializer entityManagerInitializer) {
+	public void setEntityManagerInitializer(EntityManagerInitializer entityManagerInitializer) {
 		ObjectUtils.argumentNotNull(entityManagerInitializer, "EntityManagerInitializer must be not null");
 		this.entityManagerInitializer = entityManagerInitializer;
 	}
@@ -462,7 +419,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 * Sets the {@link EntityManager} finalizer to use after Datastore operations execution.
 	 * @param entityManagerFinalizer the EntityManagerFinalizer to set
 	 */
-	protected void setEntityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
+	public void setEntityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
 		this.entityManagerFinalizer = entityManagerFinalizer;
 	}
 
@@ -516,6 +473,7 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	 */
 	@Override
 	public <R> R withEntityManager(EntityManagerOperation<R> operation) {
+		checkInitialized();
 		ObjectUtils.argumentNotNull(operation, "Operation must be not null");
 
 		EntityManager entityManager = null;
@@ -524,31 +482,17 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 			// check current
 			final EntityManager current = CURRENT_ENTITY_MANAGER.get();
 			if (current != null) {
-
-				LOGGER.debug(() -> "Execute operation using current EntityManager [" + current.hashCode() + "]");
-
 				return operation.execute(current);
 			}
 
 			// if a transaction is active, use current transaction EntityManager
-			final JpaTransaction tx = getCurrentTransaction().orElse(null);
-			if (tx != null) {
-
-				LOGGER.debug(() -> "Execute operation using current transaction EntityManager ["
-						+ tx.getEntityManager().hashCode() + "]");
-
-				return operation.execute(tx.getEntityManager());
+			EntityManager txem = getCurrentTransactionEntityManager().orElse(null);
+			if (txem != null) {
+				return operation.execute(txem);
 			}
 
-			// obtain EntityManager
-			entityManager = obtainEntityManager();
-			CURRENT_ENTITY_MANAGER.set(entityManager);
-
-			// execute operation
-
-			LOGGER.debug(
-					() -> "Execute operation using EntityManager [" + CURRENT_ENTITY_MANAGER.get().hashCode() + "]");
-
+			// get an EntityManager from handler
+			CURRENT_ENTITY_MANAGER.set(entityManager = obtainEntityManager());
 			return operation.execute(entityManager);
 
 		} catch (DataAccessException e) {
@@ -558,14 +502,10 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		} finally {
 			// check active transaction: avoid EntityManager finalization if present
 			if (entityManager != null) {
-				final EntityManager em = entityManager;
-
 				// finalize EntityManager
 				finalizeEntityManager(entityManager);
 				// remove current
 				CURRENT_ENTITY_MANAGER.remove();
-
-				LOGGER.debug(() -> "Current EntityManager finalized and removed [" + em.hashCode() + "]");
 			}
 		}
 	}
@@ -578,9 +518,10 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	@Override
 	public <R> R withTransaction(TransactionalOperation<R> operation,
 			TransactionConfiguration transactionConfiguration) {
+		checkInitialized();
 		ObjectUtils.argumentNotNull(operation, "TransactionalOperation must be not null");
 
-		final JpaTransaction tx = beginTransaction(transactionConfiguration);
+		final JpaTransaction tx = beginTransaction(transactionConfiguration, false);
 
 		try {
 			// execute operation
@@ -590,30 +531,43 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 			if (tx.getConfiguration().isRollbackOnError()) {
 				tx.setRollbackOnly();
 			}
+			if (e instanceof DataAccessException) {
+				throw (DataAccessException) e;
+			}
 			throw new DataAccessException("Failed to execute operation", e);
 		} finally {
 			try {
-				finalizeTransaction();
+				endTransaction(tx);
 			} catch (Exception e) {
 				throw new DataAccessException("Failed to finalize transaction", e);
 			}
 		}
 	}
 
-	/**
-	 * Get the {@link JpaTransactionProvider} to use to create a new JPA transaction.
-	 * @return the transaction provider
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.core.datastore.transaction.Transactional#getTransaction(com.holonplatform.core.datastore.
+	 * transaction.TransactionConfiguration)
 	 */
-	protected JpaTransactionProvider getTransactionProvider() {
-		return transactionProvider;
+	@Override
+	public Transaction getTransaction(TransactionConfiguration transactionConfiguration) {
+		return beginTransaction(transactionConfiguration, true);
 	}
 
 	/**
-	 * Set the {@link JpaTransactionProvider} to use to create a new JPA transaction.
-	 * @param transactionProvider the transaction provider to set (not null)
+	 * Get the {@link JpaTransactionFactory} to use to create a new JPA transaction.
+	 * @return the transaction factory
 	 */
-	public void setTransactionProvider(JpaTransactionProvider transactionProvider) {
-		this.transactionProvider = transactionProvider;
+	protected JpaTransactionFactory getTransactionFactory() {
+		return transactionFactory;
+	}
+
+	/**
+	 * Set the {@link JpaTransactionFactory} to use to create a new JPA transaction.
+	 * @param transactionFactory the transaction factory to set (not null)
+	 */
+	public void setTransactionFactory(JpaTransactionFactory transactionFactory) {
+		this.transactionFactory = transactionFactory;
 	}
 
 	/**
@@ -625,67 +579,115 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 	}
 
 	/**
-	 * If a transaction is active, remove the transaction from current trasactions stack and return the transaction
-	 * itself.
+	 * Get the {@link EntityManager} bound to the current transaction, if available.
+	 * @return Optional {@link EntityManager} bound to the current transaction
+	 */
+	private static Optional<EntityManager> getCurrentTransactionEntityManager() {
+		return getCurrentTransaction().map(tx -> tx.getEntityManager());
+	}
+
+	/**
+	 * Remove given transaction from current trasactions stack.
+	 * @param tx Transaction to remove
 	 * @return The removed current transaction, if it was present
 	 */
-	private static Optional<JpaTransaction> removeCurrentTransaction() {
-		return (CURRENT_TRANSACTION.get().isEmpty()) ? Optional.empty() : Optional.of(CURRENT_TRANSACTION.get().pop());
+	private static Optional<JpaTransaction> removeTransaction(JpaTransaction tx) {
+		ObjectUtils.argumentNotNull(tx, "Transaction must be not null");
+		final Stack<JpaTransaction> stack = CURRENT_TRANSACTION.get();
+		if (!stack.isEmpty()) {
+			if (stack.remove(tx)) {
+				return Optional.of(tx);
+			}
+		}
+		return Optional.empty();
 	}
 
 	/**
 	 * Start a new transaction.
 	 * @param configuration Transaction configuration
+	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
+	 *        transaction is committed or rollbacked)
 	 * @return The current transaction or a new one if no transaction is active
 	 * @throws TransactionException Error starting a new transaction
 	 */
-	private JpaTransaction beginTransaction(TransactionConfiguration configuration) throws TransactionException {
+	private JpaTransaction beginTransaction(TransactionConfiguration configuration, boolean endTransactionWhenCompleted)
+			throws TransactionException {
+		// configuration
+		final TransactionConfiguration cfg = (configuration != null) ? configuration
+				: TransactionConfiguration.getDefault();
+		// entitymanager
+		final EntityManager entityManager;
 		try {
-			// create a new transaction
-			JpaTransaction tx = createTransaction(obtainEntityManager(),
-					(configuration != null) ? configuration : TransactionConfiguration.getDefault());
+			entityManager = obtainEntityManager();
+		} catch (Exception e) {
+			throw new TransactionException("Failed to obtain an EntityManager to start a transaction", e);
+		}
+		// create a new transaction
+		final JpaTransaction tx = getTransactionFactory().createTransaction(entityManager, cfg,
+				endTransactionWhenCompleted);
+		// lifecycle handler
+		tx.addLifecycleHandler(this);
+		// start transaction
+		try {
 			// start transaction
 			tx.start();
-			// stack transaction
-			return CURRENT_TRANSACTION.get().push(tx);
-		} catch (Exception e) {
-			throw new TransactionException("Failed to start a transaction", e);
+		} catch (TransactionException e) {
+			// ensure entitymanager finalization
+			finalizeEntityManager(entityManager);
+			// propagate
+			throw e;
+		}
+		// return the transaction
+		return tx;
+	}
+
+	/**
+	 * Finalize the given transaction.
+	 * @param tx Transaction to finalize
+	 * @throws TransactionException
+	 */
+	protected void endTransaction(JpaTransaction tx) throws TransactionException {
+		ObjectUtils.argumentNotNull(tx, "Transaction must be not null");
+		try {
+			if (tx.isActive()) {
+				tx.end();
+			}
+		} finally {
+			// finalize entity manager
+			try {
+				finalizeEntityManager(tx.getEntityManager());
+			} catch (Exception e) {
+				throw new TransactionException("Failed to finalize the transaction EntityManager", e);
+			}
 		}
 	}
 
-	/**
-	 * Build a new {@link JpaTransaction} using current {@link JpaTransactionProvider}.
-	 * @param entityManager The {@link EntityManager} to use (not null)
-	 * @param configuration Configuration (not null)
-	 * @return A new {@link JpaTransaction}
-	 * @throws TransactionException If an error occurred
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler#transactionStarted(com.holonplatform.datastore.
+	 * jpa.tx.JpaTransaction)
 	 */
-	protected JpaTransaction createTransaction(EntityManager entityManager, TransactionConfiguration configuration) {
-		return getTransactionProvider().createTransaction(entityManager, configuration);
+	@Override
+	public void transactionStarted(JpaTransaction transaction) {
+		if (transaction != null) {
+			// stack
+			CURRENT_TRANSACTION.get().push(transaction);
+		}
 	}
 
-	/**
-	 * Finalize current transaction, if present.
-	 * @return <code>true</code> if a transaction was active and has been finalized
-	 * @throws TransactionException Error during transaction finalization
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler#transactionEnded(com.holonplatform.datastore.
+	 * jpa.tx.JpaTransaction)
 	 */
-	private boolean finalizeTransaction() throws TransactionException {
-		return removeCurrentTransaction().map(tx -> {
-			try {
-				// finalize transaction
-				tx.end();
-				return true;
-			} catch (Exception e) {
-				throw new TransactionException("Failed to finalize transaction", e);
-			} finally {
-				// finalize entity manager
-				try {
-					finalizeEntityManager(tx.getEntityManager());
-				} catch (Exception e) {
-					throw new TransactionException("Failed finalize the EntityManager", e);
-				}
-			}
-		}).orElse(false);
+	@Override
+	public void transactionEnded(JpaTransaction transaction) {
+		if (transaction != null) {
+			// remove from stack
+			removeTransaction(transaction);
+		}
 	}
 
 	// ------- Dialect context
@@ -855,6 +857,32 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		/*
 		 * (non-Javadoc)
 		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerHandler(com.holonplatform.datastore.jpa.
+		 * JpaDatastore.EntityManagerLifecycleHandler)
+		 */
+		@Override
+		public Builder<D> entityManagerHandler(EntityManagerLifecycleHandler entityManagerHandler) {
+			ObjectUtils.argumentNotNull(entityManagerHandler, "EntityManagerLifecycleHandler must be not null");
+			datastore.setEntityManagerInitializer(entityManagerHandler);
+			datastore.setEntityManagerFinalizer(entityManagerHandler);
+			return this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#transactionFactory(com.holonplatform.datastore.jpa.tx.
+		 * JpaTransactionFactory)
+		 */
+		@Override
+		public Builder<D> transactionFactory(JpaTransactionFactory transactionFactory) {
+			datastore.setTransactionFactory(transactionFactory);
+			return this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
 		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#platform(com.holonplatform.datastore.jpa.ORMPlatform)
 		 */
 		@Override
@@ -929,10 +957,8 @@ public class DefaultJpaDatastore extends AbstractDatastore<JpaDatastoreCommodity
 		 */
 		@Override
 		public JpaDatastore build() {
-			if (datastore.getEntityManagerFactory() == null) {
-				throw new IllegalStateException(
-						"No EntityManagerFactory available: a EntityManagerFactory must be provided to build the JpaDatastore instance");
-			}
+			// init
+			datastore.initialize();
 			return datastore;
 		}
 

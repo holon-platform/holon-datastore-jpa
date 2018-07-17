@@ -68,6 +68,11 @@ public enum JPQLQueryDefinitionResolver implements JPQLContextExpressionResolver
 		final StringBuilder query = new StringBuilder();
 
 		query.append("SELECT ");
+
+		if (expression.isDistinct()) {
+			query.append("DISTINCT ");
+		}
+
 		query.append(expression.getSelect());
 		query.append(" FROM ");
 		query.append(expression.getFrom());

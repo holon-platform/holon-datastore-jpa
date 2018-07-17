@@ -22,8 +22,8 @@ import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
 import com.holonplatform.core.datastore.bulk.BulkUpdate;
-import com.holonplatform.core.datastore.operation.UpdateOperationConfiguration;
-import com.holonplatform.core.internal.datastore.bulk.AbstractBulkUpdateOperation;
+import com.holonplatform.core.internal.datastore.bulk.AbstractBulkUpdate;
+import com.holonplatform.core.internal.datastore.operation.common.UpdateOperationConfiguration;
 import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
@@ -35,7 +35,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLStatement;
  * 
  * @since 5.1.0
  */
-public class JpaBulkUpdate extends AbstractBulkUpdateOperation<BulkUpdate> implements BulkUpdate {
+public class JpaBulkUpdate extends AbstractBulkUpdate {
 
 	private static final long serialVersionUID = -470171503703187731L;
 
@@ -59,15 +59,6 @@ public class JpaBulkUpdate extends AbstractBulkUpdateOperation<BulkUpdate> imple
 	public JpaBulkUpdate(JpaOperationContext operationContext) {
 		super();
 		this.operationContext = operationContext;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.core.internal.datastore.operation.AbstractDatastoreOperation#getActualOperation()
-	 */
-	@Override
-	protected BulkUpdate getActualOperation() {
-		return this;
 	}
 
 	/*
@@ -108,7 +99,7 @@ public class JpaBulkUpdate extends AbstractBulkUpdateOperation<BulkUpdate> imple
 			// check auto-flush
 			if (operationContext.isAutoFlush() || getConfiguration().hasWriteOption(JpaWriteOption.FLUSH)) {
 				entityManager.flush();
-				
+
 				operationContext.traceOperation("FLUSH EntityManager");
 			}
 

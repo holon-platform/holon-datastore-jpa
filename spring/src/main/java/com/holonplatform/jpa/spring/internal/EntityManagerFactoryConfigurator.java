@@ -40,7 +40,6 @@ import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter;
 
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.internal.utils.ObjectUtils;
@@ -271,16 +270,14 @@ class EntityManagerFactoryConfigurator {
 	protected JpaVendorAdapter buildJpaVendorAdapter(ORMPlatform orm) {
 		AbstractJpaVendorAdapter adapter = null;
 		switch (orm) {
-		case DATANUCLEUS:
-			break;
 		case ECLIPSELINK:
 			adapter = new EclipseLinkJpaVendorAdapter();
 			break;
 		case HIBERNATE:
 			adapter = new HibernateJpaVendorAdapter();
 			break;
+		case DATANUCLEUS:
 		case OPENJPA:
-			adapter = new OpenJpaVendorAdapter();
 			break;
 		default:
 			break;

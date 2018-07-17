@@ -19,20 +19,20 @@ import java.util.Optional;
 
 import javax.annotation.Priority;
 
+import com.holonplatform.core.ConstantConverterExpression;
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.ExpressionResolver;
-import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLExpression;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLLiteral;
 
 /**
- * {@link ConstantExpression} resolver.
+ * {@link ConstantConverterExpression} resolver.
  *
  * @since 5.0.0
  */
 @SuppressWarnings("rawtypes")
 @Priority(Integer.MAX_VALUE)
-public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExpression, JPQLExpression> {
+public enum ConstantExpressionResolver implements ExpressionResolver<ConstantConverterExpression, JPQLExpression> {
 
 	INSTANCE;
 
@@ -41,8 +41,8 @@ public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExp
 	 * @see com.holonplatform.core.ExpressionResolver#getExpressionType()
 	 */
 	@Override
-	public Class<? extends ConstantExpression> getExpressionType() {
-		return ConstantExpression.class;
+	public Class<? extends ConstantConverterExpression> getExpressionType() {
+		return ConstantConverterExpression.class;
 	}
 
 	/*
@@ -60,15 +60,17 @@ public enum ConstantExpressionResolver implements ExpressionResolver<ConstantExp
 	 * com.holonplatform.core.ExpressionResolver.ResolutionContext)
 	 */
 	@Override
-	public Optional<JPQLExpression> resolve(ConstantExpression expression, ResolutionContext context)
+	public Optional<JPQLExpression> resolve(ConstantConverterExpression expression, ResolutionContext context)
 			throws InvalidExpressionException {
 
 		// validate
 		expression.validate();
 
 		// resolve as Literal
-		return context.resolve(JPQLLiteral.create(expression.getModelValue(),
-				((ConstantExpression<?>) expression).getTemporalType().orElse(null)), JPQLExpression.class, context);
+		return context.resolve(
+				JPQLLiteral.create(expression.getModelValue(),
+						((ConstantConverterExpression<?, ?>) expression).getTemporalType().orElse(null)),
+				JPQLExpression.class, context);
 	}
 
 }

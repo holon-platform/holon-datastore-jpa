@@ -36,8 +36,8 @@ import com.holonplatform.datastore.jpa.ORMPlatform;
 		BlobTest.class, BulkInsertTest.class, BulkUpdateTest.class, BulkDeleteTest.class, BulkUpdateAliasTest.class,
 		BulkDeleteAliasTest.class, AggregationFunctionsTest.class, StringFunctionsTest.class,
 		TemporalFunctionsTest.class, DataTargetResolverTest.class, CustomExpressionsTest.class,
-		EntityProjectionTest.class, InsertedKeysTest.class, TransactionTest.class, QueryHintTest.class,
-		LockModeTest.class, SharedEntityManagerTest.class })
+		EntityProjectionTest.class, InsertedKeysTest.class, DistinctTest.class, TransactionTest.class,
+		QueryHintTest.class, LockModeTest.class, SharedEntityManagerTest.class, LockTest.class })
 public abstract class AbstractJpaDatastoreTestSuite {
 
 	public static Datastore datastore;
@@ -78,7 +78,7 @@ public abstract class AbstractJpaDatastoreTestSuite {
 	public static boolean temporalProjectionTest = true;
 
 	public static boolean transactionalTest = true;
-	
+
 	public static boolean saveOperationTest = true;
 
 	public static boolean saveOperationTypeTest = true;
@@ -86,11 +86,11 @@ public abstract class AbstractJpaDatastoreTestSuite {
 	public static boolean updateNullsTest = true;
 
 	public static boolean enumProjectionTest = true;
-	
+
 	public static boolean updateWithFunctionTest = true;
-	
+
 	public static boolean updateNestedTest = true;
-	
+
 	public static boolean customFunctionExpressionTest = true;
 
 }

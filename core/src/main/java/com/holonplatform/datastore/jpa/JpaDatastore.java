@@ -24,6 +24,7 @@ import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.datastore.DatastoreCommodity;
 import com.holonplatform.core.datastore.DatastoreCommodityRegistrar;
+import com.holonplatform.core.datastore.DatastoreOperations;
 import com.holonplatform.core.datastore.transaction.Transactional;
 import com.holonplatform.core.query.Query;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
@@ -31,6 +32,7 @@ import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory;
 import com.holonplatform.datastore.jpa.context.EntityManagerHandler;
 import com.holonplatform.datastore.jpa.dialect.ORMDialect;
 import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
+import com.holonplatform.datastore.jpa.tx.JpaTransactionFactory;
 
 /**
  * JPA {@link Datastore}.
@@ -66,7 +68,7 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 	/**
 	 * {@link JpaDatastore} builder.
 	 */
-	public interface Builder<D extends JpaDatastore> extends Datastore.Builder<D, Builder<D>> {
+	public interface Builder<D extends JpaDatastore> extends DatastoreOperations.Builder<D, Builder<D>> {
 
 		/**
 		 * Set the {@link EntityManagerFactory} to use to obtain {@link EntityManager}s used for datastore operations.
@@ -88,6 +90,21 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		 * @return this
 		 */
 		Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer);
+
+		/**
+		 * Set both the {@link EntityManager} initializer (instance provider) and finalizer using the
+		 * {@link EntityManagerLifecycleHandler} convenience interface.
+		 * @param entityManagerHandler the {@link EntityManagerLifecycleHandler} to set (not null)
+		 * @return this
+		 */
+		Builder<D> entityManagerHandler(EntityManagerLifecycleHandler entityManagerHandler);
+
+		/**
+		 * Set a custom {@link JpaTransactionFactory} to be used by the Datastore to create new transactions.
+		 * @param transactionFactory The transaction factory to set (not null)
+		 * @return this
+		 */
+		Builder<D> transactionFactory(JpaTransactionFactory transactionFactory);
 
 		/**
 		 * Set the {@link ORMPlatform} to use.
@@ -185,6 +202,15 @@ public interface JpaDatastore extends Datastore, Transactional, EntityManagerHan
 		static EntityManagerFinalizer createDefault() {
 			return em -> em.close();
 		}
+
+	}
+
+	/**
+	 * Convenience interface which combines {@link EntityManagerInitializer} and {@link EntityManagerFinalizer}.
+	 * 
+	 * @since 5.2.0
+	 */
+	public interface EntityManagerLifecycleHandler extends EntityManagerInitializer, EntityManagerFinalizer {
 
 	}
 

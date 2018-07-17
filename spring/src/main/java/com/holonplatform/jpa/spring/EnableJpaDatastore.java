@@ -32,6 +32,7 @@ import com.holonplatform.core.datastore.DataContextBound;
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.jpa.spring.internal.JpaDatastoreRegistrar;
+import com.holonplatform.spring.EnableDatastoreConfiguration;
 import com.holonplatform.spring.PrimaryMode;
 
 /**
@@ -57,6 +58,7 @@ import com.holonplatform.spring.PrimaryMode;
 @Documented
 @Inherited
 @Import(JpaDatastoreRegistrar.class)
+@EnableDatastoreConfiguration
 public @interface EnableJpaDatastore {
 
 	/**

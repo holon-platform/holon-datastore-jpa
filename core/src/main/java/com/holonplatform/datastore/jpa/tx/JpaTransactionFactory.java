@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.holonplatform.datastore.jpa.internal.transaction;
+package com.holonplatform.datastore.jpa.tx;
 
 import javax.persistence.EntityManager;
 
@@ -21,29 +21,33 @@ import com.holonplatform.core.datastore.transaction.Transaction.TransactionExcep
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
 
 /**
- * {@link JpaTransaction} implementation provider.
+ * Factory to create and configure new {@link JpaTransaction} implementation using an {@link EntityManager} and a
+ * {@link TransactionConfiguration} definition.
  *
- * @since 5.1.0
+ * @since 5.2.0
  */
 @FunctionalInterface
-public interface JpaTransactionProvider {
+public interface JpaTransactionFactory {
 
 	/**
 	 * Build a new {@link JpaTransaction}.
 	 * @param entityManager The {@link EntityManager} to use (not null)
 	 * @param configuration Configuration (not null)
+	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
+	 *        transaction is committed or rollbacked)
 	 * @return A new {@link JpaTransaction} (not null)
 	 * @throws TransactionException If an error occurred
 	 */
-	JpaTransaction createTransaction(EntityManager entityManager, TransactionConfiguration configuration)
-			throws TransactionException;
+	JpaTransaction createTransaction(EntityManager entityManager, TransactionConfiguration configuration,
+			boolean endTransactionWhenCompleted) throws TransactionException;
 
 	/**
-	 * Get the default {@link JpaTransactionProvider}.
-	 * @return the default {@link JpaTransactionProvider}
+	 * Get the default {@link JpaTransactionFactory}.
+	 * @return the default {@link JpaTransactionFactory}
 	 */
-	static JpaTransactionProvider getDefault() {
-		return DefaultJpaTransactionProvider.INSTANCE;
+	static JpaTransactionFactory getDefault() {
+		return (entityManager, configuration, endTransactionWhenCompleted) -> JpaTransaction.create(entityManager,
+				configuration, endTransactionWhenCompleted);
 	}
 
 }

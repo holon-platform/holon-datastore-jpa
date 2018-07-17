@@ -33,9 +33,9 @@ import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
 import com.holonplatform.core.datastore.DefaultWriteOption;
-import com.holonplatform.core.datastore.operation.InsertOperation;
+import com.holonplatform.core.datastore.operation.Insert;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.datastore.operation.AbstractInsertOperation;
+import com.holonplatform.core.internal.datastore.operation.AbstractInsert;
 import com.holonplatform.core.property.PathProperty;
 import com.holonplatform.core.property.PathPropertyBoxAdapter;
 import com.holonplatform.core.property.PropertyBox;
@@ -47,11 +47,11 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
- * JPA {@link InsertOperation}.
+ * JPA {@link Insert}.
  *
  * @since 5.1.0
  */
-public class JpaInsert extends AbstractInsertOperation {
+public class JpaInsert extends AbstractInsert {
 
 	private static final long serialVersionUID = 463250918269446451L;
 
@@ -62,15 +62,15 @@ public class JpaInsert extends AbstractInsertOperation {
 
 	// Commodity factory
 	@SuppressWarnings("serial")
-	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, InsertOperation> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, InsertOperation>() {
+	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, Insert> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, Insert>() {
 
 		@Override
-		public Class<? extends InsertOperation> getCommodityType() {
-			return InsertOperation.class;
+		public Class<? extends Insert> getCommodityType() {
+			return Insert.class;
 		}
 
 		@Override
-		public InsertOperation createCommodity(JpaDatastoreCommodityContext context)
+		public Insert createCommodity(JpaDatastoreCommodityContext context)
 				throws CommodityConfigurationException {
 			return new JpaInsert(context);
 		}

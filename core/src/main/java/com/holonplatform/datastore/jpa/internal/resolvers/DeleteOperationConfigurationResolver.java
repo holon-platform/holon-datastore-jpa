@@ -20,8 +20,8 @@ import java.util.Optional;
 import javax.annotation.Priority;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
-import com.holonplatform.core.datastore.operation.DeleteOperationConfiguration;
 import com.holonplatform.core.datastore.relational.RelationalTarget;
+import com.holonplatform.core.internal.datastore.operation.common.DeleteOperationConfiguration;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLContextExpressionResolver;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.context.JPQLStatementResolutionContext;

@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.internal.operations;
 
 import java.util.Map;
 
-import com.holonplatform.core.Path;
+import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.Datastore.OperationType;
@@ -25,11 +25,9 @@ import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfi
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
 import com.holonplatform.core.datastore.bulk.BulkInsert;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.datastore.bulk.AbstractBulkInsertOperation;
-import com.holonplatform.core.property.PathPropertyBoxAdapter;
+import com.holonplatform.core.internal.datastore.bulk.AbstractBulkInsert;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.core.property.PropertySet;
-import com.holonplatform.core.query.ConstantExpression;
 import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
@@ -42,7 +40,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
  * 
  * @since 5.1.0
  */
-public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> implements BulkInsert {
+public class JpaBulkInsert extends AbstractBulkInsert {
 
 	private static final long serialVersionUID = -2659369449773116773L;
 
@@ -65,32 +63,9 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 
 	private final JpaOperationContext operationContext;
 
-	private PropertySet<?> propertySet;
-
 	public JpaBulkInsert(JpaOperationContext operationContext) {
 		super();
 		this.operationContext = operationContext;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.core.internal.datastore.bulk.AbstractBulkInsertOperation#operationPaths(com.holonplatform.core.
-	 * property.PropertySet)
-	 */
-	@Override
-	public BulkInsert operationPaths(PropertySet<?> propertySet) {
-		this.propertySet = propertySet;
-		return super.operationPaths(propertySet);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.core.internal.datastore.operation.AbstractDatastoreOperation#getActualOperation()
-	 */
-	@Override
-	protected BulkInsert getActualOperation() {
-		return this;
 	}
 
 	/*
@@ -106,6 +81,10 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 		// composition context
 		final JPQLResolutionContext context = JPQLResolutionContext.create(operationContext);
 		context.addExpressionResolvers(getConfiguration().getExpressionResolvers());
+
+		// property set
+		final PropertySet<?> propertySet = getConfiguration().getPropertySet()
+				.orElseThrow(() -> new InvalidExpressionException("Missing bulk insert operation property set"));
 
 		// get entity class
 		final Class<?> entity = context.resolveOrFail(getConfiguration().getTarget(), JpaEntity.class).getEntityClass();
@@ -136,12 +115,13 @@ public class JpaBulkInsert extends AbstractBulkInsertOperation<BulkInsert> imple
 			final BeanPropertySet<Object> set = operationContext.getBeanIntrospector().getPropertySet(entity);
 
 			int i = 0;
-			for (Map<Path<?>, ConstantExpression<?>> value : getConfiguration().getValues()) {
+			for (PropertyBox value : getConfiguration().getValues()) {
 
 				PropertyBox box = PropertyBox.builder(propertySet).invalidAllowed(true).build();
-				PathPropertyBoxAdapter adapter = PathPropertyBoxAdapter.create(box);
-				value.forEach((p, e) -> {
-					adapter.setValue((Path<Object>) p, e.getModelValue());
+				propertySet.forEach(property -> {
+					if (value.contains(property)) {
+						box.setValue(property, value.getValue(property));
+					}
 				});
 
 				// persist entity

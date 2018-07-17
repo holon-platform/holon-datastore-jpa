@@ -15,8 +15,12 @@
  */
 package com.holonplatform.datastore.jpa.internal.operations;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
@@ -25,11 +29,17 @@ import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.query.QueryAdapterQuery;
 import com.holonplatform.core.internal.query.QueryDefinition;
 import com.holonplatform.core.internal.query.QueryUtils;
+import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
+import com.holonplatform.core.internal.query.lock.LockQueryAdapterQuery;
 import com.holonplatform.core.internal.utils.TypeUtils;
 import com.holonplatform.core.query.Query;
 import com.holonplatform.core.query.QueryAdapter;
 import com.holonplatform.core.query.QueryConfiguration;
 import com.holonplatform.core.query.QueryOperation;
+import com.holonplatform.core.query.SelectAllProjection;
+import com.holonplatform.core.query.lock.LockMode;
+import com.holonplatform.core.query.lock.LockQuery;
+import com.holonplatform.core.query.lock.LockQueryAdapter;
 import com.holonplatform.datastore.jpa.JpaDatastore;
 import com.holonplatform.datastore.jpa.JpaQueryHint;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
@@ -44,7 +54,7 @@ import com.holonplatform.datastore.jpa.jpql.expression.JPQLQuery;
  *
  * @since 5.1.0
  */
-public class JpaQuery implements QueryAdapter<QueryConfiguration> {
+public class JpaQuery implements LockQueryAdapter<QueryConfiguration> {
 
 	// Commodity factory
 	@SuppressWarnings("serial")
@@ -58,6 +68,21 @@ public class JpaQuery implements QueryAdapter<QueryConfiguration> {
 		@Override
 		public Query createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
 			return new QueryAdapterQuery<>(new JpaQuery(context), QueryDefinition.create());
+		}
+	};
+
+	// LockQuery Commodity factory
+	@SuppressWarnings("serial")
+	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, LockQuery> LOCK_FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, LockQuery>() {
+
+		@Override
+		public Class<? extends LockQuery> getCommodityType() {
+			return LockQuery.class;
+		}
+
+		@Override
+		public LockQuery createCommodity(JpaDatastoreCommodityContext context) throws CommodityConfigurationException {
+			return new LockQueryAdapterQuery<>(new JpaQuery(context), QueryDefinition.create());
 		}
 	};
 
@@ -75,11 +100,11 @@ public class JpaQuery implements QueryAdapter<QueryConfiguration> {
 	@Override
 	public <R> Stream<R> stream(QueryOperation<QueryConfiguration, R> queryOperation) throws DataAccessException {
 
-		/// composition context
+		// composition context
 		final JPQLResolutionContext context = JPQLResolutionContext.create(operationContext);
 		context.addExpressionResolvers(queryOperation.getConfiguration().getExpressionResolvers());
 
-		// resolve to SQLQuery
+		// resolve to JPQLQuery
 		@SuppressWarnings("unchecked")
 		final JPQLQuery<Object, R> query = context.resolveOrFail(queryOperation, JPQLQuery.class);
 
@@ -104,30 +129,129 @@ public class JpaQuery implements QueryAdapter<QueryConfiguration> {
 		return operationContext.withEntityManager(entityManager -> {
 
 			// configure query
-			final TypedQuery<?> q = entityManager.createQuery(query.getJPQL(), query.getQueryResultType());
-
-			// resolve parameters
-			context.setupQueryParameters(q);
-
-			// setup limit and offset
-			queryOperation.getConfiguration().getLimit().ifPresent((l) -> q.setMaxResults(l));
-			queryOperation.getConfiguration().getOffset().ifPresent((o) -> q.setFirstResult(o));
-
-			// query hints and lock mode
-			queryOperation.getConfiguration().getParameter(JpaQueryHint.QUERY_PARAMETER_HINT)
-					.ifPresent(p -> q.setHint(p.getName(), p.getValue()));
-			queryOperation.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE)
-					.ifPresent(p -> q.setLockMode(p));
-			queryOperation.getConfiguration().getParameter(JpaDatastore.QUERY_PARAMETER_FLUSH_MODE)
-					.ifPresent(p -> q.setFlushMode(p));
+			final TypedQuery<?> q = createEntityManagerQuery(context, entityManager, query,
+					queryOperation.getConfiguration());
 
 			// execute and convert results
 			final JpaExecutionContext ctx = JpaExecutionContext.create(operationContext, entityManager);
 
-			return QueryUtils.asResultsStream(q.getResultList(), null).map(t -> converter.convert(ctx, t));
+			try {
+				return QueryUtils.asResultsStream(q.getResultList(), null).map(t -> converter.convert(ctx, t));
+			} catch (PersistenceException e) {
+				// translate PersistenceException using dialect
+				throw operationContext.getDialect().translateException(e);
+			}
 
 		});
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.holonplatform.core.query.lock.LockQueryAdapter#tryLock(com.holonplatform.core.query.QueryConfiguration)
+	 */
+	@Override
+	public boolean tryLock(QueryConfiguration queryConfiguration) {
+
+		// composition context
+		final JPQLResolutionContext context = JPQLResolutionContext.create(operationContext);
+		context.addExpressionResolvers(queryConfiguration.getExpressionResolvers());
+
+		final QueryOperation<?, ?> queryOperation = QueryOperation.create(queryConfiguration,
+				SelectAllProjection.create());
+
+		// resolve to JPQLQuery
+		final JPQLQuery<?, ?> jpqlQuery = context.resolveOrFail(queryOperation, JPQLQuery.class);
+
+		// trace
+		operationContext.trace(jpqlQuery.getJPQL());
+
+		// execute
+		return operationContext.withEntityManager(entityManager -> {
+
+			// configure query
+			final TypedQuery<?> q = JpaQuery.createEntityManagerQuery(context, entityManager, jpqlQuery,
+					queryOperation.getConfiguration());
+
+			// execute
+			try {
+				q.getResultList();
+			} catch (PersistenceException e) {
+				// translate PersistenceException using dialect
+				DataAccessException dae = operationContext.getDialect().translateException(e);
+				// check lock acquistion exception
+				if (LockAcquisitionException.class.isAssignableFrom(dae.getClass())) {
+					return false;
+				}
+				throw e;
+			}
+
+			return true;
+		});
+	}
+
+	/**
+	 * Create a JPA {@link TypedQuery} using given {@link JPQLQuery} statement and configured according to given query
+	 * configuration.
+	 * @param context Resolution content
+	 * @param entityManager EntityManager to use
+	 * @param query JPQL query definition
+	 * @param configuration Query configuration
+	 * @return A new {@link TypedQuery} using given {@link JPQLQuery} statement and configured according to given query
+	 *         configuration
+	 */
+	static TypedQuery<?> createEntityManagerQuery(JPQLResolutionContext context, EntityManager entityManager,
+			JPQLQuery<?, ?> query, QueryConfiguration configuration) {
+
+		// configure query
+		final TypedQuery<?> q = entityManager.createQuery(query.getJPQL(), query.getQueryResultType());
+
+		// resolve parameters
+		context.setupQueryParameters(q);
+
+		// setup limit and offset
+		configuration.getLimit().ifPresent((l) -> q.setMaxResults(l));
+		configuration.getOffset().ifPresent((o) -> q.setFirstResult(o));
+
+		// query hints
+		configuration.getParameter(JpaQueryHint.QUERY_PARAMETER_HINT)
+				.ifPresent(p -> q.setHint(p.getName(), p.getValue()));
+
+		// flush mode
+		configuration.getParameter(JpaDatastore.QUERY_PARAMETER_FLUSH_MODE).ifPresent(p -> q.setFlushMode(p));
+
+		// lock mode
+		if (configuration.hasNotNullParameter(LockQueryAdapterQuery.LOCK_MODE)) {
+			getJpaLockMode(configuration.getParameter(LockQueryAdapterQuery.LOCK_MODE, null)).ifPresent(lm -> {
+				q.setLockMode(lm);
+				// timeout
+				configuration.getParameter(LockQueryAdapterQuery.LOCK_TIMEOUT).filter(t -> t != null && t > -1)
+						.ifPresent(timeout -> {
+							entityManager.setProperty("javax.persistence.lock.timeout", timeout);
+						});
+			});
+		} else {
+			configuration.getParameter(JpaDatastore.QUERY_PARAMETER_LOCK_MODE).ifPresent(p -> q.setLockMode(p));
+		}
+
+		return q;
+	}
+
+	/**
+	 * Get the JPA {@link LockModeType} which corresponds to given {@link LockMode}, if available.
+	 * @param lockMode Lock mode
+	 * @return Optional JPA {@link LockModeType}
+	 */
+	private static Optional<LockModeType> getJpaLockMode(LockMode lockMode) {
+		if (lockMode != null) {
+			switch (lockMode) {
+			case PESSIMISTIC:
+				return Optional.of(LockModeType.PESSIMISTIC_WRITE);
+			default:
+				break;
+			}
+		}
+		return Optional.empty();
 	}
 
 }

@@ -19,8 +19,8 @@ import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.Datastore.OperationType;
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
-import com.holonplatform.core.datastore.operation.DeleteOperation;
-import com.holonplatform.core.internal.datastore.operation.AbstractDeleteOperation;
+import com.holonplatform.core.datastore.operation.Delete;
+import com.holonplatform.core.internal.datastore.operation.AbstractDelete;
 import com.holonplatform.datastore.jpa.JpaWriteOption;
 import com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityContext;
 import com.holonplatform.datastore.jpa.context.JpaOperationContext;
@@ -28,25 +28,25 @@ import com.holonplatform.datastore.jpa.jpql.context.JPQLResolutionContext;
 import com.holonplatform.datastore.jpa.jpql.expression.JpaEntity;
 
 /**
- * JPA {@link DeleteOperation}.
+ * JPA {@link Delete}.
  *
  * @since 5.1.0
  */
-public class JpaDelete extends AbstractDeleteOperation {
+public class JpaDelete extends AbstractDelete {
 
 	private static final long serialVersionUID = 3232028846502770705L;
 
 	// Commodity factory
 	@SuppressWarnings("serial")
-	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, DeleteOperation> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, DeleteOperation>() {
+	public static final DatastoreCommodityFactory<JpaDatastoreCommodityContext, Delete> FACTORY = new DatastoreCommodityFactory<JpaDatastoreCommodityContext, Delete>() {
 
 		@Override
-		public Class<? extends DeleteOperation> getCommodityType() {
-			return DeleteOperation.class;
+		public Class<? extends Delete> getCommodityType() {
+			return Delete.class;
 		}
 
 		@Override
-		public DeleteOperation createCommodity(JpaDatastoreCommodityContext context)
+		public Delete createCommodity(JpaDatastoreCommodityContext context)
 				throws CommodityConfigurationException {
 			return new JpaDelete(context);
 		}

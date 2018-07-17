@@ -29,6 +29,7 @@ import com.holonplatform.core.TypedExpression;
 import com.holonplatform.core.internal.Logger;
 import com.holonplatform.core.property.Property;
 import com.holonplatform.core.query.PropertySetProjection;
+import com.holonplatform.core.query.QueryProjection;
 import com.holonplatform.datastore.jpa.internal.JpqlDatastoreLogger;
 import com.holonplatform.datastore.jpa.internal.converters.PropertyBoxResultArrayConverter;
 import com.holonplatform.datastore.jpa.internal.converters.PropertyBoxTupleConverter;
@@ -84,14 +85,13 @@ public enum PropertySetProjectionResolver
 		Map<TypedExpression<?>, Property<?>> selectionProperties = new HashMap<>(size);
 
 		for (Property<?> property : expression.getPropertySet()) {
-			if (TypedExpression.class.isAssignableFrom(property.getClass())) {
-				final TypedExpression<?> propertyExpression = (TypedExpression<?>) property;
-				selection.add(propertyExpression);
+			if (QueryProjection.class.isAssignableFrom(property.getClass())) {
+				selection.add(property);
 				// resolve and get alias
 				final String alias = projection
-						.addSelection(context.resolveOrFail(propertyExpression, JPQLExpression.class).getValue());
-				selectionAlias.put(propertyExpression, alias);
-				selectionProperties.put(propertyExpression, property);
+						.addSelection(context.resolveOrFail(property, JPQLExpression.class).getValue());
+				selectionAlias.put(property, alias);
+				selectionProperties.put(property, property);
 			}
 		}
 
