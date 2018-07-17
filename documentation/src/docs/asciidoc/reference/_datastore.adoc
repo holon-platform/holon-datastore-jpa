@@ -422,7 +422,7 @@ The `LockQuery` API is a _Datastore commodity_, automatically registered in the 
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreLock.java[tag=lockcommodity,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreLock.java[tag=lockcommodity,indent=0]
 ----
 <1> Obtain a new `LockQuery` implementation as a _Datastore commodity_
 
@@ -432,7 +432,7 @@ The `LockQuery` implementation, even when used as a standard `Query` API, provid
 
 [source, java]
 ----
-include::{examplesdir}/com/holonplatform/datastore/jdbc/examples/ExampleJpaDatastoreLock.java[tag=execution,indent=0]
+include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatastoreLock.java[tag=execution,indent=0]
 ----
 <1> Obtain a new `LockQuery`
 <2> Configure the query _lock_, using default mode and timeout
