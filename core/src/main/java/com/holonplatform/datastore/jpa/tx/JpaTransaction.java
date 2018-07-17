@@ -70,6 +70,7 @@ public interface JpaTransaction extends Transaction {
 	 * @param configuration Transaction configuration (not null)
 	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
 	 *        transaction is committed or rollbacked)
+	 * @return A new {@link JpaTransaction} implementation
 	 */
 	static JpaTransaction create(EntityManager entityManager, TransactionConfiguration configuration,
 			boolean endTransactionWhenCompleted) {
