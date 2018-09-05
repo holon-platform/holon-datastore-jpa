@@ -25,8 +25,8 @@ import javax.persistence.PessimisticLockException;
 import javax.persistence.Tuple;
 
 import com.holonplatform.core.exceptions.DataAccessException;
-import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.query.QueryFunction;
+import com.holonplatform.core.query.lock.LockAcquisitionException;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.jpql.expression.JPQLFunction;
 

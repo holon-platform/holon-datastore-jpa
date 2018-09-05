@@ -19,7 +19,9 @@ import javax.persistence.EntityManager;
 
 import com.holonplatform.core.datastore.transaction.Transaction;
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
+import com.holonplatform.core.datastore.transaction.TransactionStatus;
 import com.holonplatform.datastore.jpa.internal.tx.DefaultJpaTransaction;
+import com.holonplatform.datastore.jpa.internal.tx.DelegatedJpaTransaction;
 
 /**
  * JPA {@link Transaction}.
@@ -53,28 +55,25 @@ public interface JpaTransaction extends Transaction {
 	TransactionConfiguration getConfiguration();
 
 	/**
-	 * Add a transaction lifecycle handler.
-	 * @param handler The handler to add (not null)
-	 */
-	void addLifecycleHandler(JpaTransactionLifecycleHandler handler);
-
-	/**
-	 * Remove a transaction lifecycle handler.
-	 * @param handler The handler to remove
-	 */
-	void removeLifecycleHandler(JpaTransactionLifecycleHandler handler);
-
-	/**
 	 * Create a new {@link JpaTransaction}.
 	 * @param entityManager EntityManager (not null)
 	 * @param configuration Transaction configuration (not null)
-	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
-	 *        transaction is committed or rollbacked)
 	 * @return A new {@link JpaTransaction} implementation
 	 */
-	static JpaTransaction create(EntityManager entityManager, TransactionConfiguration configuration,
-			boolean endTransactionWhenCompleted) {
-		return new DefaultJpaTransaction(entityManager, configuration, endTransactionWhenCompleted);
+	static JpaTransaction create(EntityManager entityManager, TransactionConfiguration configuration) {
+		return new DefaultJpaTransaction(entityManager, configuration);
+	}
+
+	/**
+	 * Create a {@link JpaTransaction} which delegates its operations and status to the given delegated transaction.
+	 * <p>
+	 * The delegated transaction returns <code>false</code> from the {@link TransactionStatus#isNew()} method.
+	 * </p>
+	 * @param delegated Delegated transaction (not null)
+	 * @return A delegated {@link JpaTransaction} implementation
+	 */
+	static JpaTransaction delegate(JpaTransaction delegated) {
+		return new DelegatedJpaTransaction(delegated);
 	}
 
 }

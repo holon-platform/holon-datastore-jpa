@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.internal.Logger;
@@ -36,10 +36,10 @@ public abstract class AbstractJpaDatastoreSuiteTest {
 		});
 	}
 
-	protected <T> T inTransaction(Callable<T> operation) {
+	protected <T> T inTransaction(Supplier<T> operation) {
 		return getDatastore().requireTransactional().withTransaction(tx -> {
 			tx.setRollbackOnly();
-			return operation.call();
+			return operation.get();
 		});
 	}
 

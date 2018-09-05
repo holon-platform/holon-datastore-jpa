@@ -142,9 +142,7 @@ public class TransactionTest extends AbstractJpaDatastoreSuiteTest {
 
 					String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT)
 							.orElse(null);
-					Assert.assertEquals("Two", txt);
-
-					tx2.commit();
+					Assert.assertEquals("Two_tx1", txt);
 				});
 
 				String txt = getDatastore().query().target(TX_TARGET).filter(TX_CODE.eq(2L)).findOne(TX_TEXT)

@@ -17,8 +17,8 @@ package com.holonplatform.datastore.jpa.tx;
 
 import javax.persistence.EntityManager;
 
-import com.holonplatform.core.datastore.transaction.Transaction.TransactionException;
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
+import com.holonplatform.core.datastore.transaction.TransactionStatus.TransactionException;
 
 /**
  * Factory to create and configure new {@link JpaTransaction} implementation using an {@link EntityManager} and a
@@ -33,21 +33,18 @@ public interface JpaTransactionFactory {
 	 * Build a new {@link JpaTransaction}.
 	 * @param entityManager The {@link EntityManager} to use (not null)
 	 * @param configuration Configuration (not null)
-	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
-	 *        transaction is committed or rollbacked)
 	 * @return A new {@link JpaTransaction} (not null)
 	 * @throws TransactionException If an error occurred
 	 */
-	JpaTransaction createTransaction(EntityManager entityManager, TransactionConfiguration configuration,
-			boolean endTransactionWhenCompleted) throws TransactionException;
+	JpaTransaction createTransaction(EntityManager entityManager, TransactionConfiguration configuration)
+			throws TransactionException;
 
 	/**
 	 * Get the default {@link JpaTransactionFactory}.
 	 * @return the default {@link JpaTransactionFactory}
 	 */
 	static JpaTransactionFactory getDefault() {
-		return (entityManager, configuration, endTransactionWhenCompleted) -> JpaTransaction.create(entityManager,
-				configuration, endTransactionWhenCompleted);
+		return (entityManager, configuration) -> JpaTransaction.create(entityManager, configuration);
 	}
 
 }

@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.property.PropertyBox;
+import com.holonplatform.core.query.lock.LockAcquisitionException;
 import com.holonplatform.core.query.lock.LockQuery;
 
 public class LockTest extends AbstractJpaDatastoreSuiteTest {

@@ -25,8 +25,8 @@ import org.hibernate.dialect.lock.LockingStrategyException;
 
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
-import com.holonplatform.core.internal.query.lock.LockAcquisitionException;
 import com.holonplatform.core.internal.utils.ClassUtils;
+import com.holonplatform.core.query.lock.LockAcquisitionException;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 
 /**

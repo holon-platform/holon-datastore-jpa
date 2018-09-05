@@ -16,7 +16,6 @@
 package com.holonplatform.datastore.jpa.internal;
 
 import java.util.Optional;
-import java.util.Stack;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -26,9 +25,8 @@ import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.core.beans.BeanIntrospector;
 import com.holonplatform.core.datastore.DatastoreCommodity;
 import com.holonplatform.core.datastore.DatastoreConfigProperties;
-import com.holonplatform.core.datastore.transaction.Transaction;
-import com.holonplatform.core.datastore.transaction.Transaction.TransactionException;
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
+import com.holonplatform.core.datastore.transaction.TransactionStatus.TransactionException;
 import com.holonplatform.core.datastore.transaction.TransactionalOperation;
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.internal.Logger;
@@ -94,7 +92,6 @@ import com.holonplatform.datastore.jpa.jpql.JPQLValueDeserializer;
 import com.holonplatform.datastore.jpa.jpql.JPQLValueSerializer;
 import com.holonplatform.datastore.jpa.tx.JpaTransaction;
 import com.holonplatform.datastore.jpa.tx.JpaTransactionFactory;
-import com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler;
 
 /**
  * Default {@link JpaDatastore} implementation.
@@ -105,7 +102,7 @@ import com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler;
  * @since 5.0.0
  */
 public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatastoreCommodityContext>
-		implements JpaDatastore, JpaDatastoreCommodityContext, JpaTransactionLifecycleHandler {
+		implements JpaDatastore, JpaDatastoreCommodityContext {
 
 	private static final long serialVersionUID = -8695844962665825169L;
 
@@ -120,10 +117,9 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 	private static final ThreadLocal<EntityManager> CURRENT_ENTITY_MANAGER = new ThreadLocal<>();
 
 	/**
-	 * Current local {@link JpaTransaction} stack
+	 * Current local transaction
 	 */
-	private static final ThreadLocal<Stack<JpaTransaction>> CURRENT_TRANSACTION = ThreadLocal
-			.withInitial(() -> new Stack<>());
+	private static final ThreadLocal<JpaTransaction> CURRENT_TRANSACTION = new ThreadLocal<>();
 
 	/**
 	 * Datastore EntityManagerFactory
@@ -521,37 +517,26 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		checkInitialized();
 		ObjectUtils.argumentNotNull(operation, "TransactionalOperation must be not null");
 
-		final JpaTransaction tx = beginTransaction(transactionConfiguration, false);
+		// check active transaction or create a new one
+		final JpaTransaction tx = getCurrentTransaction().map(t -> JpaTransaction.delegate(t))
+				.orElseGet(() -> startTransaction(transactionConfiguration));
 
 		try {
 			// execute operation
 			return operation.execute(tx);
 		} catch (Exception e) {
 			// check rollback transaction
-			if (tx.getConfiguration().isRollbackOnError()) {
+			if (tx.getConfiguration().isRollbackOnError() && !tx.isCompleted()) {
 				tx.setRollbackOnly();
 			}
-			if (e instanceof DataAccessException) {
-				throw (DataAccessException) e;
-			}
-			throw new DataAccessException("Failed to execute operation", e);
+			throw e;
 		} finally {
 			try {
 				endTransaction(tx);
 			} catch (Exception e) {
-				throw new DataAccessException("Failed to finalize transaction", e);
+				throw new TransactionException("Failed to finalize transaction", e);
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.core.datastore.transaction.Transactional#getTransaction(com.holonplatform.core.datastore.
-	 * transaction.TransactionConfiguration)
-	 */
-	@Override
-	public Transaction getTransaction(TransactionConfiguration transactionConfiguration) {
-		return beginTransaction(transactionConfiguration, true);
 	}
 
 	/**
@@ -575,7 +560,7 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 	 * @return Optional current transaction
 	 */
 	private static Optional<JpaTransaction> getCurrentTransaction() {
-		return (CURRENT_TRANSACTION.get().isEmpty()) ? Optional.empty() : Optional.of(CURRENT_TRANSACTION.get().peek());
+		return Optional.ofNullable(CURRENT_TRANSACTION.get());
 	}
 
 	/**
@@ -587,34 +572,27 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 	}
 
 	/**
-	 * Remove given transaction from current trasactions stack.
-	 * @param tx Transaction to remove
-	 * @return The removed current transaction, if it was present
+	 * Starts a {@link JpaTransaction}. If a local transaction is active, it will be forcedly finalized.
+	 * @param configuration Transaction configuration. If <code>null</code>, a default configuration will be used
+	 * @return A new transaction
 	 */
-	private static Optional<JpaTransaction> removeTransaction(JpaTransaction tx) {
-		ObjectUtils.argumentNotNull(tx, "Transaction must be not null");
-		final Stack<JpaTransaction> stack = CURRENT_TRANSACTION.get();
-		if (!stack.isEmpty()) {
-			if (stack.remove(tx)) {
-				return Optional.of(tx);
-			}
-		}
-		return Optional.empty();
-	}
+	private JpaTransaction startTransaction(TransactionConfiguration configuration) throws TransactionException {
 
-	/**
-	 * Start a new transaction.
-	 * @param configuration Transaction configuration
-	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
-	 *        transaction is committed or rollbacked)
-	 * @return The current transaction or a new one if no transaction is active
-	 * @throws TransactionException Error starting a new transaction
-	 */
-	private JpaTransaction beginTransaction(TransactionConfiguration configuration, boolean endTransactionWhenCompleted)
-			throws TransactionException {
+		// check if a current transaction is present
+		getCurrentTransaction().ifPresent(tx -> {
+			LOGGER.warn("A thread bound transaction was already present [" + tx
+					+ "] - The current transaction will be finalized");
+			try {
+				endTransaction(tx);
+			} catch (Exception e) {
+				LOGGER.warn("Failed to force current transaction finalization", e);
+			}
+		});
+
 		// configuration
 		final TransactionConfiguration cfg = (configuration != null) ? configuration
 				: TransactionConfiguration.getDefault();
+
 		// entitymanager
 		final EntityManager entityManager;
 		try {
@@ -622,11 +600,10 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		} catch (Exception e) {
 			throw new TransactionException("Failed to obtain an EntityManager to start a transaction", e);
 		}
+
 		// create a new transaction
-		final JpaTransaction tx = getTransactionFactory().createTransaction(entityManager, cfg,
-				endTransactionWhenCompleted);
-		// lifecycle handler
-		tx.addLifecycleHandler(this);
+		final JpaTransaction tx = getTransactionFactory().createTransaction(entityManager, cfg);
+
 		// start transaction
 		try {
 			// start transaction
@@ -637,17 +614,34 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 			// propagate
 			throw e;
 		}
+
+		// set as current transaction
+		CURRENT_TRANSACTION.set(tx);
+
+		LOGGER.debug(() -> "JPA transaction [" + tx + "] created and setted as current transaction");
+
 		// return the transaction
 		return tx;
 	}
 
 	/**
-	 * Finalize the given transaction.
+	 * Finalize the given transaction, only if the transaction is new.
 	 * @param tx Transaction to finalize
-	 * @throws TransactionException
+	 * @throws TransactionException Error finalizing transaction
+	 * @return <code>true</code> if the transaction was actually finalized
 	 */
-	protected void endTransaction(JpaTransaction tx) throws TransactionException {
+	protected boolean endTransaction(JpaTransaction tx) throws TransactionException {
 		ObjectUtils.argumentNotNull(tx, "Transaction must be not null");
+
+		// check new
+		if (!tx.isNew()) {
+			LOGGER.debug(() -> "JPA transaction [" + tx + "] was not finalized because it is not new");
+			return false;
+		}
+
+		// remove reference
+		getCurrentTransaction().filter(current -> current == tx).ifPresent(current -> CURRENT_TRANSACTION.remove());
+
 		try {
 			if (tx.isActive()) {
 				tx.end();
@@ -660,34 +654,10 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 				throw new TransactionException("Failed to finalize the transaction EntityManager", e);
 			}
 		}
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler#transactionStarted(com.holonplatform.datastore.
-	 * jpa.tx.JpaTransaction)
-	 */
-	@Override
-	public void transactionStarted(JpaTransaction transaction) {
-		if (transaction != null) {
-			// stack
-			CURRENT_TRANSACTION.get().push(transaction);
-		}
-	}
+		LOGGER.debug(() -> "JPA transaction [" + tx + "] finalized");
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler#transactionEnded(com.holonplatform.datastore.
-	 * jpa.tx.JpaTransaction)
-	 */
-	@Override
-	public void transactionEnded(JpaTransaction transaction) {
-		if (transaction != null) {
-			// remove from stack
-			removeTransaction(transaction);
-		}
+		return true;
 	}
 
 	// ------- Dialect context

@@ -15,9 +15,6 @@
  */
 package com.holonplatform.datastore.jpa.internal.tx;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
@@ -27,7 +24,6 @@ import com.holonplatform.core.internal.datastore.transaction.AbstractTransaction
 import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.datastore.jpa.tx.JpaTransaction;
-import com.holonplatform.datastore.jpa.tx.JpaTransactionLifecycleHandler;
 
 /**
  * Default {@link JpaTransaction} implementation.
@@ -44,27 +40,19 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 
 	private EntityTransaction entityTransaction;
 
-	private final boolean endTransactionWhenCompleted;
-
 	private boolean active;
-
-	private final List<JpaTransactionLifecycleHandler> handlers = new LinkedList<>();
 
 	/**
 	 * Constructor.
 	 * @param entityManager EntityManager (not null)
 	 * @param configuration Transaction configuration (not null)
-	 * @param endTransactionWhenCompleted Whether the transaction should be finalized when completed (i.e. when the
-	 *        transaction is committed or rollbacked)
 	 */
-	public DefaultJpaTransaction(EntityManager entityManager, TransactionConfiguration configuration,
-			boolean endTransactionWhenCompleted) {
-		super();
+	public DefaultJpaTransaction(EntityManager entityManager, TransactionConfiguration configuration) {
+		super(true);
 		ObjectUtils.argumentNotNull(entityManager, "EntityManager must be not null");
 		ObjectUtils.argumentNotNull(configuration, "TransactionConfiguration must be not null");
 		this.entityManager = entityManager;
 		this.configuration = configuration;
-		this.endTransactionWhenCompleted = endTransactionWhenCompleted;
 	}
 
 	/*
@@ -74,40 +62,6 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 	@Override
 	public EntityManager getEntityManager() {
 		return entityManager;
-	}
-
-	/**
-	 * Get whether the transaction should be finalized when completed (i.e. when the transaction is committed or
-	 * rollbacked).
-	 * @return whether the transaction should be finalized when completed
-	 */
-	protected boolean isEndTransactionWhenCompleted() {
-		return endTransactionWhenCompleted;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.tx.JpaTransaction#addLifecycleHandler(com.holonplatform.datastore.jpa.tx.
-	 * JpaTransactionLifecycleHandler)
-	 */
-	@Override
-	public void addLifecycleHandler(JpaTransactionLifecycleHandler handler) {
-		ObjectUtils.argumentNotNull(handler, "Transaction lifecycle handler must be not null");
-		if (!handlers.contains(handler)) {
-			handlers.add(handler);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.tx.JpaTransaction#removeLifecycleHandler(com.holonplatform.datastore.jpa.tx.
-	 * JpaTransactionLifecycleHandler)
-	 */
-	@Override
-	public void removeLifecycleHandler(JpaTransactionLifecycleHandler handler) {
-		if (handler != null) {
-			handlers.remove(handler);
-		}
 	}
 
 	/*
@@ -138,9 +92,6 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 		// set as active
 		active = true;
 
-		// fire lifecycle handlers
-		handlers.forEach(handler -> handler.transactionStarted(this));
-
 		LOGGER.debug(() -> "JPA transaction started");
 	}
 
@@ -170,9 +121,6 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 		// set as not active
 		active = false;
 
-		// fire lifecycle handlers
-		handlers.forEach(handler -> handler.transactionEnded(this));
-
 		LOGGER.debug(() -> "Jpa transaction finalized");
 	}
 
@@ -199,31 +147,38 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 	 * @see com.holonplatform.core.datastore.transaction.Transaction#commit()
 	 */
 	@Override
-	public synchronized void commit() throws TransactionException {
+	public synchronized boolean commit() throws TransactionException {
+
+		// check active
 		if (!isActive()) {
 			throw new IllegalTransactionStatusException("Cannot commit the transaction: the transaction is not active");
 		}
+
+		// check completed
 		if (isCompleted()) {
 			throw new IllegalTransactionStatusException(
 					"Cannot commit the transaction: the transaction is already completed");
 		}
+
+		final boolean committed;
 		try {
 			// check rollback only
 			if (isRollbackOnly()) {
 				rollback();
+				committed = false;
 			} else {
 				entityTransaction.commit();
+				committed = true;
 				LOGGER.debug(() -> "Jpa transaction committed");
 			}
 		} catch (Exception e) {
 			throw new TransactionException("Failed to commit the transaction", e);
 		}
+
+		// set as completed
 		setCompleted();
 
-		// check finalize
-		if (isEndTransactionWhenCompleted()) {
-			end();
-		}
+		return committed;
 	}
 
 	/*
@@ -232,26 +187,28 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 	 */
 	@Override
 	public synchronized void rollback() throws TransactionException {
+
+		// check active
 		if (!isActive()) {
 			throw new IllegalTransactionStatusException(
 					"Cannot rollback the transaction: the transaction is not active");
 		}
+
+		// check completed
 		if (isCompleted()) {
 			throw new IllegalTransactionStatusException(
 					"Cannot rollback the transaction: the transaction is already completed");
 		}
+
 		try {
 			entityTransaction.rollback();
 			LOGGER.debug(() -> "Jpa transaction rolled back");
 		} catch (Exception e) {
 			throw new TransactionException("Failed to rollback the transaction", e);
 		}
-		setCompleted();
 
-		// check finalize
-		if (isEndTransactionWhenCompleted()) {
-			end();
-		}
+		// set as completed
+		setCompleted();
 	}
 
 	/*
@@ -261,7 +218,7 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 	@Override
 	public void setRollbackOnly() {
 		super.setRollbackOnly();
-		if (entityTransaction != null) {
+		if (entityTransaction != null && entityTransaction.isActive()) {
 			entityTransaction.setRollbackOnly();
 		}
 	}
@@ -272,10 +229,20 @@ public class DefaultJpaTransaction extends AbstractTransaction implements JpaTra
 	 */
 	@Override
 	public boolean isRollbackOnly() {
-		if (entityTransaction != null && entityTransaction.getRollbackOnly()) {
+		if (entityTransaction != null && entityTransaction.isActive() && entityTransaction.getRollbackOnly()) {
 			return true;
 		}
 		return super.isRollbackOnly();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "JpaTransaction [" + hashCode() + "] - [entityManager=" + entityManager + ", configuration="
+				+ configuration + "]";
 	}
 
 }
