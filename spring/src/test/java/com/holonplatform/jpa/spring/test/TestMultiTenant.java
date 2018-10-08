@@ -15,23 +15,23 @@
  */
 package com.holonplatform.jpa.spring.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
 import javax.sql.DataSource;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +46,7 @@ import com.holonplatform.jpa.spring.EnableJpa;
 import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 import com.holonplatform.spring.EnableBeanContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestMultiTenant.Config.class)
 public class TestMultiTenant {
 
@@ -92,12 +92,12 @@ public class TestMultiTenant {
 	@Autowired
 	private JpaDatastore datastore;
 
-	@BeforeClass
+	@BeforeAll
 	public static void before() {
 		TENANT.set("tenant1");
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void after() {
 		TENANT.remove();
 	}

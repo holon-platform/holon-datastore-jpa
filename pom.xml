@@ -1,10 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>com.holon-platform</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.12</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<groupId>com.holon-platform.jpa</groupId>
@@ -65,14 +67,14 @@
 		<holon.jdbc.version>5.2.0-alpha2-SNAPSHOT</holon.jdbc.version>
 
 		<!-- Holon JPA -->
-		<holon.jpa.version>5.2.0-alpha1</holon.jpa.version>
+		<holon.jpa.version>5.2.0-alpha2-SNAPSHOT</holon.jpa.version>
 
 		<!-- JPA API -->
 		<jpa.api.version>2.2</jpa.api.version>
 
 		<!-- ORMs -->
-		<hibernate.version>5.3.2.Final</hibernate.version>
-		<eclipselink.version>2.7.2</eclipselink.version>
+		<hibernate.version>5.3.6.Final</hibernate.version>
+		<eclipselink.version>2.7.3</eclipselink.version>
 		<openjpa.version>3.0.0</openjpa.version>
 
 		<datanucleus.core.version>5.1.9</datanucleus.core.version>
@@ -87,7 +89,7 @@
 		<hikaricp.version>3.2.0</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.8.12</bytebuddy.version>
+		<bytebuddy.version>1.9.0</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.196</h2.version>
@@ -103,6 +105,37 @@
 		<module>bom</module>
 		<module>documentation</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit.vintage</groupId>
+				<artifactId>junit-vintage-engine</artifactId>
+				<version>${junit.jupiter.engine.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- JUnit 5 tests -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Logback for tests -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

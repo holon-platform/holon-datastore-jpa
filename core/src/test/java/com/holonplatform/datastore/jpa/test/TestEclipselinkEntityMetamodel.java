@@ -20,8 +20,8 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import com.holonplatform.datastore.jpa.JpaDatastore;
 
@@ -29,7 +29,7 @@ public class TestEclipselinkEntityMetamodel extends AbstractEntityMetamodelTest 
 
 	private static EntityManagerFactory entityManagerFactory;
 
-	@BeforeClass
+	@BeforeAll
 	public static void initDatastore() {
 
 		Properties props = new Properties();
@@ -44,7 +44,7 @@ public class TestEclipselinkEntityMetamodel extends AbstractEntityMetamodelTest 
 
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void closeEmf() {
 		entityManagerFactory.close();
 	}

@@ -28,7 +28,6 @@ import org.junit.Test;
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
 import com.holonplatform.core.exceptions.DataAccessException;
-import com.holonplatform.core.internal.utils.TestUtils;
 import com.holonplatform.core.property.PropertyBox;
 import com.holonplatform.datastore.jpa.context.EntityManagerHandler;
 
@@ -95,7 +94,7 @@ public class TransactionTest extends AbstractJpaDatastoreSuiteTest {
 
 			if (AbstractJpaDatastoreTestSuite.txExpectedErrorTest) {
 
-				TestUtils.expectedException(DataAccessException.class,
+				expectedException(DataAccessException.class,
 						() -> getDatastore().requireTransactional().withTransaction(tx -> {
 							PropertyBox box = PropertyBox.builder(TX_CODE, TX_TEXT).set(TX_TEXT, "ToRollback").build();
 							getDatastore().insert(TX_TARGET, box);

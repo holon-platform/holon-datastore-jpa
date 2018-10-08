@@ -15,13 +15,12 @@
  */
 package com.holonplatform.jpa.spring.boot.test;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,7 +32,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.holonplatform.core.datastore.Datastore;
@@ -41,7 +39,6 @@ import com.holonplatform.jpa.spring.boot.JpaAutoConfiguration;
 import com.holonplatform.jpa.spring.boot.test.domain1.TestJpaDomain1;
 import com.holonplatform.jpa.spring.boot.test.domain2.TestJpaDomain2;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @ActiveProfiles("standard")
 public class TestDatastoreMultiConditional {

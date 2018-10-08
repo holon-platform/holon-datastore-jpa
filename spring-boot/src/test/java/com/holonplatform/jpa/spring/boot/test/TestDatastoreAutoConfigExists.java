@@ -15,15 +15,14 @@
  */
 package com.holonplatform.jpa.spring.boot.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -31,7 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.holonplatform.core.datastore.DataTarget;
@@ -44,7 +42,6 @@ import com.holonplatform.datastore.jpa.internal.DefaultJpaDatastore;
 import com.holonplatform.jpa.spring.SpringEntityManagerLifecycleHandler;
 import com.holonplatform.jpa.spring.boot.test.domain1.TestJpaDomain1;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @ActiveProfiles("standard")
 public class TestDatastoreAutoConfigExists {
