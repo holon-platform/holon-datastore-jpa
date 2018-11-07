@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.holon-platform</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.1.0</version>
+		<version>1.1.1</version>
 	</parent>
 
 	<groupId>com.holon-platform.jpa</groupId>
@@ -89,7 +89,7 @@
 		<hikaricp.version>3.2.0</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.9.0</bytebuddy.version>
+		<bytebuddy.version>1.9.3</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.196</h2.version>
