@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.holon-platform.jpa</groupId>
 		<artifactId>holon-datastore-jpa-root</artifactId>
-		<version>5.2.0-alpha2-SNAPSHOT</version>
+		<version>5.2.0-alpha2</version>
 	</parent>
 
 	<artifactId>holon-starter-jpa-hibernate</artifactId>
