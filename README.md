@@ -70,10 +70,10 @@ class Config {
 
   @Bean
   public FactoryBean<EntityManagerFactory> entityManagerFactory(DataSource dataSource) {
-    LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-    emf.setDataSource(dataSource);
-    emf.setPackagesToScan("com.example.entities");
-    return emf;
+      LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+      emf.setDataSource(dataSource);
+      emf.setPackagesToScan("com.example.entities");
+      return emf;
   }
 
 }
