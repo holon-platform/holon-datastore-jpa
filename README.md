@@ -18,6 +18,84 @@ The JPA Datastore supports any standard JPA __ORM__ library, altough is tested a
 
 A complete __Spring__ and __Spring Boot__ support is provided for JPA Datastore integration in a Spring environment and for __auto-configuration__ facilities.
 
+See the module [documentation](https://docs.holon-platform.com/current/reference/holon-datastore-jpa.html) for details.
+
+Just like any other platform module, this artifact is part of the [Holon Platform](https://holon-platform.com) ecosystem, but can be also used as a _stand-alone_ library.
+
+See [Getting started](#getting-started) and the [platform documentation](https://docs.holon-platform.com/current/reference) for further details.
+
+## At-a-glance overview
+
+_JPA Datastore operations:_
+```java
+DataTarget<MyEntity> TARGET = JpaTarget.of(MyEntity.class);
+		
+Datastore datastore = JpaDatastore.builder().entityManagerFactory(myEntityManagerFactory).build();
+
+datastore.save(TARGET, PropertyBox.builder(TEST).set(ID, 1L).set(VALUE, "One").build());
+
+Stream<PropertyBox> results = datastore.query().target(TARGET).filter(ID.goe(1L)).stream(TEST);
+
+List<String> values = datastore.query().target(TARGET).sort(ID.asc()).list(VALUE);
+
+Stream<String> values = datastore.query().target(TARGET).filter(VALUE.startsWith("prefix")).restrict(10, 0).stream(VALUE);
+
+long count = datastore.query(TARGET).aggregate(QueryAggregation.builder().path(VALUE).filter(ID.gt(1L)).build()).count();
+
+Stream<Integer> months = datastore.query().target(TARGET).distinct().stream(LOCAL_DATE.month());
+		
+List<MyEntity> entities = datastore.query().target(TARGET).list(BeanProjection.of(MyEntity.class));
+
+datastore.bulkUpdate(TARGET).filter(ID.in(1L, 2L)).set(VALUE, "test").execute();
+
+datastore.bulkDelete(TARGET).filter(ID.gt(0L)).execute();
+```
+
+_Transaction management:_
+```java
+long updatedCount = datastore.withTransaction(tx -> {
+	long updated = datastore.bulkUpdate(TARGET).set(VALUE, "test").execute().getAffectedCount();
+			
+	tx.commit();
+			
+	return updated;
+});
+```
+
+_JPA Datastore configuration using Spring:_
+```java
+@EnableJpaDatastore
+@Configuration
+class Config {
+
+  @Bean
+  public FactoryBean<EntityManagerFactory> entityManagerFactory(DataSource dataSource) {
+    LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+    emf.setDataSource(dataSource);
+    emf.setPackagesToScan("com.example.entities");
+    return emf;
+  }
+
+}
+
+@Autowired
+Datastore datastore;
+```
+
+_JPA Datastore auto-configuration using Spring Boot:_
+```yaml
+spring:
+  datasource:
+    url: "jdbc:h2:mem:test"
+    username: "sa"
+    
+holon: 
+  datastore:
+    trace: true
+```
+
+See the [module documentation](https://docs.holon-platform.com/current/reference/holon-datastore-jpa.html) for the user guide and a full set of examples.
+
 ## Code structure
 
 See [Holon Platform code structure and conventions](https://github.com/holon-platform/platform/blob/master/CODING.md) to learn about the _"real Java API"_ philosophy with which the project codebase is developed and organized.
