@@ -106,7 +106,7 @@ See [Holon Platform code structure and conventions](https://github.com/holon-pla
 
 The Holon Platform is built using __Java 8__, so you need a JRE/JDK version 8 or above to use the platform artifacts.
 
-The __JPA API version 2.x__ or above support by the __ORM__ in use is reccomended to use all the functionalities of the JPA Datastore.
+The __JPA API version 2.x__ or above is reccomended to use all the functionalities of the JPA Datastore.
 
 ### Releases
 
