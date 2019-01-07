@@ -655,7 +655,7 @@ A Datastore commodity factory class which extends the `JpaDatastoreCommodityFact
 
 *1. Direct registration using the JPA `Datastore` API builder:*
 
-The JPA `Datastore` API supports `DatastoreCommodityFactory` automatic registration using the link:{apidir}/com/holonplatform/datastore/jpa/config/JpaDatastoreCommodityFactory.html[JpaDatastoreCommodityFactory^] type using a _Java service extensions_ based registration method.
+The JPA `Datastore` API supports the commodity factory registration using the `withCommodity` builder method.
 
 [source, java]
 ----
@@ -665,6 +665,6 @@ include::{examplesdir}/com/holonplatform/datastore/jpa/examples/ExampleJpaDatast
 
 *2. Automatic registration using the  _Java service extensions_:*
 
-To automatically register an commodity factory using the standard _Java service extensions_ based method, a class implementing `JpaDatastoreCommodityFactory` has to be created and its qualified full name must be specified in a file named `com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory`,  placed in the `META-INF/services` folder of the classpath.
+To automatically register an commodity factory using the standard _Java service extensions_ based method, a class implementing `JpaDatastoreCommodityFactory` has to be created and its qualified full name must be specified in a file named `com.holonplatform.datastore.jpa.config.JpaDatastoreCommodityFactory`, placed in the `META-INF/services` folder of the classpath.
 
 When this registration method is used, the commodity factories defined this way will be registered for *any JPA `Datastore` API instance*.
