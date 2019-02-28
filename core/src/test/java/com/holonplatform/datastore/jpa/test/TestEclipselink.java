@@ -77,6 +77,7 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 		rightJoinTest = false;
 		avgProjectionTest = false;
 		txExpectedErrorTest = false;
+		temporalProjectionTest = false;
 
 		JPA_TARGET = JpaTarget.of(Test1.class);
 

@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -59,13 +61,13 @@
 		<bintray.package>holon-datastore-jpa</bintray.package>
 
 		<!-- Holon core -->
-		<holon.core.version>5.2.0</holon.core.version>
+		<holon.core.version>5.2.1</holon.core.version>
 
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.2.0</holon.jdbc.version>
+		<holon.jdbc.version>5.2.1</holon.jdbc.version>
 
 		<!-- Holon JPA -->
-		<holon.jpa.version>5.2.0</holon.jpa.version>
+		<holon.jpa.version>5.2.1</holon.jpa.version>
 
 		<!-- JPA API -->
 		<jpa.api.version>2.2</jpa.api.version>
@@ -90,7 +92,7 @@
 		<bytebuddy.version>1.9.10</bytebuddy.version>
 
 		<!-- Test: H2 -->
-		<h2.version>1.4.196</h2.version>
+		<h2.version>1.4.198</h2.version>
 
 	</properties>
 
@@ -125,12 +127,6 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- Logback for tests -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
