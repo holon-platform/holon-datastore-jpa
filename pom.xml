@@ -62,7 +62,7 @@
 		<holon.core.version>5.2.1</holon.core.version>
 
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.2.1</holon.jdbc.version>
+		<holon.jdbc.version>5.2.2</holon.jdbc.version>
 
 		<!-- Holon JPA -->
 		<holon.jpa.version>5.2.1</holon.jpa.version>
@@ -87,7 +87,7 @@
 		<hikaricp.version>3.3.1</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.9.10</bytebuddy.version>
+		<bytebuddy.version>1.9.12</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.198</h2.version>
