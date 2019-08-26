@@ -1,6 +1,6 @@
 # Holon platform JPA Datastore
 
-> Latest release: [5.2.4](#obtain-the-artifacts)
+> Latest release: [5.3.0](#obtain-the-artifacts)
 
 This is the reference __JPA__ `Datastore` implementation of the [Holon Platform](https://holon-platform.com), using the Java `JPA` API for data access and manipulation.
 
@@ -128,7 +128,7 @@ _Maven BOM:_
     <dependency>
         <groupId>com.holon-platform.jpa</groupId>
         <artifactId>holon-datastore-jpa-bom</artifactId>
-        <version>5.2.4</version>
+        <version>5.3.0</version>
         <type>pom</type>
         <scope>import</scope>
     </dependency>
