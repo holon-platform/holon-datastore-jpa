@@ -71,11 +71,11 @@ public class DatanucleusTest extends AbstractJpaDatastoreTestSuite {
 		TIME = TemporalProperty.localTime("localTimeValue");
 
 		PROPERTIES = PropertySet.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME)
-				.identifier(KEY).build();
+				.withIdentifier(KEY).build();
 		PROPERTIES_NOID = PropertySet.of(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME);
 		PROPERTIES_V = PropertySet
 				.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
-				.identifier(KEY).build();
+				.withIdentifier(KEY).build();
 
 		CLOB_SET_STR = PropertySet.of(PROPERTIES, CLOB_STR);
 

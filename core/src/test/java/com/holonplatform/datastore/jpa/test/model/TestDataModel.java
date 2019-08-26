@@ -100,7 +100,7 @@ public interface TestDataModel {
 	public final static PathProperty<Long> TEST3_CODE = PathProperty.create("pk.code", long.class);
 	public final static PathProperty<String> TEST3_TEXT = PathProperty.create("text", String.class);
 
-	public final static PropertySet<?> TEST3_SET = PropertySet.builderOf(TEST3_CODE, TEST3_TEXT).identifier(TEST3_CODE)
+	public final static PropertySet<?> TEST3_SET = PropertySet.builderOf(TEST3_CODE, TEST3_TEXT).withIdentifier(TEST3_CODE)
 			.build();
 
 	// utils
