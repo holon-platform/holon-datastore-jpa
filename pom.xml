@@ -1,10 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>com.holon-platform</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.1.4</version>
+		<version>1.1.5</version>
 	</parent>
 
 	<groupId>com.holon-platform.jpa</groupId>
@@ -56,20 +58,20 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Holon core -->
-		<holon.core.version>5.3.0</holon.core.version>
+		<holon.core.version>5.4.0</holon.core.version>
 
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.3.0</holon.jdbc.version>
+		<holon.jdbc.version>5.4.0</holon.jdbc.version>
 
 		<!-- Holon JPA -->
-		<holon.jpa.version>5.3.0</holon.jpa.version>
+		<holon.jpa.version>5.4.0</holon.jpa.version>
 
 		<!-- JPA API -->
 		<jpa.api.version>2.2</jpa.api.version>
 
 		<!-- ORMs -->
-		<hibernate.version>5.4.4.Final</hibernate.version>
-		<eclipselink.version>2.7.4</eclipselink.version>
+		<hibernate.version>5.4.10.Final</hibernate.version>
+		<eclipselink.version>2.7.5</eclipselink.version>
 		<openjpa.version>3.1.0</openjpa.version>
 
 		<datanucleus.core.version>5.1.9</datanucleus.core.version>
@@ -78,13 +80,13 @@
 		<datanucleus.plugin.version>5.0.2</datanucleus.plugin.version>
 
 		<!-- Hibernate validator -->
-		<hibernate.validator.version>6.0.17.Final</hibernate.validator.version>
+		<hibernate.validator.version>6.1.0.Final</hibernate.validator.version>
 
 		<!-- HikariCP -->
-		<hikaricp.version>3.3.1</hikaricp.version>
+		<hikaricp.version>3.4.1</hikaricp.version>
 
 		<!-- ByteBuddy -->
-		<bytebuddy.version>1.10.1</bytebuddy.version>
+		<bytebuddy.version>1.10.6</bytebuddy.version>
 
 		<!-- Test: H2 -->
 		<h2.version>1.4.198</h2.version>
