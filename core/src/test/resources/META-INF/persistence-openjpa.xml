@@ -22,7 +22,7 @@
 		<properties>
 			<property name="openjpa.jdbc.DBDictionary" value="h2" />
 			<property name="openjpa.ConnectionURL"
-				value="jdbc:h2:mem:datastore3;DB_CLOSE_DELAY=-1;MVCC=TRUE" />
+				value="jdbc:h2:mem:datastore3;DB_CLOSE_DELAY=-1" />
 			<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
 			<property name="openjpa.ConnectionUserName" value="sa" />
 			<property name="openjpa.ConnectionPassword" value="" />
