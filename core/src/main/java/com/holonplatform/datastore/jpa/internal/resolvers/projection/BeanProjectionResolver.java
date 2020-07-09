@@ -82,7 +82,7 @@ public enum BeanProjectionResolver implements JPQLContextExpressionResolver<Bean
 
 		final BeanPropertySet<?> bps = BeanIntrospector.get().getPropertySet(expression.getBeanClass());
 
-		List<Path> selection = ((BeanProjection<?>) expression).getSelection().map(s -> Arrays.asList(s)).orElse(null);
+		List<Path> selection = ((BeanProjection<?>) expression).getSelection().map(Arrays::asList).orElse(null);
 		if (selection == null) {
 			// use bean property set
 			selection = bps.stream().map(p -> (Path) p).collect(Collectors.toList());
@@ -91,7 +91,7 @@ public enum BeanProjectionResolver implements JPQLContextExpressionResolver<Bean
 		final List<Path<?>> selectionPaths = new ArrayList<>(selection.size());
 		final Map<Path<?>, String> selectionAlias = new LinkedHashMap<>();
 
-		for (Path<?> path : selection) {
+		for (Path path : selection) {
 			if (QueryExpression.class.isAssignableFrom(path.getClass())) {
 				selectionPaths.add(path);
 				final String alias = projection.addSelection(

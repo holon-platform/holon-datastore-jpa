@@ -89,7 +89,7 @@
 		<bytebuddy.version>1.10.13</bytebuddy.version>
 
 		<!-- Test: H2 -->
-		<h2.version>1.4.200</h2.version>
+		<h2.version>1.4.198</h2.version>
 
 	</properties>
 

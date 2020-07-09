@@ -34,12 +34,12 @@ public class DefaultJPQLContextParametersHandler implements JPQLContextParameter
 
 	private static final long serialVersionUID = 3466242242359565279L;
 
-	private final static Logger LOGGER = JpqlDatastoreLogger.create();
+	private static final Logger LOGGER = JpqlDatastoreLogger.create();
 
 	/**
 	 * Named parameters
 	 */
-	private final Map<String, JPQLParameter<?>> namedParameters = new HashMap<>();
+	private final transient Map<String, JPQLParameter<?>> namedParameters = new HashMap<>();
 
 	@Override
 	public <T> String addNamedParameter(JPQLParameter<T> parameter) {
@@ -63,7 +63,8 @@ public class DefaultJPQLContextParametersHandler implements JPQLContextParameter
 	}
 
 	/**
-	 * Generate a named parameter name. By default, the pattern <code>:[001]</code> is used.
+	 * Generate a named parameter name. By default, the pattern <code>:[001]</code>
+	 * is used.
 	 * @param index Parameter index
 	 * @return Parameter name
 	 */

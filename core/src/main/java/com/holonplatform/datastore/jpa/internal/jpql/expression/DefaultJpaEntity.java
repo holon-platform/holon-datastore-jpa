@@ -51,7 +51,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	/**
 	 * Logger
 	 */
-	private final static Logger LOGGER = JpaDatastoreLogger.create();
+	private static final Logger LOGGER = JpaDatastoreLogger.create();
 
 	/**
 	 * Entity class
@@ -66,21 +66,21 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	/**
 	 * Identifier metadata
 	 */
-	private IdMetadata<T> idMetadata;
+	private transient IdMetadata<T> idMetadata;
 
 	/**
 	 * Version attribute
 	 */
-	private SingularAttribute<? super T, ?> versionAttribute;
+	private transient SingularAttribute<? super T, ?> versionAttribute;
 
 	/**
 	 * Entity class property set
 	 */
-	private final BeanPropertySet<T> beanPropertySet;
+	private final transient BeanPropertySet<T> beanPropertySet;
 
 	/**
 	 * Constructor.
-	 * @param metamodel JPA Metamodel (not null)
+	 * @param metamodel   JPA Metamodel (not null)
 	 * @param entityClass Entity class (not null)
 	 */
 	public DefaultJpaEntity(Metamodel metamodel, Class<T> entityClass) {
@@ -122,6 +122,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.holonplatform.datastore.jpa.internal.JpaEntity#getEntityClass()
 	 */
 	@Override
@@ -131,6 +132,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.holonplatform.datastore.jpa.internal.JpaEntity#getEntityName()
 	 */
 	@Override
@@ -140,6 +142,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.holonplatform.core.Expression#validate()
 	 */
 	@Override
@@ -154,6 +157,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getIdType()
 	 */
 	@Override
@@ -163,7 +167,9 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#hasCompositeId()
+	 * 
+	 * @see
+	 * com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#hasCompositeId()
 	 */
 	@Override
 	public boolean hasCompositeId() {
@@ -172,7 +178,10 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getId(java.lang.Object)
+	 * 
+	 * @see
+	 * com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getId(java.lang.
+	 * Object)
 	 */
 	@Override
 	public Optional<Object> getId(T entity) {
@@ -206,7 +215,10 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#isNew(java.lang.Object)
+	 * 
+	 * @see
+	 * com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#isNew(java.lang.
+	 * Object)
 	 */
 	@Override
 	public boolean isNew(T entity) {
@@ -263,7 +275,8 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	/**
 	 * Get the entity identifier metadata
 	 * @return The entity identifier metadata
-	 * @throws IllegalStateException if the entity identifier metadata is not available
+	 * @throws IllegalStateException if the entity identifier metadata is not
+	 *                               available
 	 */
 	protected IdMetadata<T> getIdMetadata() {
 		if (idMetadata == null) {
@@ -275,7 +288,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/**
 	 * Checks whether given identifier value is to be considered <code>null</code>.
-	 * @param id Identifier value
+	 * @param id   Identifier value
 	 * @param type Identifier value type
 	 * @return <code>true</code> if it is to be considered <code>null</code>
 	 */
@@ -287,10 +300,12 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	}
 
 	/**
-	 * Get the entity name using {@link Entity#name()} annotation attribute, if available.
+	 * Get the entity name using {@link Entity#name()} annotation attribute, if
+	 * available.
 	 * @param entityClass Entity class (not null)
-	 * @return The entity name as specified using {@link Entity#name()} annotation attribute, or an empty Optional if
-	 *         the {@link Entity} annotation is not present or the <code>name</code> attribute has no value
+	 * @return The entity name as specified using {@link Entity#name()} annotation
+	 *         attribute, or an empty Optional if the {@link Entity} annotation is
+	 *         not present or the <code>name</code> attribute has no value
 	 */
 	private static Optional<String> getEntityNameFromAnnotation(Class<?> entityClass) {
 		if (entityClass.isAnnotationPresent(Entity.class)) {
@@ -303,9 +318,10 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	}
 
 	/**
-	 * Try to obtain the <em>version</em> attribute of the entity type, if available.
+	 * Try to obtain the <em>version</em> attribute of the entity type, if
+	 * available.
 	 * @param metamodel JPA Metamodel
-	 * @param type Entity type
+	 * @param type      Entity type
 	 * @return Optional version attribute
 	 */
 	@SuppressWarnings("unchecked")

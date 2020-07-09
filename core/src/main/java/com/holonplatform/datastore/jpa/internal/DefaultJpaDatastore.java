@@ -163,8 +163,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		super(JpaDatastoreCommodityFactory.class, JpaDatastoreExpressionResolver.class);
 
 		// EntityManager lifecycle
-		setEntityManagerInitializer((emf) -> emf.createEntityManager());
-		setEntityManagerFinalizer((em) -> em.close());
+		setEntityManagerInitializer(emf -> emf.createEntityManager());
+		setEntityManagerFinalizer(em -> em.close());
 
 		// register resolvers
 		addExpressionResolver(NullExpressionResolver.INSTANCE);
