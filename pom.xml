@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.holon-platform</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.1.6</version>
+		<version>1.2.0</version>
 	</parent>
 
 	<groupId>com.holon-platform.jpa</groupId>
@@ -56,21 +56,21 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Holon core -->
-		<holon.core.version>5.5.0</holon.core.version>
+		<holon.core.version>5.7.0</holon.core.version>
 
 		<!-- Holon JDBC -->
-		<holon.jdbc.version>5.5.0</holon.jdbc.version>
+		<holon.jdbc.version>5.7.0</holon.jdbc.version>
 
 		<!-- Holon JPA -->
-		<holon.jpa.version>5.5.0</holon.jpa.version>
+		<holon.jpa.version>5.7.0</holon.jpa.version>
 
 		<!-- JPA API -->
 		<jpa.api.version>2.2</jpa.api.version>
 
 		<!-- ORMs -->
-		<hibernate.version>5.4.18.Final</hibernate.version>
-		<eclipselink.version>2.7.7</eclipselink.version>
-		<openjpa.version>3.1.1</openjpa.version>
+		<hibernate.version>5.6.15.Final</hibernate.version>
+		<eclipselink.version>2.7.13</eclipselink.version>
+		<openjpa.version>3.2.2</openjpa.version>
 
 		<datanucleus.core.version>5.1.9</datanucleus.core.version>
 		<datanucleus.rdbms.version>5.1.11</datanucleus.rdbms.version>
@@ -78,10 +78,10 @@
 		<datanucleus.plugin.version>5.0.2</datanucleus.plugin.version>
 
 		<!-- Hibernate validator -->
-		<hibernate.validator.version>6.1.5.Final</hibernate.validator.version>
+		<hibernate.validator.version>6.2.5.Final</hibernate.validator.version>
 
 		<!-- HikariCP -->
-		<hikaricp.version>3.4.5</hikaricp.version>
+		<hikaricp.version>5.0.1</hikaricp.version>
 
 		<!-- ByteBuddy -->
 		<bytebuddy.version>1.10.13</bytebuddy.version>
