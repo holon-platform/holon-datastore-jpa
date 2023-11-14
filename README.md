@@ -1,6 +1,6 @@
 # Holon platform JPA Datastore
 
-> Latest release: [5.5.0](#obtain-the-artifacts)
+> Latest release: [5.7.0](#obtain-the-artifacts)
 
 This is the reference __JPA__ `Datastore` implementation of the [Holon Platform](https://holon-platform.com), using the Java `JPA` API for data access and manipulation.
 
@@ -13,8 +13,8 @@ As a _relational Datastore_, standard [relational expressions](https://docs.holo
 
 The JPA Datastore supports any standard JPA __ORM__ library, altough is tested and optimized specifically for:
 
-* [Hibernate](http://hibernate.org/orm) version __4.x__ or __5.x__
-* [EclipseLink](http://www.eclipse.org/eclipselink) version __2.5 or above__
+* [Hibernate](http://hibernate.org/orm) version __5.6__
+* [EclipseLink](http://www.eclipse.org/eclipselink) version __2.7 or above__
 
 A complete __Spring__ and __Spring Boot__ support is provided for JPA Datastore integration in a Spring environment and for __auto-configuration__ facilities.
 
@@ -104,7 +104,7 @@ See [Holon Platform code structure and conventions](https://github.com/holon-pla
 
 ### System requirements
 
-The Holon Platform is built using __Java 8__, so you need a JRE/JDK version 8 or above to use the platform artifacts.
+The Holon Platform is built using __Java 11__, so you need a JRE/JDK version 11 or above to use the platform artifacts.
 
 The __JPA API version 2.x__ or above is reccomended to use all the functionalities of the JPA Datastore.
 
@@ -124,7 +124,7 @@ _Maven BOM:_
     <dependency>
         <groupId>com.holon-platform.jpa</groupId>
         <artifactId>holon-datastore-jpa-bom</artifactId>
-        <version>5.5.0</version>
+        <version>5.7.0</version>
         <type>pom</type>
         <scope>import</scope>
     </dependency>
