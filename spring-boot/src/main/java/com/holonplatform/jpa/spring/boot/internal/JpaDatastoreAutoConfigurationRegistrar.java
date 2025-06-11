@@ -15,7 +15,7 @@
  */
 package com.holonplatform.jpa.spring.boot.internal;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;

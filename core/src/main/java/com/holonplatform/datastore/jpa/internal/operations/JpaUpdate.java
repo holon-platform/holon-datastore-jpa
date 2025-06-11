@@ -78,7 +78,7 @@ public class JpaUpdate extends AbstractUpdate {
 		return operationContext.withEntityManager(entityManager -> {
 
 			// create a new instance
-			Object instance = entity.newInstance();
+			Object instance = entity.getDeclaredConstructor().newInstance();
 
 			// merge entity
 			entityManager.merge(operationContext.getBeanIntrospector().write(getConfiguration().getValue(), instance));

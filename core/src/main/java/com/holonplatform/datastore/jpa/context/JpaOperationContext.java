@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.context;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import com.holonplatform.core.beans.BeanIntrospector;
 import com.holonplatform.core.datastore.DatastoreCommodityHandler;

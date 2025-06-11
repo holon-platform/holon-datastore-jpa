@@ -18,7 +18,7 @@ package com.holonplatform.datastore.jpa.dialect;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import org.hibernate.PessimisticLockException;
 import org.hibernate.dialect.lock.LockingStrategyException;
@@ -171,7 +171,7 @@ public class HibernateDialect implements ORMDialect {
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * com.holonplatform.datastore.jpa.dialect.ORMDialect#translateException(javax.persistence.PersistenceException)
+	 * com.holonplatform.datastore.jpa.dialect.ORMDialect#translateException(jakarta.persistence.PersistenceException)
 	 */
 	@Override
 	public DataAccessException translateException(PersistenceException exception) {

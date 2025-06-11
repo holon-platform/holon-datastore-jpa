@@ -22,7 +22,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
@@ -83,19 +83,19 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testProperties() {
-		PropertyBox result = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(KEY, STR, NBOOL)
+		PropertyBox result = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(KEY, STR1, NBOOL)
 				.orElse(null);
 		assertEquals(Long.valueOf(1), result.getValue(KEY));
-		assertEquals("One", result.getValue(STR));
+		assertEquals("One", result.getValue(STR1));
 		assertEquals(Boolean.TRUE, result.getValue(NBOOL));
 
 		assertFalse(result.contains(DBL));
 
-		List<PropertyBox> results = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).list(KEY, STR, NBOOL);
+		List<PropertyBox> results = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).list(KEY, STR1, NBOOL);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		assertEquals(Long.valueOf(1), results.get(0).getValue(KEY));
-		assertEquals("One", results.get(0).getValue(STR));
+		assertEquals("One", results.get(0).getValue(STR1));
 		assertEquals(Boolean.TRUE, results.get(0).getValue(NBOOL));
 	}
 
@@ -105,7 +105,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 		assertNotNull(key);
 		assertEquals(Long.valueOf(1), key);
 
-		String str = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
+		String str = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR1).orElse(null);
 		assertNotNull(str);
 		assertEquals("One", str);
 
@@ -186,8 +186,8 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 				.map((r) -> r.getValue(KEY)).collect(Collectors.toList());
 		assertNotNull(keys);
 		assertEquals(2, keys.size());
-		assertEquals(new Long(1), keys.get(0));
-		assertEquals(new Long(2), keys.get(1));
+		assertEquals(Long.valueOf(1), keys.get(0));
+		assertEquals(Long.valueOf(2), keys.get(1));
 	}
 
 	@Test
@@ -246,7 +246,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 	private static void checkKey1Value(PropertyBox value) {
 		assertNotNull(value);
 		assertEquals(Long.valueOf(1), value.getValue(KEY));
-		assertEquals("One", value.getValue(STR));
+		assertEquals("One", value.getValue(STR1));
 		assertEquals(Double.valueOf(7.4), value.getValue(DBL));
 		assertEquals(TestEnum.FIRST, value.getValue(ENM));
 		assertEquals(Boolean.TRUE, value.getValue(NBOOL));
@@ -275,7 +275,7 @@ public class QueryProjectionTest extends AbstractJpaDatastoreSuiteTest {
 	private static void checkKey2Value(PropertyBox value) {
 		assertNotNull(value);
 		assertEquals(Long.valueOf(2), value.getValue(KEY));
-		assertEquals("Two", value.getValue(STR));
+		assertEquals("Two", value.getValue(STR1));
 		assertNull(value.getValue(DBL));
 		assertEquals(TestEnum.SECOND, value.getValue(ENM));
 		assertEquals(Boolean.FALSE, value.getValue(NBOOL));

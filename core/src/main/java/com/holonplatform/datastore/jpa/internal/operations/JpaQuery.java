@@ -18,10 +18,10 @@ package com.holonplatform.datastore.jpa.internal.operations;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 
 import com.holonplatform.core.datastore.DatastoreCommodityContext.CommodityConfigurationException;
 import com.holonplatform.core.datastore.DatastoreCommodityFactory;
@@ -227,7 +227,7 @@ public class JpaQuery implements LockQueryAdapter<QueryConfiguration> {
 				// timeout
 				configuration.getParameter(LockQueryAdapterQuery.LOCK_TIMEOUT).filter(t -> t != null && t > -1)
 						.ifPresent(timeout -> {
-							entityManager.setProperty("javax.persistence.lock.timeout", timeout);
+							entityManager.setProperty("jakarta.persistence.lock.timeout", timeout);
 						});
 			});
 		} else {

@@ -16,7 +16,7 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
@@ -63,10 +63,10 @@ public class RefreshTest extends AbstractJpaDatastoreSuiteTest {
 			PropertyBox value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES)
 					.orElse(null);
 			assertNotNull(value);
-			assertEquals("One", value.getValue(STR));
+			assertEquals("One", value.getValue(STR1));
 
-			// update STR value
-			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, "OneX").filter(KEY.eq(1L))
+			// update STR1 value
+			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR1, "OneX").filter(KEY.eq(1L))
 					.execute();
 			assertEquals(1, result.getAffectedCount());
 
@@ -74,7 +74,7 @@ public class RefreshTest extends AbstractJpaDatastoreSuiteTest {
 			PropertyBox refreshed = getDatastore().refresh(JPA_TARGET, value);
 			assertNotNull(refreshed);
 			assertEquals(Long.valueOf(1), refreshed.getValue(KEY));
-			assertEquals("OneX", refreshed.getValue(STR));
+			assertEquals("OneX", refreshed.getValue(STR1));
 
 		});
 	}

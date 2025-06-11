@@ -1,6 +1,5 @@
 package com.holonplatform.datastore.jpa.examples;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -12,6 +11,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.jpa.spring.EnableJpaDatastore;
+
+import jakarta.persistence.EntityManagerFactory;
 
 public class ExampleJpaDatastoreSpring1 {
 

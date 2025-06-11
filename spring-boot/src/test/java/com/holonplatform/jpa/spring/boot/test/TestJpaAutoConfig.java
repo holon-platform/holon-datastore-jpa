@@ -50,7 +50,7 @@ public class TestJpaAutoConfig {
 	}
 
 	private final static PathProperty<Long> KEY = PathProperty.create("key", long.class);
-	private final static PathProperty<String> STR = PathProperty.create("stringValue", String.class);
+	private final static PathProperty<String> STR1 = PathProperty.create("stringValue", String.class);
 	private final static PathProperty<Double> DEC = PathProperty.create("decimalValue", Double.class);
 
 	private final static DataTarget<TestJpaDomain1> TARGET1 = JpaTarget.of(TestJpaDomain1.class);
@@ -74,7 +74,7 @@ public class TestJpaAutoConfig {
 		td.setDecimalValue(7.7);
 
 		datastore1.save(TARGET1,
-				PropertyBox.builder(KEY, STR, DEC).set(KEY, 7L).set(STR, "Test ds").set(DEC, 7.7).build());
+				PropertyBox.builder(KEY, STR1, DEC).set(KEY, 7L).set(STR1, "Test ds").set(DEC, 7.7).build());
 
 		Optional<Long> found = datastore1.query().target(TARGET1).filter(KEY.eq(7L)).findOne(KEY);
 		assertTrue(found.isPresent());
@@ -93,7 +93,7 @@ public class TestJpaAutoConfig {
 		td.setDecimalValue(7.7);
 
 		datastore2.save(TARGET2,
-				PropertyBox.builder(KEY, STR, DEC).set(KEY, 7L).set(STR, "Test ds").set(DEC, 7.7).build());
+				PropertyBox.builder(KEY, STR1, DEC).set(KEY, 7L).set(STR1, "Test ds").set(DEC, 7.7).build());
 
 		Optional<Long> found = datastore2.query().target(TARGET2).filter(KEY.eq(7L)).findOne(KEY);
 		assertTrue(found.isPresent());

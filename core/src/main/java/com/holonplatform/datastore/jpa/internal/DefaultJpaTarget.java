@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.internal;
 
 import java.util.Optional;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import com.holonplatform.core.internal.datastore.DefaultDataTarget;
 import com.holonplatform.core.internal.utils.ObjectUtils;

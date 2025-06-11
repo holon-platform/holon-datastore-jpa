@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
@@ -48,8 +47,11 @@ import com.holonplatform.jpa.spring.internal.JpaRegistrar;
 import com.holonplatform.spring.internal.BeanRegistryUtils;
 import com.holonplatform.spring.internal.DataContextBoundBeanDefinition;
 
+import jakarta.persistence.EntityManagerFactory;
+
 /**
- * Registrar for JPA stack and {@link Datastore} beans registration, using Spring boot {@link EntityScan} annotation.
+ * Registrar for JPA stack and {@link Datastore} beans registration, using Spring boot
+ * {@link EntityScan} annotation.
  * 
  * @since 5.0.0
  */
@@ -64,7 +66,8 @@ public class JpaAutoConfigurationRegistrar
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
+	 * @see
+	 * org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
 	 */
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
@@ -73,8 +76,8 @@ public class JpaAutoConfigurationRegistrar
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.
+	 * factory.BeanFactory)
 	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -83,7 +86,8 @@ public class JpaAutoConfigurationRegistrar
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.context.EnvironmentAware#setEnvironment(org.springframework.core.env.Environment)
+	 * @see org.springframework.context.EnvironmentAware#setEnvironment(org.springframework.core.env.
+	 * Environment)
 	 */
 	@Override
 	public void setEnvironment(Environment environment) {
@@ -93,8 +97,9 @@ public class JpaAutoConfigurationRegistrar
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.springframework.
-	 * core.type.AnnotationMetadata, org.springframework.beans.factory.support.BeanDefinitionRegistry)
+	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.
+	 * springframework. core.type.AnnotationMetadata,
+	 * org.springframework.beans.factory.support.BeanDefinitionRegistry)
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
@@ -168,8 +173,8 @@ public class JpaAutoConfigurationRegistrar
 	}
 
 	/**
-	 * Gets package names to scan to detect JPA Entity classes, using {@link JpaEntityScan} (or {@link EntityScan} for
-	 * default data context id) annotation.
+	 * Gets package names to scan to detect JPA Entity classes, using {@link JpaEntityScan} (or
+	 * {@link EntityScan} for default data context id) annotation.
 	 * @param dataContextId Data context id
 	 * @return Package names to scan to detect JPA Entity classes
 	 */

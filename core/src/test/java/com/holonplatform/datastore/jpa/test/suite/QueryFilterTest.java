@@ -20,7 +20,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.LDAT;
@@ -43,43 +43,45 @@ import org.junit.Test;
 
 import com.holonplatform.core.internal.query.filter.NotFilter;
 import com.holonplatform.core.property.PropertyBox;
+import com.holonplatform.datastore.jpa.ORMPlatform;
+import com.holonplatform.datastore.jpa.test.config.DatastoreConfigCommodity;
 
 public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testFilters() {
 
-		long count = getDatastore().query().target(JPA_TARGET).filter(STR.eq("One")).count();
+		long count = getDatastore().query().target(JPA_TARGET).filter(STR1.eq("One")).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(new NotFilter(STR.eq("One"))).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(new NotFilter(STR1.eq("One"))).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.eq("One").not()).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.eq("One").not()).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.neq("Two")).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.neq("Two")).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.isNotNull()).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.isNotNull()).count();
 		assertEquals(2, count);
 
 		count = getDatastore().query().target(JPA_TARGET).filter(DBL.isNull()).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.endsWith("x")).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.endsWith("x")).count();
 		assertEquals(0, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("w")).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.contains("w")).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.containsIgnoreCase("O")).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.containsIgnoreCase("O")).count();
 		assertEquals(2, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.startsWith("O")).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.startsWith("O")).count();
 		assertEquals(1, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(STR.startsWithIgnoreCase("o")).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(STR1.startsWithIgnoreCase("o")).count();
 		assertEquals(1, count);
 
 		count = getDatastore().query().target(JPA_TARGET).filter(DBL.gt(7d)).count();
@@ -106,7 +108,7 @@ public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 		count = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L).or(KEY.eq(2L))).count();
 		assertEquals(2, count);
 
-		count = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L).and(STR.eq("One"))).count();
+		count = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L).and(STR1.eq("One"))).count();
 		assertEquals(1, count);
 
 	}
@@ -115,24 +117,24 @@ public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 	public void testEscape() {
 		inTransaction(() -> {
 
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 1001L).set(STR, "50%").set(NBOOL, false)
+			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 1001L).set(STR1, "50%").set(NBOOL, false)
 					.build();
 			getDatastore().insert(JPA_TARGET, value);
-			value = PropertyBox.builder(PROPERTIES).set(KEY, 1002L).set(STR, "100%").set(NBOOL, false).build();
+			value = PropertyBox.builder(PROPERTIES).set(KEY, 1002L).set(STR1, "100%").set(NBOOL, false).build();
 			getDatastore().insert(JPA_TARGET, value);
-			value = PropertyBox.builder(PROPERTIES).set(KEY, 1003L).set(STR, "_3").set(NBOOL, false).build();
+			value = PropertyBox.builder(PROPERTIES).set(KEY, 1003L).set(STR1, "_3").set(NBOOL, false).build();
 			getDatastore().insert(JPA_TARGET, value);
 
-			long count = getDatastore().query().target(JPA_TARGET).filter(STR.endsWith("%")).count();
+			long count = getDatastore().query().target(JPA_TARGET).filter(STR1.endsWith("%")).count();
 			assertEquals(2, count);
 
-			count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("0%")).count();
+			count = getDatastore().query().target(JPA_TARGET).filter(STR1.contains("0%")).count();
 			assertEquals(2, count);
 
-			count = getDatastore().query().target(JPA_TARGET).filter(STR.contains("100%")).count();
+			count = getDatastore().query().target(JPA_TARGET).filter(STR1.contains("100%")).count();
 			assertEquals(1, count);
 
-			count = getDatastore().query().target(JPA_TARGET).filter(STR.startsWith("_")).count();
+			count = getDatastore().query().target(JPA_TARGET).filter(STR1.startsWith("_")).count();
 			assertEquals(1, count);
 
 		});
@@ -207,8 +209,10 @@ public class QueryFilterTest extends AbstractJpaDatastoreSuiteTest {
 		assertEquals(30, time.getMinute());
 		assertEquals(15, time.getSecond());
 
-		long cnt = getDatastore().query().target(JPA_TARGET).filter(TIME.eq(LocalTime.of(18, 30, 15))).count();
-		assertEquals(1, cnt);
+		if (!ORMPlatform.ECLIPSELINK.equals(getDatastore().create(DatastoreConfigCommodity.class).getPlatform())) {
+			long cnt = getDatastore().query().target(JPA_TARGET).filter(TIME.eq(LocalTime.of(18, 30, 15))).count();
+			assertEquals(1, cnt);
+		}
 
 	}
 

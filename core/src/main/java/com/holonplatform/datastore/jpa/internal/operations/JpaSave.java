@@ -89,7 +89,8 @@ public class JpaSave extends AbstractSave {
 					.getPropertySet(entity.getEntityClass());
 
 			// create instance and write values
-			Object instance = set.write(getConfiguration().getValue(), entity.getEntityClass().newInstance());
+			Object instance = set.write(getConfiguration().getValue(),
+					entity.getEntityClass().getDeclaredConstructor().newInstance());
 
 			OperationResult result;
 

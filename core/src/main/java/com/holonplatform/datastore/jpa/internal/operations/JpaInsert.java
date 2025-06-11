@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.metamodel.Attribute.PersistentAttributeType;
-import javax.persistence.metamodel.EmbeddableType;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.SingularAttribute;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.metamodel.Attribute.PersistentAttributeType;
+import jakarta.persistence.metamodel.EmbeddableType;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.SingularAttribute;
 
 import com.holonplatform.core.Path;
 import com.holonplatform.core.beans.BeanPropertySet;
@@ -102,7 +102,7 @@ public class JpaInsert extends AbstractInsert {
 		return operationContext.withEntityManager(entityManager -> {
 
 			// create a new instance
-			Object instance = entity.newInstance();
+			Object instance = entity.getDeclaredConstructor().newInstance();
 			// Bean property set
 			final BeanPropertySet<Object> set = operationContext.getBeanIntrospector().getPropertySet(entity);
 			// persist entity
@@ -130,7 +130,8 @@ public class JpaInsert extends AbstractInsert {
 	}
 
 	/**
-	 * Set the entity id values of given <code>entity</code> instance to be returned as an {@link OperationResult}.
+	 * Set the entity id values of given <code>entity</code> instance to be returned as an
+	 * {@link OperationResult}.
 	 * @param result OperationResult in which to set the ids
 	 * @param entityManager EntityManager
 	 * @param set Entity bean property set

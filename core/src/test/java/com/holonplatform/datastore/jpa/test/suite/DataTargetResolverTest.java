@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.test.suite;
 
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 
@@ -40,7 +40,7 @@ public class DataTargetResolverTest extends AbstractJpaDatastoreSuiteTest {
 				(t, c) -> "#testres#".equals(t.getName()) ? Optional.of(JpaTarget.of(Test1.class)) : Optional.empty());
 
 		long count = getDatastore().query().withExpressionResolver(dr).target(DataTarget.named("#testres#"))
-				.filter(STR.eq("One")).count();
+				.filter(STR1.eq("One")).count();
 		assertEquals(1, count);
 
 	}
@@ -54,7 +54,7 @@ public class DataTargetResolverTest extends AbstractJpaDatastoreSuiteTest {
 						: Optional.empty());
 
 		long count = getDatastore().query().withExpressionResolver(dr).target(DataTarget.named("#testres2#"))
-				.filter(STR.eq("One")).count();
+				.filter(STR1.eq("One")).count();
 		assertEquals(1, count);
 
 	}

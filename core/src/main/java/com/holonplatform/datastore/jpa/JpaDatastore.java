@@ -15,10 +15,10 @@
  */
 package com.holonplatform.datastore.jpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.LockModeType;
 
 import com.holonplatform.core.config.ConfigProperty;
 import com.holonplatform.core.datastore.Datastore;

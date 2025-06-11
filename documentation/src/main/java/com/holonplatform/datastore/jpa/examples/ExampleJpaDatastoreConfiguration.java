@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.examples;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.core.datastore.DatastoreConfigProperties;

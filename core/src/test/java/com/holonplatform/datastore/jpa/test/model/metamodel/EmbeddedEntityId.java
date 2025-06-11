@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.test.model.metamodel;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class EmbeddedEntityId implements Serializable {

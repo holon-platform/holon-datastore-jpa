@@ -15,9 +15,10 @@
  */
 package com.holonplatform.jpa.spring.boot;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -41,7 +42,7 @@ import com.holonplatform.jpa.spring.boot.internal.JpaAutoConfigurationRegistrar;
  * 
  * @since 5.0.0
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass({ LocalContainerEntityManagerFactoryBean.class, EntityManager.class })
 @AutoConfigureAfter(DataSourcesAutoConfiguration.class)
 @AutoConfigureBefore({ DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
@@ -51,7 +52,7 @@ public class JpaAutoConfiguration {
 	private final static Logger LOGGER = JpaDatastoreLogger.create();
 
 	@Configuration
-	@ConditionalOnMissingBean(name = { "javax.persistence.EntityManagerFactory",
+	@ConditionalOnMissingBean(name = { "jakarta.persistence.EntityManagerFactory",
 			"org.springframework.orm.jpa.LocalEntityManagerFactoryBean" })
 	@Import(JpaAutoConfigurationRegistrar.class)
 	static class JpaStackConfiguration implements InitializingBean {

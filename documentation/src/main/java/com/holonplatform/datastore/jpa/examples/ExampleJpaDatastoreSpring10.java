@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.examples;
 
-import javax.persistence.ValidationMode;
+import jakarta.persistence.ValidationMode;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;

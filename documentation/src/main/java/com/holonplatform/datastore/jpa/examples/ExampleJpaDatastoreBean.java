@@ -17,8 +17,8 @@ package com.holonplatform.datastore.jpa.examples;
 
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.datastore.DataTarget;

@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Priority;
-import javax.persistence.Tuple;
+import jakarta.annotation.Priority;
+import jakarta.persistence.Tuple;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.TypedExpression;

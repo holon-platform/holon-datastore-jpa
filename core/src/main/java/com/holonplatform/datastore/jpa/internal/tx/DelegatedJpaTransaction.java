@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.internal.tx;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
 import com.holonplatform.core.internal.datastore.transaction.AbstractDelegatedTransaction;

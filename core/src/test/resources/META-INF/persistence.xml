@@ -18,12 +18,12 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<!-- Configuration properties -->
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url"
+			<property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="jakarta.persistence.jdbc.url"
 				value="jdbc:h2:mem:datastore1;DB_CLOSE_DELAY=-1" />
-			<property name="javax.persistence.jdbc.user" value="sa" />
-			<property name="javax.persistence.jdbc.password" value="" />
-			<!-- <property name="hibernate.show_sql" value="true" /> -->
+			<property name="jakarta.persistence.jdbc.user" value="sa" />
+			<property name="jakarta.persistence.jdbc.password" value="" />
+			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="none" />
 		</properties>
 	</persistence-unit>
@@ -43,11 +43,11 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<!-- Configuration properties -->
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url"
+			<property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="jakarta.persistence.jdbc.url"
 				value="jdbc:h2:mem:metamodel;DB_CLOSE_DELAY=-1" />
-			<property name="javax.persistence.jdbc.user" value="sa" />
-			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="jakarta.persistence.jdbc.user" value="sa" />
+			<property name="jakarta.persistence.jdbc.password" value="" />
 			<property name="hibernate.hbm2ddl.auto" value="none" />
 		</properties>
 	</persistence-unit>
@@ -68,11 +68,11 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<!-- Configuration properties -->
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url"
+			<property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="jakarta.persistence.jdbc.url"
 				value="jdbc:h2:mem:datastore4;DB_CLOSE_DELAY=-1" />
-			<property name="javax.persistence.jdbc.user" value="sa" />
-			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="jakarta.persistence.jdbc.user" value="sa" />
+			<property name="jakarta.persistence.jdbc.password" value="" />
 		</properties>
 	</persistence-unit>
 

@@ -33,7 +33,7 @@ public interface TestDataModel {
 	// public final static JpaTarget<Test1> JPA_TARGET = JpaTarget.of(Test1.class);
 
 	public final static NumericProperty<Long> KEY = NumericProperty.create("key", long.class);
-	public final static StringProperty STR = StringProperty.create("stringValue");
+	public final static StringProperty STR1 = StringProperty.create("stringValue");
 	public final static NumericProperty<Double> DBL = NumericProperty.doubleType("decimalValue");
 	public final static TemporalProperty<Date> DAT = TemporalProperty.create("dateValue", Date.class)
 			.temporalType(TemporalType.DATE);
@@ -54,20 +54,20 @@ public interface TestDataModel {
 	// public final static TemporalProperty<LocalTime> TIME = TemporalProperty.localTime("localTimeValue");
 
 	// public final static PropertySet<?> PROPERTIES = PropertySet
-	// .builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME).identifier(KEY).build();
+	// .builderOf(KEY, STR1, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME).identifier(KEY).build();
 
-	// public final static PropertySet<?> PROPERTIES_NOID = PropertySet.of(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL,
+	// public final static PropertySet<?> PROPERTIES_NOID = PropertySet.of(KEY, STR1, DBL, DAT, LDAT, ENM, NBOOL,
 	// NST_STR,
 	// NST_DEC, TMS, LTMS, TIME);
 
 	// virtual
 
 	public static final VirtualProperty<String> VIRTUAL_STR = VirtualProperty.create(String.class, pb -> {
-		return pb.getValueIfPresent(STR).map(str -> "[" + str + "]").orElse("NONE");
+		return pb.getValueIfPresent(STR1).map(str -> "[" + str + "]").orElse("NONE");
 	});
 
 	// public final static PropertySet<?> PROPERTIES_V = PropertySet
-	// .builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
+	// .builderOf(KEY, STR1, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
 	// .identifier(KEY).build();
 
 	// lobs

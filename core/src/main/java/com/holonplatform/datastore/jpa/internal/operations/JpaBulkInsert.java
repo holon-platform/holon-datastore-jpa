@@ -125,7 +125,7 @@ public class JpaBulkInsert extends AbstractBulkInsert {
 				});
 
 				// persist entity
-				entityManager.persist(set.write(box, entity.newInstance()));
+				entityManager.persist(set.write(box, entity.getDeclaredConstructor().newInstance()));
 
 				operationContext.traceOperation("Bulk PERSIST entity [" + entity.getName() + "]");
 

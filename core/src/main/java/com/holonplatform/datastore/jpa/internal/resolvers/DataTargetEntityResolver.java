@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-import javax.annotation.Priority;
-import javax.persistence.EntityManagerFactory;
+import jakarta.annotation.Priority;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.datastore.DataTarget;

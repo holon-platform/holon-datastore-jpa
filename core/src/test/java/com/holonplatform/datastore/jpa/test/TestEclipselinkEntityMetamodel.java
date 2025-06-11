@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.test;
 
 import java.util.Properties;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.jupiter.api.AfterAll;

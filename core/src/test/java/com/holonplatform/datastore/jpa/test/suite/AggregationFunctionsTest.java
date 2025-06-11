@@ -16,7 +16,7 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +33,7 @@ public class AggregationFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testCount() {
 
-		long result = getDatastore().query().target(JPA_TARGET).findOne(Count.create(STR)).orElse(-1L);
+		long result = getDatastore().query().target(JPA_TARGET).findOne(Count.create(STR1)).orElse(-1L);
 		assertEquals(2, result);
 
 		result = getDatastore().query().target(JPA_TARGET).findOne(KEY.count()).orElse(-1L);
@@ -45,18 +45,18 @@ public class AggregationFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 	public void testMinMax() {
 		Optional<Long> key = getDatastore().query().target(JPA_TARGET).findOne(KEY.max());
 		assertTrue(key.isPresent());
-		assertEquals(new Long(2), key.get());
+		assertEquals(Long.valueOf(2), key.get());
 
 		key = getDatastore().query().target(JPA_TARGET).findOne(KEY.min());
 		assertTrue(key.isPresent());
-		assertEquals(new Long(1), key.get());
+		assertEquals(Long.valueOf(1), key.get());
 	}
 
 	@Test
 	public void testSum() {
 		Optional<Long> sum = getDatastore().query().target(JPA_TARGET).findOne(QueryFunction.sum(KEY));
 		assertTrue(sum.isPresent());
-		assertEquals(new Long(3), sum.get());
+		assertEquals(Long.valueOf(3), sum.get());
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class AggregationFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 		if (AbstractJpaDatastoreTestSuite.avgProjectionTest) {
 			Optional<Double> avg = getDatastore().query().target(JPA_TARGET).findOne(KEY.avg());
 			assertTrue(avg.isPresent());
-			assertEquals(new Double(1.5), avg.get());
+			assertEquals(Double.valueOf(1.5), avg.get());
 		}
 	}
 

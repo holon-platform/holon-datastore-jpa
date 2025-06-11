@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.internal.operations;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 
 import com.holonplatform.core.datastore.Datastore.OperationResult;
 import com.holonplatform.core.datastore.Datastore.OperationType;

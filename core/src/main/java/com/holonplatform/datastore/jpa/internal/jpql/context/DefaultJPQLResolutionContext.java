@@ -22,8 +22,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.core.Expression.InvalidExpressionException;
@@ -260,7 +260,7 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.context.JPQLCompositionContext#setupQueryParameters(javax.persistence.Query)
+	 * @see com.holonplatform.datastore.jpa.context.JPQLCompositionContext#setupQueryParameters(jakarta.persistence.Query)
 	 */
 	@Override
 	public void setupQueryParameters(Query query) {
@@ -285,16 +285,16 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 
 			} else if (TypeUtils.isLocalTemporal(p.getType()) && !getDialect().temporalTypeParametersSupported()) {
 				final Date date;
-				javax.persistence.TemporalType tt = null;
+				jakarta.persistence.TemporalType tt = null;
 				if (LocalDate.class.isAssignableFrom(p.getType())) {
 					date = java.sql.Date.valueOf((LocalDate) p.getValue());
-					tt = javax.persistence.TemporalType.DATE;
+					tt = jakarta.persistence.TemporalType.DATE;
 				} else if (LocalDateTime.class.isAssignableFrom(p.getType())) {
 					date = java.sql.Timestamp.valueOf((LocalDateTime) p.getValue());
-					tt = javax.persistence.TemporalType.TIMESTAMP;
+					tt = jakarta.persistence.TemporalType.TIMESTAMP;
 				} else if (LocalTime.class.isAssignableFrom(p.getType())) {
 					date = java.sql.Time.valueOf((LocalTime) p.getValue());
-					tt = javax.persistence.TemporalType.TIME;
+					tt = jakarta.persistence.TemporalType.TIME;
 				} else {
 					date = null;
 				}
@@ -315,19 +315,19 @@ public class DefaultJPQLResolutionContext implements JPQLResolutionContext {
 	}
 
 	/**
-	 * Convert given <code>temporalType</code> into a JPA {@link javax.persistence.TemporalType}.
+	 * Convert given <code>temporalType</code> into a JPA {@link jakarta.persistence.TemporalType}.
 	 * @param temporalType Temporal type to convert
 	 * @return Converted temporal type
 	 */
-	private static javax.persistence.TemporalType convert(TemporalType temporalType) {
+	private static jakarta.persistence.TemporalType convert(TemporalType temporalType) {
 		if (temporalType != null) {
 			switch (temporalType) {
 			case DATE:
-				return javax.persistence.TemporalType.DATE;
+				return jakarta.persistence.TemporalType.DATE;
 			case DATE_TIME:
-				return javax.persistence.TemporalType.TIMESTAMP;
+				return jakarta.persistence.TemporalType.TIMESTAMP;
 			case TIME:
-				return javax.persistence.TemporalType.TIME;
+				return jakarta.persistence.TemporalType.TIME;
 			default:
 				break;
 			}

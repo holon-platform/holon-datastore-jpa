@@ -23,16 +23,16 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
 
 import java.util.List;
 import java.util.Properties;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.spi.PersistenceProvider;
-import javax.persistence.spi.PersistenceProviderResolverHolder;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.spi.PersistenceProvider;
+import jakarta.persistence.spi.PersistenceProviderResolverHolder;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.AfterClass;
@@ -85,11 +85,11 @@ public class TestEclipselink extends AbstractJpaDatastoreTestSuite {
 		LTMS = TemporalProperty.localDateTime("localDatetimeValue");
 		TIME = TemporalProperty.localTime("localTimeValue");
 
-		PROPERTIES = PropertySet.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME)
+		PROPERTIES = PropertySet.builderOf(KEY, STR1, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME)
 				.withIdentifier(KEY).build();
-		PROPERTIES_NOID = PropertySet.of(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME);
+		PROPERTIES_NOID = PropertySet.of(KEY, STR1, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME);
 		PROPERTIES_V = PropertySet
-				.builderOf(KEY, STR, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
+				.builderOf(KEY, STR1, DBL, DAT, LDAT, ENM, NBOOL, NST_STR, NST_DEC, TMS, LTMS, TIME, VIRTUAL_STR)
 				.withIdentifier(KEY).build();
 
 		CLOB_SET_STR = PropertySet.of(PROPERTIES, CLOB_STR);

@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.holonplatform.jpa.spring.boot.JpaAutoConfiguration,\
-com.holonplatform.jpa.spring.boot.JpaDatastoreAutoConfiguration

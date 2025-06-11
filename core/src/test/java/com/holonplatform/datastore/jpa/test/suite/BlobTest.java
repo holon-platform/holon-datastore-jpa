@@ -18,7 +18,7 @@ package com.holonplatform.datastore.jpa.test.suite;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.BLOB_BYS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static org.junit.Assert.assertNotNull;
@@ -67,7 +67,7 @@ public class BlobTest extends AbstractJpaDatastoreSuiteTest {
 
 				// insert
 
-				value = PropertyBox.builder(BLOB_SET_BYT).set(KEY, 77L).set(STR, "Test clob").set(NBOOL, false)
+				value = PropertyBox.builder(BLOB_SET_BYT).set(KEY, 77L).set(STR1, "Test clob").set(NBOOL, false)
 						.set(BLOB_BYS, bytes).build();
 				getDatastore().insert(JPA_TARGET, value);
 

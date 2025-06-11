@@ -54,6 +54,20 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<!-- JDK9 Automatic-Module-Name -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>com.holonplatform.documentation.datastore.jpa</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			
 		</plugins>
 	</build>
 
@@ -76,8 +90,8 @@
 
 		<!-- JPA API -->
 		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>javax.persistence-api</artifactId>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
 			<version>${jpa.api.version}</version>
 			<scope>provided</scope>
 		</dependency>

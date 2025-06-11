@@ -15,8 +15,8 @@
  */
 package com.holonplatform.jpa.spring.internal;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
 
@@ -34,7 +34,7 @@ public class DefaultSpringEntityManagerLifecycleHandler implements SpringEntityM
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.JpaDatastore.EntityManagerInitializer#getEntityManager(javax.persistence.
+	 * @see com.holonplatform.datastore.jpa.JpaDatastore.EntityManagerInitializer#getEntityManager(jakarta.persistence.
 	 * EntityManagerFactory)
 	 */
 	@Override
@@ -44,7 +44,7 @@ public class DefaultSpringEntityManagerLifecycleHandler implements SpringEntityM
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.datastore.jpa.JpaDatastore.EntityManagerFinalizer#finalizeEntityManager(javax.persistence.
+	 * @see com.holonplatform.datastore.jpa.JpaDatastore.EntityManagerFinalizer#finalizeEntityManager(jakarta.persistence.
 	 * EntityManager)
 	 */
 	@Override

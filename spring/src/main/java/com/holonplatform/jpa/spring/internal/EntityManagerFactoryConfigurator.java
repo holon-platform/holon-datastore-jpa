@@ -19,20 +19,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.persistence.SharedCacheMode;
-import javax.persistence.ValidationMode;
-
 import org.eclipse.persistence.config.TargetDatabase;
-import org.hibernate.dialect.DB2400Dialect;
+import org.hibernate.community.dialect.DerbyLegacyDialect;
+import org.hibernate.community.dialect.InformixDialect;
+import org.hibernate.community.dialect.MySQLLegacyDialect;
+import org.hibernate.community.dialect.OracleLegacyDialect;
+import org.hibernate.community.dialect.PostgreSQLLegacyDialect;
 import org.hibernate.dialect.DB2Dialect;
-import org.hibernate.dialect.DerbyTenSevenDialect;
+import org.hibernate.dialect.DB2iDialect;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.dialect.HANARowStoreDialect;
+import org.hibernate.dialect.HANADialect;
 import org.hibernate.dialect.HSQLDialect;
-import org.hibernate.dialect.InformixDialect;
-import org.hibernate.dialect.MySQL5Dialect;
-import org.hibernate.dialect.Oracle10gDialect;
-import org.hibernate.dialect.PostgreSQL82Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -46,6 +43,9 @@ import com.holonplatform.core.internal.utils.ObjectUtils;
 import com.holonplatform.datastore.jpa.ORMPlatform;
 import com.holonplatform.datastore.jpa.internal.JpaDatastoreLogger;
 import com.holonplatform.jdbc.DatabasePlatform;
+
+import jakarta.persistence.SharedCacheMode;
+import jakarta.persistence.ValidationMode;
 
 /**
  * Configurator for EntityManagerFactory beans
@@ -101,8 +101,8 @@ class EntityManagerFactoryConfigurator {
 	protected Properties jpaProperties;
 
 	/**
-	 * Set data context id. Data context id will be setted as EntityManagerFactory <code>PersistenceUnit</code> name
-	 * too.
+	 * Set data context id. Data context id will be setted as EntityManagerFactory
+	 * <code>PersistenceUnit</code> name too.
 	 * @param dataContextId Data context id
 	 */
 	public void setDataContextId(String dataContextId) {
@@ -110,8 +110,9 @@ class EntityManagerFactoryConfigurator {
 	}
 
 	/**
-	 * Add a package name to scan for automatic JPA Entity declation for Persistence Unit bound to EntityManagerFactory.
-	 * This way, entity classes declaration in <code>persistence.xml</code> file can be omitted.
+	 * Add a package name to scan for automatic JPA Entity declation for Persistence Unit bound to
+	 * EntityManagerFactory. This way, entity classes declaration in <code>persistence.xml</code> file
+	 * can be omitted.
 	 * @param packageName Package name to scan to search for Entity classes
 	 */
 	public void addEntityPackage(String packageName) {
@@ -120,8 +121,8 @@ class EntityManagerFactoryConfigurator {
 	}
 
 	/**
-	 * Add a package name to scan for automatic JPA Entity declation for Persistence Unit bound to EntityManagerFactory,
-	 * using the package name to which given <code>referenceClass</code> is bound
+	 * Add a package name to scan for automatic JPA Entity declation for Persistence Unit bound to
+	 * EntityManagerFactory, using the package name to which given <code>referenceClass</code> is bound
 	 * @param referenceClass Reference class to obtain the package name
 	 */
 	public void addEntityPackage(Class<?> referenceClass) {
@@ -135,8 +136,8 @@ class EntityManagerFactoryConfigurator {
 	}
 
 	/**
-	 * Set target Database platform. If not specified, builder will try to detect Database platform from DataSource
-	 * connection settings
+	 * Set target Database platform. If not specified, builder will try to detect Database platform from
+	 * DataSource connection settings
 	 * @param database Database platform
 	 */
 	public void setDatabase(DatabasePlatform database) {
@@ -144,8 +145,9 @@ class EntityManagerFactoryConfigurator {
 	}
 
 	/**
-	 * Set ORM vendor-specific dialect class to use for underlying Database access. If not specified, builder will try
-	 * to detect appropriate dialect to use from Database platform or DataSource connection.
+	 * Set ORM vendor-specific dialect class to use for underlying Database access. If not specified,
+	 * builder will try to detect appropriate dialect to use from Database platform or DataSource
+	 * connection.
 	 * @param dialect Vendor-specific dialect class
 	 */
 	public void setDialect(String dialect) {
@@ -169,8 +171,8 @@ class EntityManagerFactoryConfigurator {
 	}
 
 	/**
-	 * Specify the JPA 2.0 validation mode for this persistence unit, overriding a value in {@code persistence.xml} if
-	 * set.
+	 * Specify the JPA 2.0 validation mode for this persistence unit, overriding a value in
+	 * {@code persistence.xml} if set.
 	 * @param validationMode Validation mode
 	 */
 	public void setValidationMode(ValidationMode validationMode) {
@@ -178,8 +180,8 @@ class EntityManagerFactoryConfigurator {
 	}
 
 	/**
-	 * Specify the JPA 2.0 shared cache mode for this persistence unit, overriding a value in {@code persistence.xml} if
-	 * set.
+	 * Specify the JPA 2.0 shared cache mode for this persistence unit, overriding a value in
+	 * {@code persistence.xml} if set.
 	 * @param sharedCacheMode Shared cache mode
 	 */
 	public void setSharedCacheMode(SharedCacheMode sharedCacheMode) {
@@ -327,9 +329,9 @@ class EntityManagerFactoryConfigurator {
 		case DB2:
 			return DB2Dialect.class;
 		case DB2_AS400:
-			return DB2400Dialect.class;
+			return DB2iDialect.class;
 		case DERBY:
-			return DerbyTenSevenDialect.class;
+			return DerbyLegacyDialect.class;
 		case H2:
 			return H2Dialect.class;
 		case HSQL:
@@ -337,17 +339,17 @@ class EntityManagerFactoryConfigurator {
 		case INFORMIX:
 			return InformixDialect.class;
 		case MYSQL:
-			return MySQL5Dialect.class;
+			return MySQLLegacyDialect.class;
 		case ORACLE:
-			return Oracle10gDialect.class;
+			return OracleLegacyDialect.class;
 		case POSTGRESQL:
-			return PostgreSQL82Dialect.class;
+			return PostgreSQLLegacyDialect.class;
 		case SQL_SERVER:
 			return SQLServerDialect.class;
 		case MARIADB:
-			return MySQL5Dialect.class;
+			return MySQLLegacyDialect.class;
 		case HANA:
-			return HANARowStoreDialect.class;
+			return HANADialect.class;
 		case SQLITE:
 		case NONE:
 		default:

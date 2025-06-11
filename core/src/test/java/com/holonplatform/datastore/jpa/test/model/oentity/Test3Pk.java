@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.test.model.oentity;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class Test3Pk implements Serializable {

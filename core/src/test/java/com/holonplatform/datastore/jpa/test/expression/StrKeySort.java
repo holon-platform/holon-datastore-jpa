@@ -29,6 +29,6 @@ public class StrKeySort implements QuerySort {
 	}
 
 	public static final ExpressionResolver<QuerySort, QuerySort> RESOLVER = ExpressionResolver.create(StrKeySort.class,
-			QuerySort.class, (sort, ctx) -> Optional.of(TestDataModel.STR.desc().and(TestDataModel.KEY.asc())));
+			QuerySort.class, (sort, ctx) -> Optional.of(TestDataModel.STR1.desc().and(TestDataModel.KEY.asc())));
 
 }

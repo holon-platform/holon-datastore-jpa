@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Priority;
-import javax.persistence.Tuple;
+import jakarta.annotation.Priority;
+import jakarta.persistence.Tuple;
 
 import com.holonplatform.core.Expression.InvalidExpressionException;
 import com.holonplatform.core.Path;

@@ -18,11 +18,11 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<!-- Configuration properties -->
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url"
-				value="jdbc:h2:mem:datastore2;DB_CLOSE_DELAY=-1" />
-			<property name="javax.persistence.jdbc.user" value="sa" />
-			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="jakarta.persistence.jdbc.url"
+				value="jdbc:h2:mem:datastore2;DB_CLOSE_DELAY=-1;MODE=LEGACY;" />
+			<property name="jakarta.persistence.jdbc.user" value="sa" />
+			<property name="jakarta.persistence.jdbc.password" value="" />
 			<property name="eclipselink.weaving" value="false" />
 			<!-- <property name="eclipselink.logging.level.sql" value="FINE" /> -->
 			<!-- <property name="eclipselink.logging.parameters" value="true" /> -->
@@ -44,11 +44,11 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<!-- Configuration properties -->
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url"
-				value="jdbc:h2:mem:metamodel;DB_CLOSE_DELAY=-1" />
-			<property name="javax.persistence.jdbc.user" value="sa" />
-			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="jakarta.persistence.jdbc.url"
+				value="jdbc:h2:mem:metamodel;DB_CLOSE_DELAY=-1;MODE=LEGACY;" />
+			<property name="jakarta.persistence.jdbc.user" value="sa" />
+			<property name="jakarta.persistence.jdbc.password" value="" />
 			<property name="eclipselink.weaving" value="false" />
 		</properties>
 	</persistence-unit>

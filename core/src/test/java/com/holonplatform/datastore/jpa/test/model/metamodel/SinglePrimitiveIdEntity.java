@@ -15,8 +15,8 @@
  */
 package com.holonplatform.datastore.jpa.test.model.metamodel;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity(name = "primitive_id")
 public class SinglePrimitiveIdEntity {

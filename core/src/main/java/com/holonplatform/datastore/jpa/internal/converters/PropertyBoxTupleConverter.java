@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.internal.converters;
 
 import java.util.Map;
 
-import javax.persistence.Tuple;
+import jakarta.persistence.Tuple;
 
 import com.holonplatform.core.TypedExpression;
 import com.holonplatform.core.exceptions.DataAccessException;

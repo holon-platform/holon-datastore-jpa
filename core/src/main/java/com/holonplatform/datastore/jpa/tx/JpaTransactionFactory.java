@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.tx;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import com.holonplatform.core.datastore.transaction.TransactionConfiguration;
 import com.holonplatform.core.datastore.transaction.TransactionStatus.TransactionException;

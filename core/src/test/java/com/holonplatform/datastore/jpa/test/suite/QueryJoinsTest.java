@@ -43,7 +43,7 @@ public class QueryJoinsTest extends AbstractJpaDatastoreSuiteTest {
 
 	// with parent
 	public final static PathProperty<Long> KEY_P = JPA_TARGET.property(TestDataModel.KEY);
-	public final static PathProperty<String> STR_P = JPA_TARGET.property(TestDataModel.STR);
+	public final static PathProperty<String> STR_P = JPA_TARGET.property(TestDataModel.STR1);
 
 	@Test
 	public void testJoins() {

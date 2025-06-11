@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.context;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 /**
  * Represents an operation to be executed using a Datastore managed {@link EntityManager}.

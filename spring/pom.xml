@@ -61,8 +61,8 @@
 
 		<!-- JPA API -->
 		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>javax.persistence-api</artifactId>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
 			<version>${jpa.api.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -74,6 +74,12 @@
 			<version>${hibernate.version}</version>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+    		<groupId>org.hibernate.orm</groupId>
+    		<artifactId>hibernate-community-dialects</artifactId>
+    		<version>${hibernate.version}</version> 
+		</dependency>
+		
 		<!-- EclipseLink -->
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>

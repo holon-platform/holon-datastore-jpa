@@ -17,8 +17,8 @@ package com.holonplatform.datastore.jpa.internal;
 
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.core.ExpressionResolver;
@@ -96,7 +96,8 @@ import com.holonplatform.datastore.jpa.tx.JpaTransactionFactory;
 /**
  * Default {@link JpaDatastore} implementation.
  * <p>
- * The Datastore instance must be initialized using the {@link #initialize()} method before using it.
+ * The Datastore instance must be initialized using the {@link #initialize()} method before using
+ * it.
  * </p>
  * 
  * @since 5.0.0
@@ -221,7 +222,9 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.internal.datastore.AbstractInitializableDatastore#initialize(java.lang.ClassLoader)
+	 * @see
+	 * com.holonplatform.core.internal.datastore.AbstractInitializableDatastore#initialize(java.lang.
+	 * ClassLoader)
 	 */
 	@Override
 	protected boolean initialize(ClassLoader classLoader) {
@@ -300,8 +303,9 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 	}
 
 	/**
-	 * Set whether to auto-flush mode is enabled. When auto-flush mode is enabled, {@link EntityManager#flush()} is
-	 * called after each Datastore data manipulation operation, such as <code>save</code> or <code>delete</code>.
+	 * Set whether to auto-flush mode is enabled. When auto-flush mode is enabled,
+	 * {@link EntityManager#flush()} is called after each Datastore data manipulation operation, such as
+	 * <code>save</code> or <code>delete</code>.
 	 * @param autoFlush <code>true</code> to enable the auto-flush mode, <code>false</code> to disable
 	 */
 	public void setAutoFlush(boolean autoFlush) {
@@ -463,9 +467,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.holonplatform.datastore.jpa.EntityManagerHandler#withEntityManager(com.holonplatform.datastore.jpa.context.
-	 * EntityManagerOperation)
+	 * @see com.holonplatform.datastore.jpa.EntityManagerHandler#withEntityManager(com.holonplatform.
+	 * datastore.jpa.context. EntityManagerOperation)
 	 */
 	@Override
 	public <R> R withEntityManager(EntityManagerOperation<R> operation) {
@@ -508,8 +511,10 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.holonplatform.core.datastore.transaction.Transactional#withTransaction(com.holonplatform.core.datastore.
-	 * transaction.TransactionalOperation, com.holonplatform.core.datastore.transaction.TransactionConfiguration)
+	 * @see
+	 * com.holonplatform.core.datastore.transaction.Transactional#withTransaction(com.holonplatform.core
+	 * .datastore. transaction.TransactionalOperation,
+	 * com.holonplatform.core.datastore.transaction.TransactionConfiguration)
 	 */
 	@Override
 	public <R> R withTransaction(TransactionalOperation<R> operation,
@@ -573,7 +578,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 	/**
 	 * Starts a {@link JpaTransaction}. If a local transaction is active, it will be forcedly finalized.
-	 * @param configuration Transaction configuration. If <code>null</code>, a default configuration will be used
+	 * @param configuration Transaction configuration. If <code>null</code>, a default configuration
+	 *        will be used
 	 * @return A new transaction
 	 */
 	private JpaTransaction startTransaction(TransactionConfiguration configuration) throws TransactionException {
@@ -666,9 +672,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see
-		 * com.holonplatform.datastore.jpa.operation.EntityManagerHandler#withEntityManager(com.holonplatform.datastore.
-		 * jpa.operation.EntityManagerOperation)
+		 * @see com.holonplatform.datastore.jpa.operation.EntityManagerHandler#withEntityManager(com.
+		 * holonplatform.datastore. jpa.operation.EntityManagerOperation)
 		 */
 		@Override
 		public <R> R withEntityManager(EntityManagerOperation<R> operation) {
@@ -705,8 +710,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		/*
 		 * (non-Javadoc)
 		 * @see
-		 * com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#addExpressionResolver(com.holonplatform.
-		 * core.ExpressionResolver)
+		 * com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#addExpressionResolver(com.
+		 * holonplatform. core.ExpressionResolver)
 		 */
 		@Override
 		public <E extends Expression, R extends Expression> void addExpressionResolver(
@@ -716,7 +721,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#removeExpressionResolver(com.
+		 * @see
+		 * com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport#removeExpressionResolver(com.
 		 * holonplatform.core.ExpressionResolver)
 		 */
 		@Override
@@ -765,8 +771,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		/*
 		 * (non-Javadoc)
 		 * @see
-		 * com.holonplatform.core.ExpressionResolver.ExpressionResolverBuilder#withExpressionResolver(com.holonplatform.
-		 * core.ExpressionResolver)
+		 * com.holonplatform.core.ExpressionResolver.ExpressionResolverBuilder#withExpressionResolver(com.
+		 * holonplatform. core.ExpressionResolver)
 		 */
 		@Override
 		public <E extends Expression, R extends Expression> JpaDatastore.Builder<D> withExpressionResolver(
@@ -777,8 +783,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see com.holonplatform.core.datastore.Datastore.Builder#configuration(com.holonplatform.core.datastore.
-		 * DatastoreConfigProperties)
+		 * @see com.holonplatform.core.datastore.Datastore.Builder#configuration(com.holonplatform.core.
+		 * datastore. DatastoreConfigProperties)
 		 */
 		@Override
 		public JpaDatastore.Builder<D> configuration(DatastoreConfigProperties configuration) {
@@ -792,7 +798,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerFactory(javax.persistence.
+		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerFactory(jakarta.persistence.
 		 * EntityManagerFactory)
 		 */
 		@Override
@@ -804,8 +811,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		/*
 		 * (non-Javadoc)
 		 * @see
-		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerInitializer(com.holonplatform.datastore.jpa
-		 * .JpaDatastore.EntityManagerInitializer)
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerInitializer(com.holonplatform.
+		 * datastore.jpa .JpaDatastore.EntityManagerInitializer)
 		 */
 		@Override
 		public JpaDatastore.Builder<D> entityManagerInitializer(EntityManagerInitializer entityManagerInitializer) {
@@ -815,8 +822,9 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerFinalizer(com.holonplatform.datastore.
-		 * jpa.JpaDatastore.EntityManagerFinalizer)
+		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerFinalizer(com.holonplatform.
+		 * datastore. jpa.JpaDatastore.EntityManagerFinalizer)
 		 */
 		@Override
 		public JpaDatastore.Builder<D> entityManagerFinalizer(EntityManagerFinalizer entityManagerFinalizer) {
@@ -826,9 +834,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see
-		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerHandler(com.holonplatform.datastore.jpa.
-		 * JpaDatastore.EntityManagerLifecycleHandler)
+		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#entityManagerHandler(com.holonplatform.
+		 * datastore.jpa. JpaDatastore.EntityManagerLifecycleHandler)
 		 */
 		@Override
 		public Builder<D> entityManagerHandler(EntityManagerLifecycleHandler entityManagerHandler) {
@@ -840,9 +847,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see
-		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#transactionFactory(com.holonplatform.datastore.jpa.tx.
-		 * JpaTransactionFactory)
+		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#transactionFactory(com.holonplatform.
+		 * datastore.jpa.tx. JpaTransactionFactory)
 		 */
 		@Override
 		public Builder<D> transactionFactory(JpaTransactionFactory transactionFactory) {
@@ -853,7 +859,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		/*
 		 * (non-Javadoc)
 		 * @see
-		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#platform(com.holonplatform.datastore.jpa.ORMPlatform)
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#platform(com.holonplatform.datastore.jpa.
+		 * ORMPlatform)
 		 */
 		@Override
 		public JpaDatastore.Builder<D> platform(ORMPlatform platform) {
@@ -863,8 +870,9 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 
 		/*
 		 * (non-Javadoc)
-		 * @see com.holonplatform.datastore.jpa.JpaDatastore.Builder#dialect(com.holonplatform.datastore.jpa.dialect.
-		 * ORMDialect)
+		 * @see
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#dialect(com.holonplatform.datastore.jpa.
+		 * dialect. ORMDialect)
 		 */
 		@Override
 		public JpaDatastore.Builder<D> dialect(ORMDialect dialect) {
@@ -880,7 +888,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		public JpaDatastore.Builder<D> dialect(String dialectClassName) {
 			ObjectUtils.argumentNotNull(dialectClassName, "Dialect class name must be not null");
 			try {
-				datastore.setDialect((ORMDialect) Class.forName(dialectClassName).newInstance());
+				datastore.setDialect(
+						(ORMDialect) Class.forName(dialectClassName).getDeclaredConstructor().newInstance());
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Failed to istantiate dialect class [" + dialectClassName + "]", e);
 			}
@@ -900,8 +909,8 @@ public class DefaultJpaDatastore extends AbstractInitializableDatastore<JpaDatas
 		/*
 		 * (non-Javadoc)
 		 * @see
-		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#withCommodity(com.holonplatform.datastore.jpa.config.
-		 * JpaDatastoreCommodityFactory)
+		 * com.holonplatform.datastore.jpa.JpaDatastore.Builder#withCommodity(com.holonplatform.datastore.
+		 * jpa.config. JpaDatastoreCommodityFactory)
 		 */
 		@Override
 		public <C extends DatastoreCommodity> com.holonplatform.datastore.jpa.JpaDatastore.Builder<D> withCommodity(

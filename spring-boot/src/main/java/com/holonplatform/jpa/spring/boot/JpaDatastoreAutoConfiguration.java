@@ -15,8 +15,9 @@
  */
 package com.holonplatform.jpa.spring.boot;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,7 +36,7 @@ import com.holonplatform.spring.EnableDatastoreConfiguration;
  * 
  * @since 5.0.0
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass(JpaDatastore.class)
 @AutoConfigureAfter({ HibernateJpaAutoConfiguration.class, JpaAutoConfiguration.class })
 public class JpaDatastoreAutoConfiguration {

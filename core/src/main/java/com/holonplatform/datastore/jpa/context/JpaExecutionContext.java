@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.context;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import com.holonplatform.datastore.jpa.internal.context.DefaultJpaExecutionContext;
 

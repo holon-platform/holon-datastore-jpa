@@ -17,8 +17,8 @@ package com.holonplatform.datastore.jpa.internal.context;
 
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.ExpressionResolver;
 import com.holonplatform.datastore.jpa.ORMPlatform;

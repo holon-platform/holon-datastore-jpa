@@ -94,14 +94,14 @@ public class ExampleJpaDatastoreFunction {
 
 	public void ifnull() {
 		// tag::function3[]
-		final StringProperty STR = StringProperty.create("stringAttribute");
+		final StringProperty STR1 = StringProperty.create("stringAttribute");
 		final DataTarget<?> TARGET = DataTarget.named("Test");
 
 		Datastore datastore = JpaDatastore.builder() //
 				.withExpressionResolver(new TrimResolver()) // <1>
 				.build();
 
-		Stream<String> trimmedValues = datastore.query(TARGET).stream(new Trim(STR)); // <2>
+		Stream<String> trimmedValues = datastore.query(TARGET).stream(new Trim(STR1)); // <2>
 		// end::function3[]
 	}
 

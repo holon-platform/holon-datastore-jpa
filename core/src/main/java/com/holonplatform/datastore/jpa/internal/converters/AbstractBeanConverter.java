@@ -15,6 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.internal.converters;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import com.holonplatform.core.Path;
@@ -77,8 +78,8 @@ public abstract class AbstractBeanConverter<Q, T> extends AbstractResultConverte
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * com.holonplatform.datastore.jpa.operation.JpaResultConverter#convert(com.holonplatform.datastore.jpa.context.
-	 * JpaExecutionContext, java.lang.Object)
+	 * com.holonplatform.datastore.jpa.operation.JpaResultConverter#convert(com.holonplatform.datastore.
+	 * jpa.context. JpaExecutionContext, java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -88,8 +89,8 @@ public abstract class AbstractBeanConverter<Q, T> extends AbstractResultConverte
 
 		T instance;
 		try {
-			instance = beanPropertySet.getBeanClass().newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			instance = beanPropertySet.getBeanClass().getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			throw new DataAccessException("Failed to istantiate bean class [" + beanPropertySet.getBeanClass() + "]",
 					e);
 		}

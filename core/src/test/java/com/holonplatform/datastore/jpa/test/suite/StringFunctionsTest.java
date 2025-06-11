@@ -16,7 +16,7 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -29,11 +29,11 @@ public class StringFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testLower() {
-		String str = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR.lower()).orElse(null);
+		String str = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR1.lower()).orElse(null);
 		assertNotNull(str);
 		assertEquals("one", str);
 
-		Long key = getDatastore().query().target(JPA_TARGET).filter(STR.lower().eq("one")).findOne(KEY).orElse(null);
+		Long key = getDatastore().query().target(JPA_TARGET).filter(STR1.lower().eq("one")).findOne(KEY).orElse(null);
 		assertNotNull(key);
 		assertEquals(Long.valueOf(1L), key);
 
@@ -41,11 +41,11 @@ public class StringFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 
 			inTransaction(() -> {
 
-				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, STR.lower()).filter(KEY.eq(1L))
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR1, STR1.lower()).filter(KEY.eq(1L))
 						.execute();
 				assertEquals(1, result.getAffectedCount());
 
-				String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
+				String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR1).orElse(null);
 				assertNotNull(v);
 				assertEquals("one", v);
 
@@ -56,11 +56,11 @@ public class StringFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testUpper() {
-		String str = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR.upper()).orElse(null);
+		String str = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR1.upper()).orElse(null);
 		assertNotNull(str);
 		assertEquals("ONE", str);
 
-		Long key = getDatastore().query().target(JPA_TARGET).filter(STR.upper().eq("ONE")).findOne(KEY).orElse(null);
+		Long key = getDatastore().query().target(JPA_TARGET).filter(STR1.upper().eq("ONE")).findOne(KEY).orElse(null);
 		assertNotNull(key);
 		assertEquals(Long.valueOf(1L), key);
 
@@ -68,11 +68,11 @@ public class StringFunctionsTest extends AbstractJpaDatastoreSuiteTest {
 
 			inTransaction(() -> {
 
-				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR, STR.upper()).filter(KEY.eq(1L))
+				OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(STR1, STR1.upper()).filter(KEY.eq(1L))
 						.execute();
 				assertEquals(1, result.getAffectedCount());
 
-				String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR).orElse(null);
+				String v = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(STR1).orElse(null);
 				assertNotNull(v);
 				assertEquals("ONE", v);
 

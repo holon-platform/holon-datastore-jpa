@@ -18,7 +18,7 @@ package com.holonplatform.datastore.jpa.test.suite;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.CLOB_STR;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.CLOB_SET_STR;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
@@ -55,7 +55,7 @@ public class ClobTest extends AbstractJpaDatastoreSuiteTest {
 			assertEquals("updclob", value.getValue(CLOB_STR));
 
 			// insert
-			value = PropertyBox.builder(CLOB_SET_STR).set(KEY, 77L).set(STR, "Test clob").set(NBOOL, false)
+			value = PropertyBox.builder(CLOB_SET_STR).set(KEY, 77L).set(STR1, "Test clob").set(NBOOL, false)
 					.set(CLOB_STR, "savedclob").build();
 			getDatastore().insert(JPA_TARGET, value);
 

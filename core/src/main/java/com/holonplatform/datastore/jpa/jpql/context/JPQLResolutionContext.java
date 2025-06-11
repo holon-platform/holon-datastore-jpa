@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.jpql.context;
 
 import java.util.Optional;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.core.Expression.InvalidExpressionException;

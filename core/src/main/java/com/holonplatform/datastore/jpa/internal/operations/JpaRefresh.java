@@ -77,7 +77,7 @@ public class JpaRefresh extends AbstractRefresh {
 
 			// create a new instance
 			Object instance = operationContext.getBeanIntrospector().write(getConfiguration().getValue(),
-					entity.newInstance());
+					entity.getDeclaredConstructor().newInstance());
 
 			// ensure managed
 			Object managed = !entityManager.contains(instance) ? entityManager.merge(instance) : instance;

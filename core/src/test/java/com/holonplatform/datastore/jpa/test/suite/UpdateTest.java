@@ -22,7 +22,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
@@ -55,7 +55,7 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 					.orElse(null);
 			assertNotNull(value);
 
-			value.setValue(STR, "Ustr");
+			value.setValue(STR1, "Ustr");
 			value.setValue(DBL, 432.67d);
 			value.setValue(DAT, TestSampleData.DATE1);
 			value.setValue(LDAT, TestSampleData.LDATE1);
@@ -73,7 +73,7 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
 			assertNotNull(value);
 			assertEquals(Long.valueOf(1), value.getValue(KEY));
-			assertEquals("Ustr", value.getValue(STR));
+			assertEquals("Ustr", value.getValue(STR1));
 			assertEquals(Double.valueOf(432.67), value.getValue(DBL));
 			assertEquals(TestSampleData.DATE1, value.getValue(DAT));
 			assertEquals(TestSampleData.LDATE1, value.getValue(LDAT));
@@ -101,7 +101,7 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 			assertNotNull(value);
 			assertEquals("[One]", value.getValue(VIRTUAL_STR));
 
-			value.setValue(STR, "Ustr");
+			value.setValue(STR1, "Ustr");
 			OperationResult result = getDatastore().update(JPA_TARGET, value);
 			assertEquals(1, result.getAffectedCount());
 
@@ -121,14 +121,14 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 						.orElse(null);
 				assertNotNull(value);
 
-				value.setValue(STR, null);
+				value.setValue(STR1, null);
 
 				OperationResult result = getDatastore().update(JPA_TARGET, value, JpaWriteOption.FLUSH);
 				assertEquals(1, result.getAffectedCount());
 
 				value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
 				assertNotNull(value);
-				assertNull(value.getValue(STR));
+				assertNull(value.getValue(STR1));
 
 			});
 		}
@@ -142,14 +142,14 @@ public class UpdateTest extends AbstractJpaDatastoreSuiteTest {
 					.orElse(null);
 			assertNotNull(value);
 
-			value.setValue(STR, "uxs");
+			value.setValue(STR1, "uxs");
 
 			OperationResult result = getDatastore().update(JPA_TARGET, value);
 			assertEquals(1, result.getAffectedCount());
 
 			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(1L)).findOne(PROPERTIES).orElse(null);
 			assertNotNull(value);
-			assertEquals("uxs", value.getValue(STR));
+			assertEquals("uxs", value.getValue(STR1));
 
 		});
 	}

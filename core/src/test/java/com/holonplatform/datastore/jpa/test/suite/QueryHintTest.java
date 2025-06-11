@@ -26,7 +26,7 @@ public class QueryHintTest extends AbstractJpaDatastoreSuiteTest {
 	@Test
 	public void testQueryHint() {
 		getDatastore().query().target(JPA_TARGET).parameter(JpaQueryHint.QUERY_PARAMETER_HINT,
-				JpaQueryHint.create("javax.persistence.query.timeout", 1000)).count();
+				JpaQueryHint.create("jakarta.persistence.query.timeout", 1000)).count();
 	}
 
 }

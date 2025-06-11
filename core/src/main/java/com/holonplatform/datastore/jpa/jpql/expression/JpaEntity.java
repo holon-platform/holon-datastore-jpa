@@ -18,7 +18,7 @@ package com.holonplatform.datastore.jpa.jpql.expression;
 import java.io.Serializable;
 import java.util.Optional;
 
-import javax.persistence.metamodel.Metamodel;
+import jakarta.persistence.metamodel.Metamodel;
 
 import com.holonplatform.core.Expression;
 import com.holonplatform.datastore.jpa.internal.jpql.expression.DefaultJpaEntity;

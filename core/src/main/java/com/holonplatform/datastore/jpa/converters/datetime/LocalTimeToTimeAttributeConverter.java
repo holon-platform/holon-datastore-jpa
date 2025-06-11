@@ -18,8 +18,8 @@ package com.holonplatform.datastore.jpa.converters.datetime;
 import java.sql.Time;
 import java.time.LocalTime;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * A JPA {@link AttributeConverter} to enable {@link LocalTime} data type for entity attributes.
@@ -37,7 +37,7 @@ public class LocalTimeToTimeAttributeConverter implements AttributeConverter<Loc
 
 	/*
 	 * (non-Javadoc)
-	 * @see javax.persistence.AttributeConverter#convertToDatabaseColumn(java.lang.Object)
+	 * @see jakarta.persistence.AttributeConverter#convertToDatabaseColumn(java.lang.Object)
 	 */
 	@Override
 	public Time convertToDatabaseColumn(LocalTime attribute) {
@@ -46,7 +46,7 @@ public class LocalTimeToTimeAttributeConverter implements AttributeConverter<Loc
 
 	/*
 	 * (non-Javadoc)
-	 * @see javax.persistence.AttributeConverter#convertToEntityAttribute(java.lang.Object)
+	 * @see jakarta.persistence.AttributeConverter#convertToEntityAttribute(java.lang.Object)
 	 */
 	@Override
 	public LocalTime convertToEntityAttribute(Time dbData) {

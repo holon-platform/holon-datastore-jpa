@@ -17,8 +17,8 @@ package com.holonplatform.jpa.spring;
 
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.springframework.transaction.annotation.Transactional;
 

@@ -16,7 +16,7 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 
@@ -31,15 +31,15 @@ public class QuerySortTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testSorts() {
-		List<Long> res = getDatastore().query().target(JPA_TARGET).sort(STR.desc()).sort(KEY.desc()).list(KEY);
+		List<Long> res = getDatastore().query().target(JPA_TARGET).sort(STR1.desc()).sort(KEY.desc()).list(KEY);
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));
 
-		res = getDatastore().query().target(JPA_TARGET).sort(STR.desc()).sort(KEY.asc()).list(KEY);
+		res = getDatastore().query().target(JPA_TARGET).sort(STR1.desc()).sort(KEY.asc()).list(KEY);
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));
 
-		res = getDatastore().query().target(JPA_TARGET).sort(STR.desc().and(KEY.desc())).list(KEY);
+		res = getDatastore().query().target(JPA_TARGET).sort(STR1.desc().and(KEY.desc())).list(KEY);
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));
 
@@ -55,7 +55,7 @@ public class QuerySortTest extends AbstractJpaDatastoreSuiteTest {
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));
 
-		res = getDatastore().query().target(JPA_TARGET).sort(QuerySort.of(STR.desc(), KEY.asc())).list(KEY);
+		res = getDatastore().query().target(JPA_TARGET).sort(QuerySort.of(STR1.desc(), KEY.asc())).list(KEY);
 		assertEquals(2, res.size());
 		assertEquals(Long.valueOf(2), res.get(0));
 	}

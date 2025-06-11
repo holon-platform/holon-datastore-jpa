@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.datastore.DataTarget;
 import com.holonplatform.core.internal.utils.ObjectUtils;

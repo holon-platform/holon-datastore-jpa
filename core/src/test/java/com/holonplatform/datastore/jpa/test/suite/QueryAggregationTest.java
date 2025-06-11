@@ -19,7 +19,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static org.junit.Assert.assertEquals;
@@ -43,7 +43,7 @@ public class QueryAggregationTest extends AbstractJpaDatastoreSuiteTest {
 		List<Long> keys = getDatastore().query().target(JPA_TARGET).aggregate(KEY).list(KEY);
 		assertEquals(2, keys.size());
 
-		List<String> vs = getDatastore().query().target(JPA_TARGET).aggregate(STR, DBL).sort(STR.asc()).list(STR);
+		List<String> vs = getDatastore().query().target(JPA_TARGET).aggregate(STR1, DBL).sort(STR1.asc()).list(STR1);
 		assertEquals(2, vs.size());
 		assertEquals("One", vs.get(0));
 		assertEquals("Two", vs.get(1));
@@ -71,7 +71,7 @@ public class QueryAggregationTest extends AbstractJpaDatastoreSuiteTest {
 	public void testAggregationMulti() {
 		inTransaction(() -> {
 
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 701L).set(STR, "One").set(DBL, 1.2)
+			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 701L).set(STR1, "One").set(DBL, 1.2)
 					.set(ENM, TestEnum.THIRD).set(NBOOL, false).build();
 
 			OperationResult or = getDatastore().insert(JPA_TARGET, value);
@@ -79,12 +79,12 @@ public class QueryAggregationTest extends AbstractJpaDatastoreSuiteTest {
 
 			assertEquals(3, getDatastore().query(JPA_TARGET).count());
 
-			List<String> strs = getDatastore().query(JPA_TARGET).aggregate(STR).sort(STR.asc()).list(STR);
+			List<String> strs = getDatastore().query(JPA_TARGET).aggregate(STR1).sort(STR1.asc()).list(STR1);
 			assertEquals(2, strs.size());
 			assertEquals("One", strs.get(0));
 			assertEquals("Two", strs.get(1));
 
-			List<Double> vs = getDatastore().query(JPA_TARGET).aggregate(STR).sort(STR.asc()).list(DBL.sum());
+			List<Double> vs = getDatastore().query(JPA_TARGET).aggregate(STR1).sort(STR1.asc()).list(DBL.sum());
 			assertEquals(2, vs.size());
 			assertEquals(Double.valueOf(8.6), vs.get(0));
 			assertNull(vs.get(1));
@@ -97,7 +97,7 @@ public class QueryAggregationTest extends AbstractJpaDatastoreSuiteTest {
 
 		Property<Long> MAX_KEY = KEY.max();
 
-		List<PropertyBox> pbs = getDatastore().query().target(JPA_TARGET).sort(STR.asc()).aggregate(STR, DBL).list(STR,
+		List<PropertyBox> pbs = getDatastore().query().target(JPA_TARGET).sort(STR1.asc()).aggregate(STR1, DBL).list(STR1,
 				MAX_KEY);
 		assertEquals(2, pbs.size());
 		assertEquals(Long.valueOf(1), pbs.get(0).getValue(MAX_KEY));

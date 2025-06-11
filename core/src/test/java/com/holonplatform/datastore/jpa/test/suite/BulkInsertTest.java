@@ -19,7 +19,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static org.junit.Assert.assertEquals;
@@ -42,18 +42,18 @@ public class BulkInsertTest extends AbstractJpaDatastoreSuiteTest {
 	public void testBulkInsert() {
 		inTransaction(() -> {
 
-			OperationResult result = getDatastore().bulkInsert(JPA_TARGET, PropertySet.of(KEY, STR, NBOOL))
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 201L).set(STR, "k201").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 202L).set(STR, "k202").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 203L).set(STR, "k203").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 204L).set(STR, "k204").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 205L).set(STR, "k205").set(NBOOL, false).build())
+			OperationResult result = getDatastore().bulkInsert(JPA_TARGET, PropertySet.of(KEY, STR1, NBOOL))
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 201L).set(STR1, "k201").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 202L).set(STR1, "k202").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 203L).set(STR1, "k203").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 204L).set(STR1, "k204").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 205L).set(STR1, "k205").set(NBOOL, false).build())
 					.execute();
 
 			assertEquals(5, result.getAffectedCount());
 
 			List<String> vals = getDatastore().query(JPA_TARGET).filter(KEY.between(201L, 205L)).sort(KEY.asc())
-					.list(STR);
+					.list(STR1);
 			assertEquals(5, vals.size());
 			assertEquals("k201", vals.get(0));
 			assertEquals("k202", vals.get(1));
@@ -69,9 +69,9 @@ public class BulkInsertTest extends AbstractJpaDatastoreSuiteTest {
 		inTransaction(() -> {
 
 			OperationResult result = getDatastore().bulkInsert(JPA_TARGET, PropertySet.of(PROPERTIES))
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 201L).set(STR, "k201").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 202L).set(STR, "k202").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 203L).set(STR, "k203").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 201L).set(STR1, "k201").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 202L).set(STR1, "k202").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 203L).set(STR1, "k203").set(NBOOL, false).build())
 					.execute();
 
 			assertEquals(3, result.getAffectedCount());
@@ -87,8 +87,8 @@ public class BulkInsertTest extends AbstractJpaDatastoreSuiteTest {
 		inTransaction(() -> {
 
 			OperationResult result = getDatastore().bulkInsert(JPA_TARGET, PropertySet.of(PROPERTIES))
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 201L).set(STR, "k201").set(NBOOL, false).build())
-					.add(PropertyBox.builder(PROPERTIES).set(KEY, 202L).set(STR, "k202").set(NBOOL, true).set(DBL, 3.2)
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 201L).set(STR1, "k201").set(NBOOL, false).build())
+					.add(PropertyBox.builder(PROPERTIES).set(KEY, 202L).set(STR1, "k202").set(NBOOL, true).set(DBL, 3.2)
 							.build())
 					.add(PropertyBox.builder(KEY, NBOOL, NST_STR).set(KEY, 203L).set(NST_STR, "ns203").set(NBOOL, false)
 							.build())
@@ -99,9 +99,9 @@ public class BulkInsertTest extends AbstractJpaDatastoreSuiteTest {
 			List<PropertyBox> vals = getDatastore().query(JPA_TARGET).filter(KEY.between(201L, 203L)).sort(KEY.asc())
 					.list(PROPERTIES);
 			assertEquals(3, vals.size());
-			assertEquals("k201", vals.get(0).getValue(STR));
+			assertEquals("k201", vals.get(0).getValue(STR1));
 			assertFalse(vals.get(0).getValue(NBOOL));
-			assertEquals("k202", vals.get(1).getValue(STR));
+			assertEquals("k202", vals.get(1).getValue(STR1));
 			assertTrue(vals.get(1).getValue(NBOOL));
 			assertEquals(Double.valueOf(3.2), vals.get(1).getValue(DBL));
 			assertEquals("ns203", vals.get(2).getValue(NST_STR));

@@ -1,0 +1,2 @@
+com.holonplatform.jpa.spring.boot.JpaAutoConfiguration
+com.holonplatform.jpa.spring.boot.JpaDatastoreAutoConfiguration

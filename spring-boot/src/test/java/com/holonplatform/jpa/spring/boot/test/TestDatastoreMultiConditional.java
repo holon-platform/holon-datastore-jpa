@@ -17,7 +17,6 @@ package com.holonplatform.jpa.spring.boot.test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
@@ -38,6 +37,8 @@ import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.jpa.spring.boot.JpaAutoConfiguration;
 import com.holonplatform.jpa.spring.boot.test.domain1.TestJpaDomain1;
 import com.holonplatform.jpa.spring.boot.test.domain2.TestJpaDomain2;
+
+import jakarta.persistence.EntityManagerFactory;
 
 @SpringBootTest
 @ActiveProfiles("standard")

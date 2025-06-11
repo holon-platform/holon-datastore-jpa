@@ -19,7 +19,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DAT;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.ENM;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES_V;
@@ -52,7 +52,7 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 			long count = getDatastore().query().target(JPA_TARGET).filter(new KeyIsFilter(1)).count();
 			assertEquals(1, count);
 
-			Optional<String> str = getDatastore().query().target(JPA_TARGET).filter(new KeyIsFilter(1)).findOne(STR);
+			Optional<String> str = getDatastore().query().target(JPA_TARGET).filter(new KeyIsFilter(1)).findOne(STR1);
 			assertEquals("One", str.get());
 
 			OperationResult result = getDatastore().bulkUpdate(JPA_TARGET).set(ENM, TestEnum.THIRD)
@@ -71,7 +71,7 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 			assertEquals(1, result.getAffectedCount());
 
 			pb = getDatastore().query().target(JPA_TARGET).filter(new KeyIsFilter(1)).findOne(PROPERTIES);
-			assertEquals("One", pb.get().getValue(STR));
+			assertEquals("One", pb.get().getValue(STR1));
 
 		});
 	}
@@ -101,7 +101,7 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 		};
 
 		Optional<String> str = getDatastore().query().withExpressionResolver(SQL_RESOLVER_ALIAS).target(JPA_TARGET)
-				.filter(new KeyIsFilter(1)).findOne(STR);
+				.filter(new KeyIsFilter(1)).findOne(STR1);
 		assertEquals("Two", str.get());
 	}
 
@@ -118,13 +118,13 @@ public class CustomExpressionsTest extends AbstractJpaDatastoreSuiteTest {
 		if (AbstractJpaDatastoreTestSuite.customFunctionExpressionTest) {
 			inTransaction(() -> {
 
-				PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 50101L).set(STR, "  toTrim ")
+				PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 50101L).set(STR1, "  toTrim ")
 						.set(NBOOL, true).build();
 				OperationResult result = getDatastore().insert(JPA_TARGET, value);
 				assertEquals(1, result.getAffectedCount());
 
 				String trimmed = getDatastore().query().withExpressionResolver(new TrimFunctionResolver())
-						.target(JPA_TARGET).filter(KEY.eq(50101L)).findOne(new TrimFunction(STR)).orElse(null);
+						.target(JPA_TARGET).filter(KEY.eq(50101L)).findOne(new TrimFunction(STR1)).orElse(null);
 
 				assertEquals("toTrim", trimmed);
 

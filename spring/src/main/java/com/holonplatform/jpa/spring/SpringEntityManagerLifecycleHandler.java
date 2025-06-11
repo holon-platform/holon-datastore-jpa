@@ -15,7 +15,7 @@
  */
 package com.holonplatform.jpa.spring;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import com.holonplatform.datastore.jpa.JpaDatastore.EntityManagerLifecycleHandler;
 import com.holonplatform.jpa.spring.internal.DefaultSpringEntityManagerLifecycleHandler;

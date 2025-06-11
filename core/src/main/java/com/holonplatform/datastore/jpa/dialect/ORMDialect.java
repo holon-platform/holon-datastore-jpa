@@ -18,11 +18,11 @@ package com.holonplatform.datastore.jpa.dialect;
 import java.time.temporal.Temporal;
 import java.util.Optional;
 
-import javax.persistence.LockTimeoutException;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-import javax.persistence.PessimisticLockException;
-import javax.persistence.Tuple;
+import jakarta.persistence.LockTimeoutException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.PessimisticLockException;
+import jakarta.persistence.Tuple;
 
 import com.holonplatform.core.exceptions.DataAccessException;
 import com.holonplatform.core.query.QueryFunction;

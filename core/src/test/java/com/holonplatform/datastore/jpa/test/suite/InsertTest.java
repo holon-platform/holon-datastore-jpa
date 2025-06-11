@@ -22,7 +22,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NBOOL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_DEC;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.NST_STR;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TMS;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.VIRTUAL_STR;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
@@ -50,7 +50,7 @@ public class InsertTest extends AbstractJpaDatastoreSuiteTest {
 
 		inTransaction(() -> {
 
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 301L).set(STR, "k301").set(DBL, 7.45)
+			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 301L).set(STR1, "k301").set(DBL, 7.45)
 					.set(DAT, TestSampleData.DATE1).set(LDAT, TestSampleData.LDATE1).set(ENM, TestEnum.SECOND)
 					.set(NST_STR, "str1").set(NST_DEC, TestSampleData.BD1).set(NBOOL, false)
 					.set(TMS, TestSampleData.DATETIME1).set(LTMS, TestSampleData.LDATETIME1)
@@ -62,7 +62,7 @@ public class InsertTest extends AbstractJpaDatastoreSuiteTest {
 			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(301L)).findOne(PROPERTIES).orElse(null);
 			assertNotNull(value);
 			assertEquals(Long.valueOf(301), value.getValue(KEY));
-			assertEquals("k301", value.getValue(STR));
+			assertEquals("k301", value.getValue(STR1));
 			assertEquals(Double.valueOf(7.45), value.getValue(DBL));
 			assertEquals(TestSampleData.DATE1, value.getValue(DAT));
 			assertEquals(TestSampleData.LDATE1, value.getValue(LDAT));
@@ -81,7 +81,7 @@ public class InsertTest extends AbstractJpaDatastoreSuiteTest {
 	public void testInsertVirtual() {
 		inTransaction(() -> {
 
-			PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 301L).set(STR, "k301").set(NBOOL, true)
+			PropertyBox value = PropertyBox.builder(PROPERTIES_V).set(KEY, 301L).set(STR1, "k301").set(NBOOL, true)
 					.build();
 			OperationResult result = getDatastore().insert(JPA_TARGET, value);
 			assertEquals(1, result.getAffectedCount());
@@ -89,7 +89,7 @@ public class InsertTest extends AbstractJpaDatastoreSuiteTest {
 			value = getDatastore().query().target(JPA_TARGET).filter(KEY.eq(301L)).findOne(PROPERTIES_V).orElse(null);
 			assertNotNull(value);
 			assertEquals(Long.valueOf(301), value.getValue(KEY));
-			assertEquals("k301", value.getValue(STR));
+			assertEquals("k301", value.getValue(STR1));
 			assertTrue(value.getValue(NBOOL));
 			assertEquals("[k301]", value.getValue(VIRTUAL_STR));
 

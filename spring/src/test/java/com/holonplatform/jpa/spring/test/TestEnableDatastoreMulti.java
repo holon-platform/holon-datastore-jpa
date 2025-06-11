@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
@@ -50,6 +49,8 @@ import com.holonplatform.jdbc.spring.EnableDataSource;
 import com.holonplatform.jpa.spring.EnableJpaDatastore;
 import com.holonplatform.jpa.spring.test.domain1.TestJpaDomain1;
 import com.holonplatform.jpa.spring.test.domain2.TestJpaDomain2;
+
+import jakarta.persistence.EntityManagerFactory;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestEnableDatastoreMulti.Config.class)
@@ -118,7 +119,7 @@ public class TestEnableDatastoreMulti {
 	}
 
 	private final static PathProperty<Long> KEY = PathProperty.create("key", long.class);
-	private final static PathProperty<String> STR = PathProperty.create("stringValue", String.class);
+	private final static PathProperty<String> STR1 = PathProperty.create("stringValue", String.class);
 	private final static PathProperty<Double> DEC = PathProperty.create("decimalValue", Double.class);
 
 	@Autowired
@@ -135,7 +136,7 @@ public class TestEnableDatastoreMulti {
 		assertNotNull(datastore);
 
 		datastore.save(JpaTarget.of(TestJpaDomain1.class),
-				PropertyBox.builder(KEY, STR, DEC).set(KEY, 7L).set(STR, "Test ds").set(DEC, 7.7).build());
+				PropertyBox.builder(KEY, STR1, DEC).set(KEY, 7L).set(STR1, "Test ds").set(DEC, 7.7).build());
 
 		Optional<Long> found = datastore.query().target(JpaTarget.of(TestJpaDomain1.class)).filter(KEY.eq(7L))
 				.findOne(KEY);
@@ -150,7 +151,7 @@ public class TestEnableDatastoreMulti {
 		assertNotNull(datastore2);
 
 		datastore2.save(JpaTarget.of(TestJpaDomain2.class),
-				PropertyBox.builder(KEY, STR, DEC).set(KEY, 7L).set(STR, "Test ds").set(DEC, 7.7).build());
+				PropertyBox.builder(KEY, STR1, DEC).set(KEY, 7L).set(STR1, "Test ds").set(DEC, 7.7).build());
 
 		Optional<Long> found = datastore2.query().target(JpaTarget.of(TestJpaDomain2.class)).filter(KEY.eq(7L))
 				.findOne(KEY);

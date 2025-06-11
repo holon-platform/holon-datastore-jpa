@@ -15,7 +15,7 @@
  */
 package com.holonplatform.datastore.jpa.dialect;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.holonplatform.core.ExpressionResolver.ExpressionResolverSupport;
 import com.holonplatform.datastore.jpa.context.EntityManagerHandler;

@@ -57,7 +57,8 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 /**
- * Registrar for JPA {@link Datastore} bean registration using {@link EnableJpaDatastore} annotation.
+ * Registrar for JPA {@link Datastore} bean registration using {@link EnableJpaDatastore}
+ * annotation.
  * 
  * @since 5.0.0
  */
@@ -80,7 +81,8 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
+	 * @see
+	 * org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
 	 */
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
@@ -90,8 +92,9 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.springframework.
-	 * core.type.AnnotationMetadata, org.springframework.beans.factory.support.BeanDefinitionRegistry)
+	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.
+	 * springframework. core.type.AnnotationMetadata,
+	 * org.springframework.beans.factory.support.BeanDefinitionRegistry)
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
@@ -216,7 +219,8 @@ public class JpaDatastoreRegistrar extends AbstractConfigPropertyRegistrar imple
 			String dialectClassName = datastoreConfig.getDialect();
 			if (dialectClassName != null) {
 				try {
-					ORMDialect dialect = (ORMDialect) Class.forName(dialectClassName).newInstance();
+					ORMDialect dialect = (ORMDialect) Class.forName(dialectClassName).getDeclaredConstructor()
+							.newInstance();
 					if (dialect != null) {
 						pvs.add("dialect", dialect);
 					}

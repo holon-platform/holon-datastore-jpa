@@ -19,7 +19,7 @@ import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 
 import org.junit.Test;
 

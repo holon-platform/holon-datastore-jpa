@@ -18,7 +18,7 @@ package com.holonplatform.datastore.jpa;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import com.holonplatform.core.internal.utils.ClassUtils;
 

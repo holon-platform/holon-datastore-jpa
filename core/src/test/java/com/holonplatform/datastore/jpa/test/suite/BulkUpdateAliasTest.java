@@ -17,7 +17,7 @@ package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.DBL;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_CODE;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_SET;
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.TEST3_TEXT;
@@ -46,7 +46,7 @@ public class BulkUpdateAliasTest extends AbstractJpaDatastoreSuiteTest {
 				OperationResult result = getDatastore().insert(TEST3, t3);
 				assertEquals(1, result.getAffectedCount());
 
-				final SubQuery<?> sq = SubQuery.create().target(TEST3).filter(TEST3_TEXT.eq(JPA_TARGET.property(STR)));
+				final SubQuery<?> sq = SubQuery.create().target(TEST3).filter(TEST3_TEXT.eq(JPA_TARGET.property(STR1)));
 
 				List<PropertyBox> values = getDatastore().query().target(JPA_TARGET).filter(sq.exists())
 						.list(PROPERTIES);

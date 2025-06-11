@@ -15,20 +15,21 @@
  */
 package com.holonplatform.datastore.jpa.internal.jpql.expression;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.IdClass;
-import javax.persistence.metamodel.Attribute.PersistentAttributeType;
-import javax.persistence.metamodel.EmbeddableType;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.IdentifiableType;
-import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.Metamodel;
-import javax.persistence.metamodel.SingularAttribute;
-import javax.persistence.metamodel.Type;
+import jakarta.persistence.Entity;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.metamodel.Attribute.PersistentAttributeType;
+import jakarta.persistence.metamodel.EmbeddableType;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.IdentifiableType;
+import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.metamodel.Metamodel;
+import jakarta.persistence.metamodel.SingularAttribute;
+import jakarta.persistence.metamodel.Type;
 
 import com.holonplatform.core.beans.BeanPropertySet;
 import com.holonplatform.core.internal.Logger;
@@ -80,7 +81,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/**
 	 * Constructor.
-	 * @param metamodel   JPA Metamodel (not null)
+	 * @param metamodel JPA Metamodel (not null)
 	 * @param entityClass Entity class (not null)
 	 */
 	public DefaultJpaEntity(Metamodel metamodel, Class<T> entityClass) {
@@ -122,7 +123,6 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.holonplatform.datastore.jpa.internal.JpaEntity#getEntityClass()
 	 */
 	@Override
@@ -132,7 +132,6 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.holonplatform.datastore.jpa.internal.JpaEntity#getEntityName()
 	 */
 	@Override
@@ -142,7 +141,6 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.holonplatform.core.Expression#validate()
 	 */
 	@Override
@@ -157,7 +155,6 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getIdType()
 	 */
 	@Override
@@ -167,9 +164,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#hasCompositeId()
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#hasCompositeId()
 	 */
 	@Override
 	public boolean hasCompositeId() {
@@ -178,10 +173,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getId(java.lang.
-	 * Object)
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#getId(java.lang. Object)
 	 */
 	@Override
 	public Optional<Object> getId(T entity) {
@@ -197,7 +189,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 		if (idClassAttributes != null && !idClassAttributes.isEmpty()) {
 			final BeanPropertySet<Object> idClassPropertySet = idm.getIdClassPropertySet();
 			try {
-				Object id = idm.getType().newInstance();
+				Object id = idm.getType().getDeclaredConstructor().newInstance();
 				for (SingularAttribute<? super T, ?> ica : idClassAttributes) {
 					final Object value = beanPropertySet.read(ica.getName(), entity);
 					if (value != null) {
@@ -205,7 +197,8 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 					}
 				}
 				return Optional.of(id);
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				throw new RuntimeException("Failed to istantiate id class [" + idm.getType() + "]", e);
 			}
 		}
@@ -215,10 +208,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#isNew(java.lang.
-	 * Object)
+	 * @see com.holonplatform.datastore.jpa.jpql.expression.JpaEntity#isNew(java.lang. Object)
 	 */
 	@Override
 	public boolean isNew(T entity) {
@@ -275,8 +265,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	/**
 	 * Get the entity identifier metadata
 	 * @return The entity identifier metadata
-	 * @throws IllegalStateException if the entity identifier metadata is not
-	 *                               available
+	 * @throws IllegalStateException if the entity identifier metadata is not available
 	 */
 	protected IdMetadata<T> getIdMetadata() {
 		if (idMetadata == null) {
@@ -288,7 +277,7 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 
 	/**
 	 * Checks whether given identifier value is to be considered <code>null</code>.
-	 * @param id   Identifier value
+	 * @param id Identifier value
 	 * @param type Identifier value type
 	 * @return <code>true</code> if it is to be considered <code>null</code>
 	 */
@@ -300,12 +289,11 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	}
 
 	/**
-	 * Get the entity name using {@link Entity#name()} annotation attribute, if
-	 * available.
+	 * Get the entity name using {@link Entity#name()} annotation attribute, if available.
 	 * @param entityClass Entity class (not null)
-	 * @return The entity name as specified using {@link Entity#name()} annotation
-	 *         attribute, or an empty Optional if the {@link Entity} annotation is
-	 *         not present or the <code>name</code> attribute has no value
+	 * @return The entity name as specified using {@link Entity#name()} annotation attribute, or an
+	 *         empty Optional if the {@link Entity} annotation is not present or the <code>name</code>
+	 *         attribute has no value
 	 */
 	private static Optional<String> getEntityNameFromAnnotation(Class<?> entityClass) {
 		if (entityClass.isAnnotationPresent(Entity.class)) {
@@ -318,10 +306,9 @@ public class DefaultJpaEntity<T> implements JpaEntity<T> {
 	}
 
 	/**
-	 * Try to obtain the <em>version</em> attribute of the entity type, if
-	 * available.
+	 * Try to obtain the <em>version</em> attribute of the entity type, if available.
 	 * @param metamodel JPA Metamodel
-	 * @param type      Entity type
+	 * @param type Entity type
 	 * @return Optional version attribute
 	 */
 	@SuppressWarnings("unchecked")

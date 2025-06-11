@@ -18,8 +18,8 @@ package com.holonplatform.datastore.jpa.converters.datetime;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 import com.holonplatform.core.internal.utils.ConversionUtils;
 
@@ -39,7 +39,7 @@ public class LocalDateTimeToDateAttributeConverter implements AttributeConverter
 
 	/*
 	 * (non-Javadoc)
-	 * @see javax.persistence.AttributeConverter#convertToDatabaseColumn(java.lang.Object)
+	 * @see jakarta.persistence.AttributeConverter#convertToDatabaseColumn(java.lang.Object)
 	 */
 	@Override
 	public Date convertToDatabaseColumn(LocalDateTime attribute) {
@@ -48,7 +48,7 @@ public class LocalDateTimeToDateAttributeConverter implements AttributeConverter
 
 	/*
 	 * (non-Javadoc)
-	 * @see javax.persistence.AttributeConverter#convertToEntityAttribute(java.lang.Object)
+	 * @see jakarta.persistence.AttributeConverter#convertToEntityAttribute(java.lang.Object)
 	 */
 	@Override
 	public LocalDateTime convertToEntityAttribute(Date dbData) {

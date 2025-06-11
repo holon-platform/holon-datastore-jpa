@@ -16,7 +16,7 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.PROPERTIES;
 import static org.junit.Assert.assertNotNull;
@@ -37,7 +37,7 @@ public class SharedEntityManagerTest extends AbstractJpaDatastoreSuiteTest {
 
 		ds.withEntityManager(em -> {
 
-			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 881L).set(STR, "TestSE").build();
+			PropertyBox value = PropertyBox.builder(PROPERTIES).set(KEY, 881L).set(STR1, "TestSE").build();
 
 			ds.insert(JPA_TARGET, value);
 

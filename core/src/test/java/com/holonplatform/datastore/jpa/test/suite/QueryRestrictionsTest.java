@@ -16,7 +16,7 @@
 package com.holonplatform.datastore.jpa.test.suite;
 
 import static com.holonplatform.datastore.jpa.test.model.TestDataModel.KEY;
-import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR;
+import static com.holonplatform.datastore.jpa.test.model.TestDataModel.STR1;
 import static com.holonplatform.datastore.jpa.test.suite.AbstractJpaDatastoreTestSuite.JPA_TARGET;
 import static org.junit.Assert.assertEquals;
 
@@ -28,11 +28,11 @@ public class QueryRestrictionsTest extends AbstractJpaDatastoreSuiteTest {
 
 	@Test
 	public void testRestrictions() {
-		List<String> str = getDatastore().query().target(JPA_TARGET).restrict(1, 0).sort(KEY.asc()).list(STR);
+		List<String> str = getDatastore().query().target(JPA_TARGET).restrict(1, 0).sort(KEY.asc()).list(STR1);
 		assertEquals(1, str.size());
 		assertEquals("One", str.get(0));
 
-		str = getDatastore().query().target(JPA_TARGET).restrict(1, 1).sort(KEY.asc()).list(STR);
+		str = getDatastore().query().target(JPA_TARGET).restrict(1, 1).sort(KEY.asc()).list(STR1);
 		assertEquals(1, str.size());
 		assertEquals("Two", str.get(0));
 	}

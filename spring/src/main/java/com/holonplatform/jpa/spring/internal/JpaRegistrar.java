@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.SharedCacheMode;
-import javax.persistence.ValidationMode;
 import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
@@ -60,6 +57,10 @@ import com.holonplatform.spring.internal.BeanRegistryUtils;
 import com.holonplatform.spring.internal.DefaultEnvironmentConfigPropertyProvider;
 import com.holonplatform.spring.internal.GenericDataContextBoundBeanDefinition;
 
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.SharedCacheMode;
+import jakarta.persistence.ValidationMode;
+
 /**
  * Registrar for JPA beans registration using {@link EnableJpa} annotation.
  * 
@@ -84,7 +85,8 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
+	 * @see
+	 * org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
 	 */
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
@@ -93,8 +95,8 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.
+	 * factory.BeanFactory)
 	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -104,8 +106,9 @@ public class JpaRegistrar extends AbstractConfigPropertyRegistrar implements Bea
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.springframework.
-	 * core.type.AnnotationMetadata, org.springframework.beans.factory.support.BeanDefinitionRegistry)
+	 * org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.
+	 * springframework. core.type.AnnotationMetadata,
+	 * org.springframework.beans.factory.support.BeanDefinitionRegistry)
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {

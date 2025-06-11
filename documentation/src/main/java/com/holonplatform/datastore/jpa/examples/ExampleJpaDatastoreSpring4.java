@@ -15,8 +15,6 @@
  */
 package com.holonplatform.datastore.jpa.examples;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.holonplatform.core.datastore.Datastore;
 import com.holonplatform.jpa.spring.EnableJpa;
+
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 
 public class ExampleJpaDatastoreSpring4 {
 
